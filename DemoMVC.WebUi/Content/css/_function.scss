@@ -1,0 +1,22 @@
+
+// Text color choose automatically
+@function text_color($color) {
+  @if (lightness($color) > 70) {
+    @return darken($color, 50%); // Lighter backgorund, return dark color
+  } @else {
+    @return #ffffff; // Darker background, return light color
+  }
+}
+
+// Hover effect automatically
+@function hover_color($color) {
+  @if (lightness($color) > 40) {
+    @return darken($color, 10%); // Lighter backgorund, return dark color
+  } @else {
+    @return lighten($color, 10% ); // Darker background, return light color
+  }
+} 
+
+
+
+      

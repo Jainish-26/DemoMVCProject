@@ -1,0 +1,144 @@
+::-webkit-input-placeholder {
+    color: #ccc;
+  }
+  :-ms-input-placeholder {
+    color: #ccc;
+  }
+
+.loginwrapper {
+    position: absolute;
+    width: 50%;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    padding: 0;
+}
+
+.loginmiddel_box {
+    margin: 0;
+    padding: 0;
+    display: block;
+    background: #fff;
+    border-radius: 0;
+    width: 420px;
+    overflow: hidden;
+    /* box-shadow: 0 0 8px rgba(118, 124, 136, 0.6); */
+}
+.loginBtn input.button {
+    padding: 12px 32px;
+    font-size: 17px;
+}
+.inputbox.button_div.loginBtn {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+.lgn_img_box {
+    margin: 0;
+    padding: 35px 10px;
+    display: block;
+    background:#333;
+    text-align: center;
+    background: url(../images/login_bg.jpg) no-repeat center / cover;
+    position: relative;
+}
+.lgn_img_box:after{
+    content: "";
+    position: absolute; 
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0; 
+    /*background: rgba(26, 35, 56, 0.75);*/
+}
+.lgn_img_box h2{
+    font-size: 24px;
+    color: #fff;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 0;
+}
+
+.inputbox, .forgotpsw {
+    display: block;
+    margin: 0;
+    padding: 0 0 10px 0;
+}
+.inputbox label {
+    display: flex;
+    flex-basis: 20%;
+    padding-right: 20px;
+    font-size: 14px;
+    color: #7f7f7f;
+    margin: 0;
+    align-items: center;
+}
+
+
+.div_input input[type="text"], .div_input input[type="password"] {
+    width: 100%;
+    display: block;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    height: 42px;
+    border-radius:4px;
+    padding:0 15px;
+}
+input:focus{
+    border-color: #aaa !important;
+}
+.forgotpsw .div_input {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.rememberme {
+    flex-basis: 50%;
+    justify-content: flex-start;
+    display: flex;
+    font-size: 12px;
+    color: #7f7f7f;
+}
+.frg_psw {
+    justify-content: flex-start;
+    margin-left: 20px;
+}
+.frg_psw *{
+    color: #7f7f7f;
+    font-size: 14px;
+}
+.loginPageLogo img {
+    width: 100%;
+    display: block;
+}
+
+.loginPageLogo {
+    max-width: 150px;
+    margin-bottom: 30px;
+}
+
+@media screen and (max-width:767px){
+    .inputbox label{
+        display: none;
+    }
+    .loginbox {
+        padding: 15px;
+    }
+    .div_input {
+        flex-basis: 100%;
+    }
+}
+
+.imageShowCase{
+    background:url(../../Content/images/loginBg.jpg) no-repeat center/cover;
+    position:absolute;
+    width:50%;
+    top:0;
+    height:100%;
+}

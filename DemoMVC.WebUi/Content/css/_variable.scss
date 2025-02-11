@@ -1,0 +1,45 @@
+$bodybg: #f2f3f8;
+$font-family: 'source_sans_pro';
+$headerbg: #ffffff; 
+$leftside-menu-width: 260px;
+$link-color:#0052CC;
+
+// For dark theme  |-> Please change the class in body of html - "left_menu_dark"
+$aside-menu-bg-dark: #071c2e; //left menu background
+$dark_left_menu_textcolor: #8089a5; //left menu text color
+
+// For light theme  |-> Please change the class in body of html - "left_menu_light"
+$aside-menu-bg-light: #fff; //left menu background
+$light_left_menu_textcolor: #3b4558; //left menu text color
+
+
+$primary_color:  #0052CC;
+$secondary_color:#586679;
+$success_color:   #5cb45b;
+$warning_color:  #f7b543;
+$info_color:     #04a2b3;
+$cancle_color:   #758496;
+$danger_color:   #f03154;
+$light_gray:     #ced5db;
+
+
+/*** | Status color code define  | ***/
+@mixin config-btn-status-colors($prefix, $colors...) {
+    @each $i in $colors {
+        .#{$prefix}#{nth($i, 1)} {
+            background: nth($i, 2);
+            color: darken(nth($i, 2) , 40%);
+        }
+    }
+}
+@include config-btn-status-colors('status_batch.',
+                   'New' #79c2f0,
+             'Uploading' #9ee6e8,
+            'Processing' #e8e39e,
+    'Ready_for_Dispatch' #b0ca8f,
+               'Shipped' #7dd6b4,
+             'Delivered' #7fc98d,
+              'Returned' #d36780,
+                 'draft' #d8dfe6,
+              'Complete' #6c9f6e
+);
