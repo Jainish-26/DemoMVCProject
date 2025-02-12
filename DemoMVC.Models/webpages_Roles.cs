@@ -17,11 +17,4 @@ namespace DemoMVC.Models
         public int UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
     }
-    public class RolesGridModel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string RoleCode { get; set; }
-        public bool IsActive { get; set; }
-    }
 }

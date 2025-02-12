@@ -1,11 +1,44 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <base href="@System.Configuration.ConfigurationManager.AppSettings["BaseUrl"]">
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <title>@ViewBag.Title - DemoMVC</title>
+    <link href="~/Content/images/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    @Scripts.Render("~/Scripts/polyfill.min.js")
+    <script src="@Url.Content("~/Content/inc/jquery/jquery-2.1.0.min.js")"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/commonjs")
+
+    <script src="@Url.Content("~/Content/inc/bootstrap/js/popper.min.js")"></script>
+    <script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap-datepicker/bootstrap-datepicker.js")"></script>
+    <script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap-tagsinput/bootstrap-tagsinput.min.js")"></script>
+    <!-- BEGIN META -->
+    <meta name="keywords" content="your,keywords">
+    <meta name="description" content="Short explanation about this website">
+    <!-- END META -->
+    <!-- BEGIN STYLESHEETS -->
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/css/fonts/fonts.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap.min.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap-datepicker/datepicker3.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap-tagsinput/bootstrap-tagsinput.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/select2/select2.min.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/font-awesome/css/font-awesome.min.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/et-line-icon/fonts/et-line.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/line-awesome-icon/css/line-awesome.min.css")" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/material-icons/material-icon.css")" />
+    <script src="~/Content/inc/ckeditor/ckeditor.js"></script>
+    <link href="~/Content/inc/jqueryconfirm/jquery-confirm.min.css" rel="stylesheet" />
+    <script src="~/Content/inc/jqueryconfirm/jquery-confirm.min.js"></script>
+
+    <link href="~/Content/kendo/2017.2.621/kendo.common.min.css" rel="stylesheet" />
+    <link href="~/Content/kendo/2017.2.621/kendo.metro.min.css" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/css/style.css")" />
+    <link href="~/Content/css/toast.css" rel="stylesheet" />
+    <script src="~/Content/js/toast.js"></script>
+    <script src="~/Content/js/moment.js"></script>
+    @Scripts.Render("~/bundles/kendo")
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
@@ -17,7 +50,8 @@
             </button>
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("User", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Role", "Index", "Roles", new { area = "" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                     @{
                         if (User.Identity.IsAuthenticated)
@@ -32,7 +66,7 @@
                     }
                 </ul>
             </div>
-            
+
         </div>
     </nav>
     <div class="container body-content">
@@ -42,9 +76,8 @@
             <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
         </footer>
     </div>
-
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    <script src="@Url.Content("~/Content/js/script.js")"></script>
+   
 </body>
 </html>
