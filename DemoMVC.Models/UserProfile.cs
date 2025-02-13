@@ -21,7 +21,7 @@ namespace DemoMVC.Models
         public int CreatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public int? UpdatedBy { get; set; }
-        public int DefaultPageId { get; set; }
+        //public int DefaultPageId { get; set; }
 
         [NotMapped]
         public string RoleCode { get; set; }
@@ -29,15 +29,15 @@ namespace DemoMVC.Models
         [NotMapped]
         public string Role { get; set; }
 
-        public string EmailSignature { get; set; }
+        //public string EmailSignature { get; set; }
 
-        public string Designation { get; set; }
+        //public string Designation { get; set; }
 
         public string MobileNo { get; set; }
 
         public string PhoneNo { get; set; }
-        public int? GeneratedOTP { get; set; }
-        public DateTime? OTPExpiryDate { get; set; }
+        //public int? GeneratedOTP { get; set; }
+        //public DateTime? OTPExpiryDate { get; set; }
     }
     public class UserProfileGridModel
     {

@@ -60,7 +60,8 @@ namespace DemoMVC.Data
                         Role = role.RoleName,
                         RoleCode = role.RoleCode,
                         UpdatedOn = user.UpdatedOn == null ? user.CreatedOn : user.UpdatedOn
-                    }).Where(x => x.RoleCode.ToLower() != DemoMVC.Helper.Constants.RoleCode.SADMIN.ToLower()).AsQueryable();
+                    }).AsQueryable();
+        //            .Where(x => x.RoleCode.ToLower() != DemoMVC.Helper.Constants.RoleCode.SADMIN.ToLower()).AsQueryable();
         }
         public int UpdateUserProfile(UserProfile userprofile)
         {
@@ -72,15 +73,13 @@ namespace DemoMVC.Data
                 getuser.UserName = userprofile.UserName;
                 getuser.Name = userprofile.Name;
                 getuser.Email = userprofile.Email;
-                getuser.EmailSignature = userprofile.EmailSignature;
-                getuser.Designation = userprofile.Designation;
                 getuser.PhoneNo = userprofile.PhoneNo;
                 getuser.MobileNo = userprofile.MobileNo;
                 getuser.IsActive = userprofile.IsActive;
                 getuser.UpdatedBy = userprofile.UpdatedBy;
                 getuser.UpdatedOn = userprofile.UpdatedOn;
                 getuser.IsDeleted = userprofile.IsDeleted;
-                getuser.DefaultPageId = userprofile.DefaultPageId;
+                //getuser.DefaultPageId = userprofile.DefaultPageId;
                 _db.Entry(getuser).State = System.Data.Entity.EntityState.Modified;
                 _db.SaveChanges();
             }

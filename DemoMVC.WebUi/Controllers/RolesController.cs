@@ -23,8 +23,7 @@ namespace DemoMVC.WebUi.Controllers
         // GET: Roles
         public ActionResult Index()
         {
-            //List<RolesGridModel> model = _rolesService.GetAllRolesGrid().ToList();
-            //return View(model);
+            
             return View();
         }
 

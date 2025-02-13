@@ -1,0 +1,51 @@
+﻿@using Kendo.Mvc.UI
+@model IEnumerable<DemoMVC.Models.UserProfileGridModel>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 class="text-center fw-bold mt-4">User List</h2>
+
+<div class="d-flex justify-content-end mb-3">
+    @Html.ActionLink("Create New", "Create", "UserProfile", null, new { @class = "btn btn-danger btn rounded-pill px-4 shadow-sm fw-bold" })
+</div>
+<div class="common_white_box listingpage">
+    <div class="page-loader k-loading-image"></div>
+    @(Html.Kendo().Grid<DemoMVC.Models.UserProfileGridModel>()
+        .AutoBind(true)
+        .Name("gridUserProfile")
+        .Columns(columns =>
+        {
+            columns.Bound(c => c.UpdatedOn).Hidden(true);
+            columns.Bound(c => c.Name).Width("14%").Title("Name");
+            columns.Bound(c => c.UserName).Width("14%").Title("User Name");
+            columns.Bound(c => c.Email).Width("14%").Title("Email");
+            columns.Bound(c => c.Role).Width("14%").Title("Role");
+            columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+            columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + "<a title='Edit' href='" + Url.Action("Create", "UserProfile") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
+        })
+        .NoRecords("No record found")
+        .Events(evt => evt
+            .DataBinding("fnKendoGridCommonDataBinding")
+            .DataBound("fnKendoGridDataBoundEvent")
+        )
+        .Sortable()
+        //.Filterable(filter => filter
+        //    .Mode(GridFilterMode.Row)
+        //    .Extra(false)
+        //    .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
+        //    .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
+        //)
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(new[] { 10, 20, 50, 100, 200 })
+            .ButtonCount(5)
+        )
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .Sort(sortable=>sortable.Add("UpdatedOn").Descending())
+            .Read(read => read.Action("User_Read", "UserProfile")).PageSize(10)
+        ))
+</div>
+

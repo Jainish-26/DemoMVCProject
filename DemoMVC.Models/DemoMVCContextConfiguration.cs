@@ -42,6 +42,7 @@ namespace DemoMVC.Models
             {
                 string path = GetFilePath(contextType);
 
+
                 if (File.Exists(path))
                 {
                     DateTime lastWriteTime = File.GetLastWriteTimeUtc(path);

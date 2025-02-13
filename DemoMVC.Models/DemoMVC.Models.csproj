@@ -80,6 +80,7 @@
     <Compile Include="RolesModel.cs" />
     <Compile Include="SessionHelper.cs" />
     <Compile Include="UserProfile.cs" />
+    <Compile Include="UserProfileModel.cs" />
     <Compile Include="webpages_Membership.cs" />
     <Compile Include="webpages_OAuthMembership.cs" />
     <Compile Include="webpages_Roles.cs" />

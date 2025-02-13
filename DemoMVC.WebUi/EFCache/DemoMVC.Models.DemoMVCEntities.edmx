@@ -17,13 +17,8 @@
           <Property Name="CreatedBy" Type="Int32" Nullable="false" />
           <Property Name="UpdatedOn" Type="DateTime" />
           <Property Name="UpdatedBy" Type="Int32" />
-          <Property Name="DefaultPageId" Type="Int32" Nullable="false" />
-          <Property Name="EmailSignature" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Designation" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="MobileNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="PhoneNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="GeneratedOTP" Type="Int32" />
-          <Property Name="OTPExpiryDate" Type="DateTime" />
         </EntityType>
         <EntityType Name="webpages_Membership" customannotation:ClrType="DemoMVC.Models.webpages_Membership, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
@@ -92,13 +87,8 @@
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
                 <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
-                <ScalarProperty Name="DefaultPageId" ColumnName="DefaultPageId" />
-                <ScalarProperty Name="EmailSignature" ColumnName="EmailSignature" />
-                <ScalarProperty Name="Designation" ColumnName="Designation" />
                 <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
                 <ScalarProperty Name="PhoneNo" ColumnName="PhoneNo" />
-                <ScalarProperty Name="GeneratedOTP" ColumnName="GeneratedOTP" />
-                <ScalarProperty Name="OTPExpiryDate" ColumnName="OTPExpiryDate" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -167,13 +157,8 @@
           <Property Name="CreatedBy" Type="int" Nullable="false" />
           <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
           <Property Name="UpdatedBy" Type="int" Nullable="true" />
-          <Property Name="DefaultPageId" Type="int" Nullable="false" />
-          <Property Name="EmailSignature" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="Designation" Type="nvarchar(max)" Nullable="true" />
           <Property Name="MobileNo" Type="nvarchar(max)" Nullable="true" />
           <Property Name="PhoneNo" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="GeneratedOTP" Type="int" Nullable="true" />
-          <Property Name="OTPExpiryDate" Type="datetime" Nullable="true" />
         </EntityType>
         <EntityType Name="webpages_Membership">
           <Key>
