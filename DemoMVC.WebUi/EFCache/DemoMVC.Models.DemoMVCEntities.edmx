@@ -3,6 +3,25 @@
   <Runtime>
     <ConceptualModels>
       <Schema Namespace="DemoMVC.Models" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Forms" customannotation:ClrType="DemoMVC.Models.Forms, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="NavigateURL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ParentFormId" Type="Int32" />
+          <Property Name="FormAccessCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DisplayOrder" Type="Int32" />
+          <Property Name="Icon" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsActive" Type="Boolean" />
+          <Property Name="IsDisplayMenu" Type="Boolean" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" />
+          <Property Name="UpdatedBy" Type="Int32" />
+          <Property Name="UpdatedOn" Type="DateTime" />
+        </EntityType>
         <EntityType Name="UserProfile" customannotation:ClrType="DemoMVC.Models.UserProfile, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="UserId" />
@@ -63,6 +82,7 @@
           <Property Name="RoleId" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityContainer Name="DemoMVCEntities" customannotation:UseClrTypes="true">
+          <EntitySet Name="Forms" EntityType="Self.Forms" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" />
@@ -74,6 +94,26 @@
     <Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="CodeFirstDatabase" CdmEntityContainer="DemoMVCEntities">
+          <EntitySetMapping Name="Forms">
+            <EntityTypeMapping TypeName="DemoMVC.Models.Forms">
+              <MappingFragment StoreEntitySet="Forms">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="NavigateURL" ColumnName="NavigateURL" />
+                <ScalarProperty Name="ParentFormId" ColumnName="ParentFormId" />
+                <ScalarProperty Name="FormAccessCode" ColumnName="FormAccessCode" />
+                <ScalarProperty Name="DisplayOrder" ColumnName="DisplayOrder" />
+                <ScalarProperty Name="Icon" ColumnName="Icon" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="IsDisplayMenu" ColumnName="IsDisplayMenu" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="UserProfile">
             <EntityTypeMapping TypeName="DemoMVC.Models.UserProfile">
               <MappingFragment StoreEntitySet="UserProfile">
@@ -143,6 +183,25 @@
     </Mappings>
     <StorageModels>
       <Schema Namespace="CodeFirstDatabaseSchema" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Forms">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="NavigateURL" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="ParentFormId" Type="int" Nullable="true" />
+          <Property Name="FormAccessCode" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="DisplayOrder" Type="int" Nullable="true" />
+          <Property Name="Icon" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="true" />
+          <Property Name="IsDisplayMenu" Type="bit" Nullable="false" />
+          <Property Name="IsDeleted" Type="bit" Nullable="true" />
+          <Property Name="CreatedBy" Type="int" Nullable="true" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="true" />
+          <Property Name="UpdatedBy" Type="int" Nullable="true" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
+        </EntityType>
         <EntityType Name="UserProfile">
           <Key>
             <PropertyRef Name="UserId" />
@@ -203,6 +262,7 @@
           <Property Name="RoleId" Type="int" Nullable="false" />
         </EntityType>
         <EntityContainer Name="CodeFirstDatabase">
+          <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" Table="UserProfile" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" Schema="dbo" Table="webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" Schema="dbo" Table="webpages_OAuthMembership" />

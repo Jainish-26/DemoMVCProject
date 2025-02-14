@@ -155,6 +155,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="bin\BundleConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\FormController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
@@ -2429,6 +2430,8 @@
     <Content Include="Views\Roles\Create.cshtml" />
     <Content Include="Views\UserProfile\Index.cshtml" />
     <Content Include="Views\UserProfile\Create.cshtml" />
+    <Content Include="Views\Form\Index.cshtml" />
+    <Content Include="Views\Form\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

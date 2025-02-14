@@ -1,0 +1,64 @@
+﻿@model IEnumerable<DemoMVC.Models.FormsGridModel>
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 class="text-center fw-bold mt-4">Form List</h2>
+
+<div class="d-flex justify-content-end mb-3">
+    @Html.ActionLink("Create New", "Create", "Form", null, new { @class = "btn btn-success btn rounded-pill px-4 shadow-sm fw-bold" })
+</div>
+<div class="common_white_box listingpage">
+    <div class="page-loader k-loading-image"></div>
+    @(Html.Kendo().Grid<DemoMVC.Models.FormsGridModel>()
+            .Name("gridForm")
+            .AutoBind(false)
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.Name).Width("14%").Title("Form Name");
+                columns.Bound(c => c.FormAccessCode).Width("15%").Title("Form Code");
+                columns.Bound(c => c.NavigateURL).Width("17%").Title("Navigate URL");
+                columns.Bound(c => c.ParentFormName).Width("5%").Title("Parent Form").Width("10%");
+                columns.Bound(c => c.DisplayOrder).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).Title("Display Order").Filterable(false);
+                columns.Bound(c => c.IsDisplayMenu).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsDisplayMenu == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Is Menu").Filterable(filterable => filterable.Enabled(false));
+                columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+                columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + "<a title='Edit' href='" + Url.Action("Create", "Form") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
+
+            })
+            .NoRecords("No record found")
+            .Events(evt => evt
+               .DataBinding("fnKendoGridCommonDataBinding")
+               .DataBound("fnKendoGridDataBoundEvent")
+            )
+            .Sortable()
+            //.Filterable(filter => filter
+            //    .Mode(GridFilterMode.Row)
+            //    .Extra(false)
+            //    .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
+            //    .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
+            //)
+            .Pageable(pageable => pageable
+                .Refresh(true)
+                .PageSizes(new[] {10,20, 50, 100, 200 })
+                .ButtonCount(5)
+            )
+             .DataSource(dataSource => dataSource
+                 .Ajax()
+                 .Sort(sortable=>sortable.Add("Name").Ascending())
+                 .Read(read => read.Action("GetGridData", "Form")).PageSize(10)
+             )
+        )
+</div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#gridForm').data('kendoGrid').dataSource.read();
+        $('#gridForm').data('kendoGrid').refresh();
+    });
+</script>
+
+
+

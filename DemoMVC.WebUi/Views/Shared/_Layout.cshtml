@@ -52,7 +52,8 @@
                 <ul class="navbar-nav flex-grow-1">
                     <li>@Html.ActionLink("User", "Index", "UserProfile", new { area = "" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("Role", "Index", "Roles", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Form", "Index", "Form", new { area = "" }, new { @class = "nav-link" })</li>
+
                     @{
                         if (User.Identity.IsAuthenticated)
                         {
@@ -71,10 +72,8 @@
     </nav>
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
+       
+        
     </div>
     @RenderSection("scripts", required: false)
     <script src="@Url.Content("~/Content/js/script.js")"></script>
