@@ -1,0 +1,199 @@
+﻿@model DemoMVC.Models.FormRoleMapping
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "Role & Rights";
+}
+<script>
+    kendo.culture("en-GB");
+</script>
+
+<style>
+    #GridSalary .k-grid-header {
+        padding: 0 !important;
+    }
+
+    #GridSalary .k-grid-content {
+        height: auto !important;
+        overflow-y: visible;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        $("#tdmsg").fadeOut(5000);
+    });
+</script>
+@Html.HiddenFor(c => c.RoleId)
+<div class="coman_content">
+
+    <div class="subheader">
+        <div class="left_title">
+            <h2>Role- @Model.RoleName</h2>
+            <div class="left breadcrumb_list">
+                <ul>
+                    <li><a href="@Url.Action("Index","Home")"><i class="fa fa-home"></i></a></li>
+                    <li><a href="@Url.Action("Index", "Roles")">Roles</a></li>
+                    <li>Add Rights</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+    <!--END Title div-->
+    @using (Html.BeginForm())
+    {
+
+        <label id="alertid" class="bg-success text-white"></label>
+
+        <div class="common_white_box listingpage">
+            <div class="page-loader k-loading-image"></div>
+            @(Html.Kendo().Grid<DemoMVC.Models.FormRoleMapping>()
+            .Name("RoleRights")
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.MenuId).ClientTemplate("<input type=\"text\" value=\"#=MenuId#\" />").Hidden(true);
+                columns.Bound(c => c.FormName).Title("Form Name").Width(50).Filterable(false).Sortable(false);
+                columns.Bound(c => c.FullRights).HeaderHtmlAttributes(new { @class = "center_text" }).ClientTemplate("<div class='checkbox only_checkbox'><input value=\"#=MenuId#\" type='hidden' /><input type=\"checkbox\"id='FullRights_#=MenuId#'  #= FullRights? checked='checked':'' # onclick='SelectAll(this);'/><label></label></div>").Width(50).Title("All").Filterable(false).Sortable(false);
+                columns.Bound(c => c.AllowMenu).HeaderHtmlAttributes(new { @class = "center_text" }).ClientTemplate("<div class='checkbox only_checkbox'><input type=\"checkbox\" id='allowmenu_#=MenuId#' #= AllowMenu? checked='checked':'' #  onclick='CheckValue(#=MenuId#);'/><label></label></div>").Width(50).Title("Is Menu").Filterable(false).Sortable(false);
+                columns.Bound(c => c.AllowView).HeaderHtmlAttributes(new { @class = "center_text" }).ClientTemplate("<div class='checkbox only_checkbox'><input type=\"checkbox\" id='View_#=MenuId#' #= AllowView? checked='checked':'' #  onclick='CheckValue(#=MenuId#);'/><label></label></div>").Width(50).Title("View").Filterable(false).Sortable(false);
+                columns.Bound(c => c.AllowInsert).HeaderHtmlAttributes(new { @class = "center_text" }).ClientTemplate("<div class='checkbox only_checkbox'><input type=\"checkbox\" id='Insert_#=MenuId#'  #= AllowInsert? checked='checked':''# onclick='CheckValue(#=MenuId#);'/><label></label></div>").Width(50).Title("Insert").Filterable(false).Sortable(false);
+                columns.Bound(c => c.AllowUpdate).HeaderHtmlAttributes(new { @class = "center_text" }).ClientTemplate("<div class='checkbox only_checkbox'><input type=\"checkbox\" id='Update_#=MenuId#' #= AllowUpdate? checked='checked':'' # onclick='CheckValue(#=MenuId#);'/><label></label></div>").Width(50).Title("Edit").Filterable(false).Sortable(false);
+                columns.Bound(c => c.AllowDelete).HeaderHtmlAttributes(new { @class = "center_text" }).ClientTemplate("<div class='checkbox only_checkbox'><input type=\"checkbox\" id='Delete_#=MenuId#'  #= AllowDelete? checked='checked':'' # onclick='CheckValue(#=MenuId#);'/><label></label></div>").Width(50).Title("Delete").Filterable(false).Sortable(false);
+            })
+            .Pageable()
+            .Sortable()
+            .Events(evt => evt
+                .DataBinding("fnKendoGridCommonDataBinding")
+                .DataBound("fnKendoGridDataBoundEvent")
+            )
+            .AutoBind(true)
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(100)
+                .Read(read => read.Action("FormRoleMapping_Read", "FormRoleMapping", new { RoleID = Model.RoleId }))
+            ))
+        </div>
+
+        //if (AccessPermission.Add || AccessPermission.Edit)
+        //{
+        <div class="button_div">
+            <div class="form-group">
+                <div class="input_box">
+                    <input id="btnAdd" type="submit" name="save" class="button button_primary" value="Save" />
+                    <input type="button" id="btnCancel" name="cancel" class="button button_cancel" value="Cancel" />
+                </div>
+            </div>
+        </div>
+        @*}*@
+
+    }
+</div>
+
+
+
+<script>
+    function SelectAll(a) {
+        var id = $(a).prev().val();
+        if (a.checked) {
+            $("#allowmenu_" + id).prop("checked", true);
+            $("#View_" + id).prop("checked", true);
+            $("#Insert_" + id).prop("checked", true);
+            $("#Update_" + id).prop("checked", true);
+            $("#Delete_" + id).prop("checked", true);
+        }
+        else {
+
+            $("#allowmenu_" + id).prop("checked", false);
+            $("#View_" + id).prop("checked", false);
+            $("#Insert_" + id).prop("checked", false);
+            $("#Update_" + id).prop("checked", false);
+            $("#Delete_" + id).prop("checked", false);
+        }
+    }
+
+    function CheckValue(a) {
+        if ($("#allowmenu_" + a).prop("checked") == true && $("#View_" + a).prop("checked") == true && $("#Insert_" + a).prop("checked") == true && $("#Update_" + a).prop("checked") == true && $("#Delete_" + a).prop("checked") == true) {
+            $("#FullRights_" + a).prop("checked", true);
+
+        }
+        else {
+            $("#FullRights_" + a).prop("checked", false);
+        }
+
+    }
+
+    $('#btnCancel').click(function () {
+        window.location.href = '@Url.Action("Index", "Roles")';
+        return false;
+    });
+
+    $('#btnAdd').click(function () {
+
+
+        var MenuID = new Array();
+        var AllowMenu = new Array();
+        var AllowInsert = new Array();
+        var AllowUpdate = new Array();
+        var AllowView = new Array();
+        var AllowDelete = new Array();
+        var FullRights = new Array();
+
+        var trs = $("#RoleRights").find("tbody>tr>td>div>input");
+
+        var flagcount = 0;
+
+        for (var i = 0; i < trs.length; i = i + 7) {
+            MenuID[flagcount] = trs[i].value;
+            FullRights[flagcount] = trs[i + 1].checked;
+            AllowMenu[flagcount] = trs[i + 2].checked;
+            AllowView[flagcount] = trs[i + 3].checked;
+            AllowInsert[flagcount] = trs[i + 4].checked;
+            AllowUpdate[flagcount] = trs[i + 5].checked;
+            AllowDelete[flagcount] = trs[i + 6].checked;
+            flagcount++;
+        }
+
+        var RoleMapping = [];
+
+        var RoleID = $("#RoleId").val();
+
+        for (var i = 0; i < MenuID.length; i++) {
+
+            RoleMapping.push({
+                RoleID: RoleID,
+                MenuID: MenuID[i],
+                FullRights: FullRights[i],
+                AllowMenu: AllowMenu[i],
+                AllowInsert: AllowInsert[i],
+                AllowUpdate: AllowUpdate[i],
+                AllowDelete: AllowDelete[i],
+                AllowView: AllowView[i],
+            });
+        }
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            url: '@Url.Action("UpdatePermission", "FormRoleMapping")',
+            data: JSON.stringify(RoleMapping),
+            dataType: "json",
+            async: true,
+            success: function (data) {
+                // $('#GridFormRoleMapping').data('kendoGrid').dataSource.read();
+                if (data = true) {
+                    $("#alertid").show();
+                    $("#alertid").fadeIn(1000);
+                    $("#alertid").html("Permission save successfully.");
+                    $("#alertid").fadeOut(5000);
+                }
+            },
+            error: function () {
+                $("#alertid").html("Error in update permission.");
+            }
+        });
+        return false;
+
+    });
+
+
+</script>

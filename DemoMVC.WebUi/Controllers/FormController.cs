@@ -1,5 +1,4 @@
-﻿using DemoMVC.Model;
-using DemoMVC.Models;
+﻿using DemoMVC.Models;
 using DemoMVC.Service;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;

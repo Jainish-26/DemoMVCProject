@@ -23,7 +23,9 @@ namespace DemoMVC.WebUi.Controllers
         // GET: Roles
         public ActionResult Index()
         {
-            
+            RoleService _roleService = new RoleService();
+            int roleid = SessionHelper.RoleId;
+            string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
             return View();
         }
 

@@ -25,5 +25,6 @@ namespace DemoMVC.Models
         public DbSet<webpages_Roles> webpages_Roles { get; set; }
         public DbSet<webpages_UsersInRoles> webpages_UsersInRoles { get; set; }
         public DbSet<Forms> Forms { get; set; }
+        public DbSet<FormRoleMapping> FormRoleMapping { get; set; }
     }
 }

@@ -1,14 +1,10 @@
 ﻿using DemoMVC.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.ApplicationServices;
 using System.Web.Mvc;
-using static DemoMVC.Models.SessionHelper;
 using System.Web.Security;
 using WebMatrix.WebData;
 using DemoMVC.WebUi.Filters;
+using DemoMVC.Service;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -16,6 +12,18 @@ namespace DemoMVC.WebUi.Controllers
     [InitializeSimpleMembership]
     public class AccountController : Controller
     {
+        private readonly FormRoleMappingService _formRoleService;
+        private readonly RoleService _roleService;
+        private readonly FormsService _formsService;
+        private readonly UserProfileService _userProfileService;
+
+        public AccountController()
+        {
+            _formRoleService = new FormRoleMappingService();
+            _roleService = new RoleService();
+            _formsService = new FormsService();
+            _userProfileService = new UserProfileService();
+        }
         // GET: Account
         public ActionResult Index()
         {
@@ -38,11 +46,11 @@ namespace DemoMVC.WebUi.Controllers
                 SessionHelper.UserId = userId;
                 SessionHelper.IsAdmin = true;
                 SessionHelper.UserName = model.UserName;
-                //SessionHelper.RoleName = Roles.GetRolesForUser(model.UserName).FirstOrDefault();
-                //SessionHelper.RoleId = _roleService.GetRolesByName(SessionHelper.RoleName).RoleId;
-                //SessionHelper.RoleCode = _roleService.GetRolesById(SessionHelper.RoleId).RoleCode;
-                //SessionHelper.UserEmailId = _userProfileService.GetUserById(SessionHelper.UserId).Email;
-                //SessionHelper.Name = _userProfileService.GetUserById(SessionHelper.UserId).Name;
+                SessionHelper.RoleName = Roles.GetRolesForUser(model.UserName).FirstOrDefault();
+                SessionHelper.RoleId = _roleService.GetRolesByName(SessionHelper.RoleName).RoleId;
+                SessionHelper.RoleCode = _roleService.GetRolesById(SessionHelper.RoleId).RoleCode;
+                SessionHelper.UserEmailId = _userProfileService.GetUserById(SessionHelper.UserId).Email;
+                SessionHelper.Name = _userProfileService.GetUserById(SessionHelper.UserId).Name;
                 //SessionHelper.OrganizationIds = new List<int>();
                 //if (SessionHelper.RoleCode != Constants.RoleCode.SADMIN && SessionHelper.RoleCode != Constants.RoleCode.ADMIN)
                 //{
