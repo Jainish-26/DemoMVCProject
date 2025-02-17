@@ -10,7 +10,7 @@ namespace DemoMVC.WebUi
         {
             filters.Add(new HandleErrorAttribute());
             filters.Add(new AuthenticationFilter());
-          
+            filters.Add(new ActivityLogFilter());
         }
     }
 }

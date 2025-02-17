@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivityLogProvider.cs" />
     <Compile Include="BaseProvider.cs" />
     <Compile Include="FormRoleMappingProvider.cs" />
     <Compile Include="FormsProvider.cs" />

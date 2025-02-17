@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="AccessPermission.cs" />
     <Compile Include="AccountModel.cs" />
+    <Compile Include="ActivityLog.cs" />
     <Compile Include="AuthorizeFormAccess.cs" />
     <Compile Include="DemoMVCContextConfiguration.cs" />
     <Compile Include="DemoMVCEntities.cs" />
