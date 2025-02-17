@@ -2443,11 +2443,8 @@
     <Content Include="Views\FormRoleMapping\ViewPermission.cshtml" />
     <Content Include="Views\Base\AccessDenied.cshtml" />
     <Content Include="Views\ErrorLog\ErrorLogList.cshtml" />
-<<<<<<< HEAD
     <Content Include="Views\ActivityLog\Index.cshtml" />
-=======
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
->>>>>>> ErrorLogController
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
