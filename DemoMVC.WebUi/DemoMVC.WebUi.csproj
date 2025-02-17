@@ -157,6 +157,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActivityLogController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\ErrorLogController.cs" />
     <Compile Include="Controllers\FormController.cs" />
     <Compile Include="Controllers\FormRoleMappingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -164,10 +165,12 @@
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Filters\ActivityLogFilter.cs" />
     <Compile Include="Filters\AuthenticationFilter.cs" />
+    <Compile Include="Filters\ExceptionHandlingFilter.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helper\CommonUtility.cs" />
     <Compile Include="Helper\FormUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -2440,7 +2443,11 @@
     <Content Include="Views\FormRoleMapping\ViewPermission.cshtml" />
     <Content Include="Views\Base\AccessDenied.cshtml" />
     <Content Include="Views\ErrorLog\ErrorLogList.cshtml" />
+<<<<<<< HEAD
     <Content Include="Views\ActivityLog\Index.cshtml" />
+=======
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+>>>>>>> ErrorLogController
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

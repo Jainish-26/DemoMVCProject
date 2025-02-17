@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="ActivityLogProvider.cs" />
     <Compile Include="BaseProvider.cs" />
+    <Compile Include="ErrorLogProvider.cs" />
     <Compile Include="FormRoleMappingProvider.cs" />
     <Compile Include="FormsProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

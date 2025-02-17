@@ -16,7 +16,7 @@ namespace DemoMVC.Data
         }
         public List<webpages_Roles> GetAllRoles()
         {
-            var data = (from a in _db.webpages_Roles select a).OrderByDescending(a => a.RoleId).ToList();
+            var data = (from a in _db.webpages_Roles where a.IsActive==true select a).OrderByDescending(a => a.RoleId).ToList();
             return data;
         }
         public IQueryable<RolesGridModel> GetAllRolesGrid()

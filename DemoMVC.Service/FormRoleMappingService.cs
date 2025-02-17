@@ -42,15 +42,15 @@ namespace DemoMVC.Service
             return _formrolemappingProvider.GetAllRoleRightsByRoleId(RoleId);
         }
 
-        //public List<MenuVW> GetMenu(int userID)
-        //{
-        //    return _formrolemappingProvider.GetMenu(userID);
-        //}
+        public List<MenuVW> GetMenu(int userID)
+        {
+            return _formrolemappingProvider.GetMenu(userID);
+        }
 
-        //public List<MenuVW> BindNLevelMenu(List<MenuVW> _subMenu, List<MenuVW> _fullMenu)
-        //{
-        //    return _formrolemappingProvider.BindNLevelMenu(_subMenu, _fullMenu);
-        //}
+        public List<MenuVW> BindNLevelMenu(List<MenuVW> _subMenu, List<MenuVW> _fullMenu)
+        {
+            return _formrolemappingProvider.BindNLevelMenu(_subMenu, _fullMenu);
+        }
 
         public FormRoleMapping CheckFormAccess(string _formaccessCode, int _roleID)
         {

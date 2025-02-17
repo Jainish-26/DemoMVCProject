@@ -1,0 +1,114 @@
+﻿@using Kendo.Mvc.UI
+@using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
+@using DemoMVC.WebUi.Controllers
+
+@{
+    string formCode = AuthorizeFormAccess.FormAccessCode.ERRORLOG.ToString();
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
+    BaseController _base = new BaseController();
+    bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
+    bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
+
+}
+@Html.Hidden("hdnFormAccessCode", formCode)
+@*@Html.Hidden("hdnFormAccessCode", AiRecruitment.Model.AuthorizeFormAccess.FormAccessCode.ROLES.ToString())
+    @Html.Hidden("hdnGridAccessCode",AiRecruitment.Model.AuthorizeGridAccess.GridAccessCode.GRID_ROLES.ToString())
+    @Html.Hidden("hdnKendoGridId", "gridRoles")*@
+<div class="coman_content">
+    <!--This is Title div -->
+    <div class="subheader">
+        <div class="left_title">
+            <h2>@ViewBag.Title</h2>
+            <div class="left breadcrumb_list">
+                <ul>
+                    <li><a href="@Url.Action("Index","Home")"><i class="fa fa-home"></i></a></li>
+                    <li><a href="javascript:void(0)">@parentFormname</a></li>
+                    <li>@formName</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--END Title div-->
+
+    <div class="common_white_box listingpage">
+        <div class="page-loader k-loading-image"></div>
+        @(Html.Kendo().Grid<DemoMVC.Models.ErrorLogGridModel>()
+          .Name("gridErrorLogs")
+          .AutoBind(false)
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.RecordDate).Title("Date").Format("{0:" + CommonUtility.GetDateFormat(true) + "}").Width(100).Filterable(false);
+              columns.Bound(c => c.MethodName).Title("Controller Name").Width(100).ClientTemplate("#=DisplayControllName(MethodName)#");
+              columns.Bound(c => c.MethodName).Title("Method Name").Width(100).ClientTemplate("#=DisplayMethodName(MethodName)#");
+              columns.Bound(c => c.PageName).Title("Page Name").Width(100);
+              columns.Bound(c => c.LineNumber).Title("Line Number").Width(50);
+              columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript://' onclick=\"fnShowDetails(#= Id #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
+          })
+          .Events(evt => evt
+              .DataBinding("fnKendoGridCommonDataBinding")
+              .DataBound("fnKendoGridDataBoundEvent")
+          )
+          .NoRecords("No record found")
+          .Sortable()
+          .Pageable(pageable => pageable
+              .Refresh(true)
+              .PageSizes(new[] {10,20, 50, 100, 200 })
+              .ButtonCount(5)
+          )
+           .Filterable(filter => filter
+               .Mode(GridFilterMode.Row)
+               .Extra(false)
+               .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
+               .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
+         )
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Sort(sort => sort.Add("RecordDate").Descending())
+              .Read(read => read.Action("GetGridData", "ErrorLog")).PageSize(10)
+          //.Events(e => e.RequestEnd("function (e) {fnSaveGridState.apply(this);}"))
+          ))
+    </div>
+
+</div>
+<script>
+    $(document).ready(function () {
+        //fnSetupKendoGrid();
+        $('#gridErrorLogs').data('kendoGrid').dataSource.read();
+        $('#gridErrorLogs').data('kendoGrid').refresh();
+    });
+    function fnShowDetails(Id) {
+        var popupTitle = 'Error Details';
+        var popupURL = "@Url.Action("ErrorDetails", "ErrorLog")";
+
+        $.confirm({
+            animation: 'bottom',
+            title: popupTitle,
+            backgroundDismiss: true,
+            closeIcon: true,
+            useBootstrap: false,
+            columnClass: 'popup_l',
+            content: function () {
+                var self = this;
+                return fnCallAjaxHttpGetEvent(popupURL, { Id: Id }, true, true, function (data) {
+                    self.setContent(data);
+                });
+            }
+        });
+    }
+    function DisplayControllName(ControllName) {
+        var str = ControllName;
+        var result = "";
+        result = str.split("/")[0];
+        return result;
+    }
+    function DisplayMethodName(MethodName) {
+        var str = MethodName;
+        var result = "";
+        result = str.split("/")[1];
+        return result;
+    }
+</script>

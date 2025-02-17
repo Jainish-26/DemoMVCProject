@@ -3,6 +3,7 @@
   <Runtime>
     <ConceptualModels>
       <Schema Namespace="DemoMVC.Models" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+<<<<<<< HEAD
         <EntityType Name="ActivityLog" customannotation:ClrType="DemoMVC.Models.ActivityLog, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -35,6 +36,8 @@
           <Property Name="MobileNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="PhoneNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
+=======
+>>>>>>> ErrorLogController
         <EntityType Name="ErrorLog" customannotation:ClrType="DemoMVC.Models.ErrorLog, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -150,8 +153,11 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="DemoMVCEntities" customannotation:UseClrTypes="true">
+<<<<<<< HEAD
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" />
+=======
+>>>>>>> ErrorLogController
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
@@ -169,6 +175,7 @@
     <Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="CodeFirstDatabase" CdmEntityContainer="DemoMVCEntities">
+<<<<<<< HEAD
           <EntitySetMapping Name="ActivityLog">
             <EntityTypeMapping TypeName="DemoMVC.Models.ActivityLog">
               <MappingFragment StoreEntitySet="ActivityLog">
@@ -202,6 +209,8 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+=======
+>>>>>>> ErrorLogController
           <EntitySetMapping Name="ErrorLog">
             <EntityTypeMapping TypeName="DemoMVC.Models.ErrorLog">
               <MappingFragment StoreEntitySet="ErrorLog">
@@ -316,6 +325,7 @@
     </Mappings>
     <StorageModels>
       <Schema Namespace="CodeFirstDatabaseSchema" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+<<<<<<< HEAD
         <EntityType Name="ActivityLog">
           <Key>
             <PropertyRef Name="Id" />
@@ -347,6 +357,8 @@
           <Property Name="MobileNo" Type="nvarchar(max)" Nullable="true" />
           <Property Name="PhoneNo" Type="nvarchar(max)" Nullable="true" />
         </EntityType>
+=======
+>>>>>>> ErrorLogController
         <EntityType Name="ErrorLog">
           <Key>
             <PropertyRef Name="Id" />
@@ -462,8 +474,11 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="CodeFirstDatabase">
+<<<<<<< HEAD
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" Schema="dbo" Table="ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" Table="UserProfile" />
+=======
+>>>>>>> ErrorLogController
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" Schema="dbo" Table="ErrorLog" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />

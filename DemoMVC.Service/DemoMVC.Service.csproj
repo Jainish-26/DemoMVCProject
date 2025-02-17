@@ -62,7 +62,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <Compile Include="ActivityLogService.cs" />
+=======
+>>>>>>> ErrorLogController
     <Compile Include="ErrorLogService.cs" />
     <Compile Include="FormRoleMappingService.cs" />
     <Compile Include="FormsService.cs" />

@@ -8,9 +8,13 @@ namespace DemoMVC.WebUi
     {
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
+            filters.Add(new ExceptionHandlingFilter());
             filters.Add(new HandleErrorAttribute());
             filters.Add(new AuthenticationFilter());
+<<<<<<< HEAD
             filters.Add(new ActivityLogFilter());
+=======
+>>>>>>> ErrorLogController
         }
     }
 }

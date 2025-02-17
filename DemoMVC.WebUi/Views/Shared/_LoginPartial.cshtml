@@ -1,0 +1,44 @@
+﻿@using DemoMVC.Models;
+@{
+
+}
+@if (Request.IsAuthenticated)
+{
+    <div class="user_box dropdown">
+        @if (!String.IsNullOrWhiteSpace(SessionHelper.UserName))
+        {
+            <div class="user_coman_box dropdown-toggle no_arrow" data-toggle="dropdown">
+                <span class="user_img">
+                    @SessionHelper.UserName[0].ToString().ToUpper()
+                </span>
+                <h6 class="user_name">
+                    Hello <span>@DemoMVC.Models.SessionHelper.UserName</span>
+                    <small>
+                        (@SessionHelper.RoleName.ToString())
+                    </small>
+                </h6>
+            </div>
+        }
+        <div class="dropdown-menu dropdown_center notification_dropdown">
+            <div class="header_dropdown_box">
+                <div class="profile_box">
+
+                    <div class="profile_details_box">
+
+                        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                        {
+                            <div class="dtl_inner_box">
+                                <span><a href="@Url.Action("Manage","Account")">Change Password</a></span>
+                            </div>
+                                <div class="logoff">
+                                    <a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+                                </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
