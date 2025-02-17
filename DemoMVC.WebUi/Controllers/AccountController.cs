@@ -56,12 +56,6 @@ namespace DemoMVC.WebUi.Controllers
                 SessionHelper.RoleCode = _roleService.GetRolesById(SessionHelper.RoleId).RoleCode;
                 SessionHelper.UserEmailId = _userProfileService.GetUserById(SessionHelper.UserId).Email;
                 SessionHelper.Name = _userProfileService.GetUserById(SessionHelper.UserId).Name;
-                //SessionHelper.OrganizationIds = new List<int>();
-                //if (SessionHelper.RoleCode != Constants.RoleCode.SADMIN && SessionHelper.RoleCode != Constants.RoleCode.ADMIN)
-                //{
-                //    SessionHelper.OrganizationIds = _userOrganizationService.GetOrgIdByUserId(SessionHelper.UserId).ToList();
-                //    SessionHelper.IsAdmin = false;
-                //}
                 //if (!string.IsNullOrEmpty(model.TimeZone))
                 //{
                 //    TimeZoneInfo tzi = CommonUtility.OlsonTimeZoneToTimeZoneInfo(model.TimeZone);
@@ -70,7 +64,7 @@ namespace DemoMVC.WebUi.Controllers
                 //        SessionHelper.DefaultTimeZone = tzi.StandardName;
                 //    }
                 //}
-                //Session["Menu"] = _formRoleService.GetMenu(userId);
+                Session["Menu"] = _formRoleService.GetMenu(userId);
 
                 if (returnUrl == null)
                     return RedirectToAction("Index", "Home");
