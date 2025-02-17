@@ -11,7 +11,7 @@ using System.Web.Mvc;
 namespace DemoMVC.WebUi.Controllers
 {
     [Authorize]
-    public class FormController : Controller
+    public class FormController : BaseController
     {
         private readonly FormsService _formsService;
         public FormController()
@@ -21,11 +21,29 @@ namespace DemoMVC.WebUi.Controllers
         // GET: Form
         public ActionResult Index()
         {
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString(), AccessPermission.IsView))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             return View();
         }
 
         public ActionResult Create(int? id)
         {
+            string actionPermission = "";
+            if (id == null)
+            {
+                actionPermission = AccessPermission.IsAdd;
+            }
+            else if ((id ?? 0) > 0)
+            {
+                actionPermission = AccessPermission.IsEdit;
+            }
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString(), actionPermission))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             int userId = SessionHelper.UserId;
             FormModel model = new FormModel();
             if (id.HasValue)
@@ -51,7 +69,20 @@ namespace DemoMVC.WebUi.Controllers
         [HttpPost]
         public ActionResult Create(FormModel model)
         {
-            
+            string actionPermission = "";
+            if (model.Id == null)
+            {
+                actionPermission = AccessPermission.IsAdd;
+            }
+            else if (model.Id  > 0)
+            {
+                actionPermission = AccessPermission.IsEdit;
+            }
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString(), actionPermission))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             int userId = SessionHelper.UserId;
 
             if (ModelState.IsValid)

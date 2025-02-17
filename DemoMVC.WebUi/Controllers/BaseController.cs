@@ -1,5 +1,4 @@
-﻿using DemoMVC.Model;
-using DemoMVC.Models;
+﻿using DemoMVC.Models;
 using DemoMVC.Service;
 using System.Web.Mvc;
 

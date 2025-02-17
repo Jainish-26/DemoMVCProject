@@ -35,7 +35,7 @@
 <body>
     <div class="card shadow">
         <h3 class="text-center mb-4">User Login</h3>
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(new { returnUrl = ViewBag.ReturnUrl }))
         {
             @Html.AntiForgeryToken()
             <div class="form-group mb-3">

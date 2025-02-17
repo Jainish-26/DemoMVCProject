@@ -1,8 +1,19 @@
 ﻿@model IEnumerable<DemoMVC.Models.FormsGridModel>
+@using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
+@using DemoMVC.WebUi.Controllers
 @using Kendo.Mvc.UI
 
 @{
     ViewBag.Title = "Index";
+    string formCode = AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString();
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
+    BaseController _base = new BaseController();
+    bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
+    bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
 
 <h2 class="text-center fw-bold mt-4">Form List</h2>
@@ -24,7 +35,7 @@
                 columns.Bound(c => c.DisplayOrder).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).Title("Display Order").Filterable(false);
                 columns.Bound(c => c.IsDisplayMenu).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsDisplayMenu == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Is Menu").Filterable(filterable => filterable.Enabled(false));
                 columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
-                columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + "<a title='Edit' href='" + Url.Action("Create", "Form") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
+                columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Form") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("3%").Sortable(false);
 
             })
             .NoRecords("No record found")

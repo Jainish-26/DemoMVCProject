@@ -28,12 +28,12 @@ namespace DemoMVC.WebUi.Controllers
         public ActionResult ViewPermission(int Id = 0)
         {
 
-            //string role = _roleService.GetRolesById(SessionHelper.UserId).RoleName;
-            //if (role != "sadmin")
-            //{
-            //    return RedirectToAction("AccessDenied", "Base");
+            string role = _roleService.GetRolesById(SessionHelper.UserId).RoleName;
+            if (role != "sadmin")
+            {
+                return RedirectToAction("AccessDenied", "Base");
 
-            //}
+            }
 
             FormRoleMapping model = new FormRoleMapping();
             if (Id > 0)

@@ -1,13 +1,23 @@
 ﻿@using DemoMVC.Service
 @using Kendo.Mvc.UI
 @using DemoMVC.Models
+@using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
+@using DemoMVC.WebUi.Controllers
+
 @model IEnumerable<DemoMVC.Models.RolesGridModel>
 
 @{
     RoleService _roleService = new RoleService();
     string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
     string formCode = AuthorizeFormAccess.FormAccessCode.ROLES.ToString();
-    ViewBag.Title = "Index";
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
+    BaseController _base = new BaseController();
+    bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
+    bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
 
 <h2 class="text-center fw-bold mt-4">Roles List</h2>
@@ -27,11 +37,11 @@
               columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               if (role == "sadmin")
               {
-                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'><a title='Permission' style='width:18px;' class='fa fa-cog' href='" + Url.Action("ViewPermission", "FormRoleMapping") + "/#=Id#'" + "></a>" + "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" + "</div>").Filterable(false).Title("Action").Width(100).Sortable(false);
+                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'><a title='Permission' style='width:18px;' class='fa fa-cog' href='" + Url.Action("ViewPermission","FormRoleMapping") + "/#=Id#'" + "></a>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width(100).Sortable(false);
               }
               else
               {
-                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
+                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
               }
           })
           .Events(evt => evt

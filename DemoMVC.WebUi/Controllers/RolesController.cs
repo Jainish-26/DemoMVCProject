@@ -9,10 +9,11 @@ using DemoMVC.Helper;
 using Kendo.Mvc.UI;
 using Kendo.Mvc.Extensions;
 
+
 namespace DemoMVC.WebUi.Controllers
 {
     [Authorize]
-    public class RolesController : Controller
+    public class RolesController : BaseController
     {
         private readonly RoleService _rolesService;
 
@@ -23,14 +24,31 @@ namespace DemoMVC.WebUi.Controllers
         // GET: Roles
         public ActionResult Index()
         {
-            RoleService _roleService = new RoleService();
-            int roleid = SessionHelper.RoleId;
-            string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), AccessPermission.IsView))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
+
             return View();
         }
 
         public ActionResult Create(int? id)
         {
+            string actionPermission = "";
+            if (id == null)
+            {
+                actionPermission = AccessPermission.IsAdd;
+            }
+            else if ((id ?? 0) > 0)
+            {
+                actionPermission = AccessPermission.IsEdit;
+            }
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), actionPermission))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             int userId = SessionHelper.UserId;
             RolesModel model = new RolesModel();
 
@@ -52,7 +70,20 @@ namespace DemoMVC.WebUi.Controllers
         [HttpPost]
         public ActionResult Create(RolesModel model)
         {
+            string actionPermission = "";
+            if (model.Id == 0)
+            {
+                actionPermission = AccessPermission.IsAdd;
+            }
+            else if (model.Id > 0)
+            {
+                actionPermission = AccessPermission.IsEdit;
+            }
 
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), actionPermission))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             int userId = SessionHelper.UserId;
             if (ModelState.IsValid)
             {

@@ -14,7 +14,7 @@ using RoleService = DemoMVC.Service.RoleService;
 
 namespace DemoMVC.WebUi.Controllers
 {
-    public class UserProfileController : Controller
+    public class UserProfileController : BaseController
     {
         private readonly UserProfileService _userProfileService;
         private readonly RoleService _rolesService;
@@ -27,10 +27,27 @@ namespace DemoMVC.WebUi.Controllers
         // GET: UserProfile
         public ActionResult Index()
         {
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.USER.ToString(), AccessPermission.IsView))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             return View();
         }
         public ActionResult Create(int? id)
         {
+            string actionPermission = "";
+            if (id == null)
+            {
+                actionPermission = AccessPermission.IsAdd;
+            }
+            else if ((id ?? 0) > 0)
+            {
+                actionPermission = AccessPermission.IsEdit;
+            }
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.USER.ToString(), actionPermission))
+                return RedirectToAction("AccessDenied", "Base");
+
             UserProfileModel userProfile = new UserProfileModel();
             if (id > 0)
             {
@@ -56,6 +73,19 @@ namespace DemoMVC.WebUi.Controllers
         [HttpPost]
         public ActionResult Create(UserProfileModel userProfile)
         {
+            string actionPermission = "";
+            if (userProfile.UserId == 0)
+            {
+                actionPermission = AccessPermission.IsAdd;
+            }
+            else if (userProfile.UserId > 0)
+            {
+                actionPermission = AccessPermission.IsEdit;
+            }
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.USER.ToString(), actionPermission))
+            {
+                return RedirectToAction("AccessDenied", "Base");
+            }
             if (userProfile.UserId > 0)
             {
                 ModelState.Remove("Password");

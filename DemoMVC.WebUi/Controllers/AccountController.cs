@@ -31,14 +31,19 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Login() {
+        public ActionResult Login(string returnUrl) {
             LoginModel model = new LoginModel();
+            if (SessionHelper.UserId > 0)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ViewBag.ReturnUrl = returnUrl;
             return View(model);
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Login(LoginModel model)
+        public ActionResult Login(LoginModel model,string returnUrl)
         {
             if (ModelState.IsValid && WebSecurity.Login(model.UserName.Trim(), model.Password, persistCookie: model.RememberMe))
             {
@@ -67,17 +72,27 @@ namespace DemoMVC.WebUi.Controllers
                 //}
                 //Session["Menu"] = _formRoleService.GetMenu(userId);
 
-                //if (returnUrl == null)
-                //    return RedirectToAction("Index", "Home");
-                //else
-                //    return RedirectToLocal(returnUrl);
-
-                return RedirectToAction("Index","Home");
+                if (returnUrl == null)
+                    return RedirectToAction("Index", "Home");
+                else
+                    return RedirectToLocal(returnUrl);
             }
             else
             {
                 ModelState.AddModelError("Password", "Invalid Username or Password");
                 return View(model);
+            }
+        }
+
+        private ActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
             }
         }
 
