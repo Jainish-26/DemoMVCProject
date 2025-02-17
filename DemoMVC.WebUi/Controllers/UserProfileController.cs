@@ -27,6 +27,9 @@ namespace DemoMVC.WebUi.Controllers
         // GET: UserProfile
         public ActionResult Index()
         {
+            //int a = 5;
+            //int b = 0;
+            //int ans = a / b;
             if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.USER.ToString(), AccessPermission.IsView))
             {
                 return RedirectToAction("AccessDenied", "Base");

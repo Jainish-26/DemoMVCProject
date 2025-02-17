@@ -78,6 +78,7 @@
     <Compile Include="AuthorizeFormAccess.cs" />
     <Compile Include="DemoMVCContextConfiguration.cs" />
     <Compile Include="DemoMVCEntities.cs" />
+    <Compile Include="ErrorLog.cs" />
     <Compile Include="FormModel.cs" />
     <Compile Include="FormRoleMapping.cs" />
     <Compile Include="Forms.cs" />
