@@ -27,9 +27,6 @@ namespace DemoMVC.Models
         public DbSet<Forms> Forms { get; set; }
         public DbSet<FormRoleMapping> FormRoleMapping { get; set; }
         public DbSet<ErrorLog> ErrorLog { get; set; }
-<<<<<<< HEAD
         public DbSet<ActivityLog> ActivityLog { get; set; }
-=======
->>>>>>> ErrorLogController
     }
 }
