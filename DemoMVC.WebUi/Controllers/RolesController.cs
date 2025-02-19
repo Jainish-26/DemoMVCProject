@@ -143,5 +143,39 @@ namespace DemoMVC.WebUi.Controllers
         //        return Json(true, JsonRequestBehavior.AllowGet);
         //    }
         //}
+
+        public ActionResult DeleteRole(int? id)
+        {
+            string actionPermission = AccessPermission.IsDelete;
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), actionPermission))
+            {
+                return Json(new { success = false, message = "Access Denied" });
+            }
+
+            int userId = SessionHelper.UserId;
+            var data = _rolesService.GetRolesById(id.Value);
+            TempData["RoleName"] = data.RoleName;
+
+            try
+            {
+                bool ans = _rolesService.DeleteRole(id.Value, userId);
+
+                if (ans)
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return  Json(new { success = false, message = "Active User Assigned To This Role" });
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                // Log the exception as needed
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

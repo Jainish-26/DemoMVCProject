@@ -66,6 +66,7 @@
     <Compile Include="ErrorLogService.cs" />
     <Compile Include="FormRoleMappingService.cs" />
     <Compile Include="FormsService.cs" />
+    <Compile Include="MessageService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoleService.cs" />
     <Compile Include="UserProfileService.cs" />

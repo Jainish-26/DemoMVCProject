@@ -48,5 +48,9 @@ namespace DemoMVC.Service
         {
             return _roleProvider.CheckDuplicateRoleCode(RoleCode);
         }
+        public bool DeleteRole(int id,int userId)
+        {
+            return _roleProvider.DeleteRole(id,userId);
+        }
     }
 }

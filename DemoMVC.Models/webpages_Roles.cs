@@ -16,5 +16,8 @@ namespace DemoMVC.Models
         public string RoleCode { get; set; }
         public int UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
+        public int? DeletedBy { get; set; }
+        public DateTime? DeletedOn { get; set; }
+        public bool? IsDeleted { get; set; }
     }
 }

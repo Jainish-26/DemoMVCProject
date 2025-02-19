@@ -3,7 +3,6 @@
   <Runtime>
     <ConceptualModels>
       <Schema Namespace="DemoMVC.Models" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-<<<<<<< HEAD
         <EntityType Name="ActivityLog" customannotation:ClrType="DemoMVC.Models.ActivityLog, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -36,8 +35,6 @@
           <Property Name="MobileNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="PhoneNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
-=======
->>>>>>> ErrorLogController
         <EntityType Name="ErrorLog" customannotation:ClrType="DemoMVC.Models.ErrorLog, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -98,6 +95,20 @@
           <Property Name="UpdatedBy" Type="Int32" />
           <Property Name="UpdatedOn" Type="DateTime" />
         </EntityType>
+        <EntityType Name="Message_Mst" customannotation:ClrType="DemoMVC.Models.Message_Mst, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Message" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="Comment" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="ModifiedOn" Type="DateTime" />
+        </EntityType>
         <EntityType Name="webpages_Membership" customannotation:ClrType="DemoMVC.Models.webpages_Membership, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="UserId" />
@@ -132,6 +143,9 @@
           <Property Name="RoleCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="UpdatedBy" Type="Int32" Nullable="false" />
           <Property Name="UpdatedOn" Type="DateTime" />
+          <Property Name="DeletedBy" Type="Int32" />
+          <Property Name="DeletedOn" Type="DateTime" />
+          <Property Name="IsDeleted" Type="Boolean" />
         </EntityType>
         <EntityType Name="webpages_UsersInRoles" customannotation:ClrType="DemoMVC.Models.webpages_UsersInRoles, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
@@ -153,14 +167,12 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="DemoMVCEntities" customannotation:UseClrTypes="true">
-<<<<<<< HEAD
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" />
-=======
->>>>>>> ErrorLogController
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
+          <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" />
           <EntitySet Name="webpages_Roles" EntityType="Self.webpages_Roles" />
@@ -175,7 +187,6 @@
     <Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="CodeFirstDatabase" CdmEntityContainer="DemoMVCEntities">
-<<<<<<< HEAD
           <EntitySetMapping Name="ActivityLog">
             <EntityTypeMapping TypeName="DemoMVC.Models.ActivityLog">
               <MappingFragment StoreEntitySet="ActivityLog">
@@ -209,8 +220,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-=======
->>>>>>> ErrorLogController
           <EntitySetMapping Name="ErrorLog">
             <EntityTypeMapping TypeName="DemoMVC.Models.ErrorLog">
               <MappingFragment StoreEntitySet="ErrorLog">
@@ -274,6 +283,21 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Message_Mst">
+            <EntityTypeMapping TypeName="DemoMVC.Models.Message_Mst">
+              <MappingFragment StoreEntitySet="Message_Mst">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="Comment" ColumnName="Comment" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="webpages_Membership">
             <EntityTypeMapping TypeName="DemoMVC.Models.webpages_Membership">
               <MappingFragment StoreEntitySet="webpages_Membership">
@@ -309,6 +333,9 @@
                 <ScalarProperty Name="RoleCode" ColumnName="RoleCode" />
                 <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
                 <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+                <ScalarProperty Name="DeletedBy" ColumnName="DeletedBy" />
+                <ScalarProperty Name="DeletedOn" ColumnName="DeletedOn" />
+                <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -325,7 +352,6 @@
     </Mappings>
     <StorageModels>
       <Schema Namespace="CodeFirstDatabaseSchema" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-<<<<<<< HEAD
         <EntityType Name="ActivityLog">
           <Key>
             <PropertyRef Name="Id" />
@@ -357,8 +383,6 @@
           <Property Name="MobileNo" Type="nvarchar(max)" Nullable="true" />
           <Property Name="PhoneNo" Type="nvarchar(max)" Nullable="true" />
         </EntityType>
-=======
->>>>>>> ErrorLogController
         <EntityType Name="ErrorLog">
           <Key>
             <PropertyRef Name="Id" />
@@ -419,6 +443,20 @@
           <Property Name="UpdatedBy" Type="int" Nullable="true" />
           <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
         </EntityType>
+        <EntityType Name="Message_Mst">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Message" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="Comment" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedBy" Type="int" Nullable="true" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="true" />
+          <Property Name="ModifiedBy" Type="int" Nullable="true" />
+          <Property Name="ModifiedOn" Type="datetime" Nullable="true" />
+        </EntityType>
         <EntityType Name="webpages_Membership">
           <Key>
             <PropertyRef Name="UserId" />
@@ -453,6 +491,9 @@
           <Property Name="RoleCode" Type="nvarchar(max)" Nullable="true" />
           <Property Name="UpdatedBy" Type="int" Nullable="false" />
           <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
+          <Property Name="DeletedBy" Type="int" Nullable="true" />
+          <Property Name="DeletedOn" Type="datetime" Nullable="true" />
+          <Property Name="IsDeleted" Type="bit" Nullable="true" />
         </EntityType>
         <EntityType Name="webpages_UsersInRoles">
           <Key>
@@ -474,14 +515,12 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="CodeFirstDatabase">
-<<<<<<< HEAD
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" Schema="dbo" Table="ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" Table="UserProfile" />
-=======
->>>>>>> ErrorLogController
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" Schema="dbo" Table="ErrorLog" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
+          <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" Schema="dbo" Table="Message_Mst" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" Schema="dbo" Table="webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" Schema="dbo" Table="webpages_OAuthMembership" />
           <EntitySet Name="webpages_Roles" EntityType="Self.webpages_Roles" Schema="dbo" Table="webpages_Roles" />

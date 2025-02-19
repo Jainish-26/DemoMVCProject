@@ -2,26 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DemoMVC.Helper;
 
 namespace DemoMVC.Data
 {
     public class RolesProvider : BaseProvider
     {
+        private webpages_UsersInRoles _userInRole;
         public RolesProvider()
         {
-
+            _userInRole = new webpages_UsersInRoles();
         }
         public List<webpages_Roles> GetAllRoles()
         {
-            var data = (from a in _db.webpages_Roles where a.IsActive==true select a).OrderByDescending(a => a.RoleId).ToList();
+            var data = (from a in _db.webpages_Roles where a.IsActive==true && a.IsDeleted!=true select a).OrderByDescending(a => a.RoleId).ToList();
             return data;
         }
         public IQueryable<RolesGridModel> GetAllRolesGrid()
         {
-            return (from role in _db.webpages_Roles
+            return (from role in _db.webpages_Roles where role.IsDeleted != true
                     select new RolesGridModel()
                     {
                         Id = role.RoleId,
@@ -74,5 +72,34 @@ namespace DemoMVC.Data
                                   select role).ToList();
             return getRoleDetails;
         }
+
+        public bool DeleteRole(int id,int userId)
+        {
+            var role = GetRolesById(id);
+
+            //if (role == null)
+            //{
+            //    return false; 
+            //}
+
+            //var userInRole = _db.webpages_UsersInRoles.Where(u => u.RoleId == id).ToList();
+
+            var userInRoleIds = _db.webpages_UsersInRoles
+                      .Where(u => u.RoleId == id)
+                      .Select(u => u.UserId)
+                      .ToList();
+
+            if (userInRoleIds.Any())
+            {
+                return false;
+            }
+
+            _db.webpages_Roles.Remove(role);
+            _db.Entry(role).State = System.Data.Entity.EntityState.Deleted;
+            _db.SaveChanges();
+
+            return true;
+        }
+
     }
 }

@@ -1,0 +1,43 @@
+﻿@model DemoMVC.Models.MessageGridModel
+@using Kendo.Mvc.UI
+<style>
+    .field_class {
+        margin-bottom: 5px;
+    }
+
+    .k-input.k-textbox {
+        width: 100%;
+    }    
+</style>
+<div class="main_body_content">
+    <div class="main_wrapper">
+        <input type="hidden" id="MsgId" data-bind="value:Id" name="Id">
+        <div class="container" style="padding:0px;margin-left:10px;">
+            <div class="row field_class">
+                <div class="col-md-2">Code<sup class="span_req"><i class="fa fa-star" aria-hidden="true"></i></sup></div>
+                <div class="col-md-8">
+                    <input id="CodeDuplicateValidation" type="text" class="k-input gridedit k-textbox" data-bind="value:Code" name="Code" style="text-transform:uppercase" required/>                                      
+                    <span id="CodeExistValidation" style="display:none" class='field-validation-error'></span>                    
+                </div>
+            </div>
+            <div class="row field_class">
+                <div class="col-md-2">Message<sup class="span_req"><i class="fa fa-star" aria-hidden="true"></i></sup></div>
+                <div class="col-md-8">
+                    <input id="MessageElement" type="text" class="k-input k-textbox" data-bind="value:Message" name="Message" required />
+                </div>
+            </div>
+            <div class="row field_class">
+                <div class="col-md-2">Comment</div>
+                <div class="col-md-8">
+                    <textarea class="k-input k-textbox" data-bind="value:Comment" name="Comment" style="height:120px;"></textarea>
+                </div>
+            </div>
+            <div class="row field_class">
+                <div class="col-md-2">IsActive</div>
+                <div class="col-md-8">
+                    <input type="checkbox" data-bind="value:IsActive" name="IsActive" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  

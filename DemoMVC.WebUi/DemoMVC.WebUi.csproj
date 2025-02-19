@@ -161,6 +161,7 @@
     <Compile Include="Controllers\FormController.cs" />
     <Compile Include="Controllers\FormRoleMappingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Filters\ActivityLogFilter.cs" />
@@ -2445,6 +2446,8 @@
     <Content Include="Views\ErrorLog\ErrorLogList.cshtml" />
     <Content Include="Views\ActivityLog\Index.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Message\Index.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\_MessageEditor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
