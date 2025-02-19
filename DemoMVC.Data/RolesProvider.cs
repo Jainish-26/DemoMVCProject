@@ -77,12 +77,6 @@ namespace DemoMVC.Data
         {
             var role = GetRolesById(id);
 
-            //if (role == null)
-            //{
-            //    return false; 
-            //}
-
-            //var userInRole = _db.webpages_UsersInRoles.Where(u => u.RoleId == id).ToList();
 
             var userInRoleIds = _db.webpages_UsersInRoles
                       .Where(u => u.RoleId == id)
