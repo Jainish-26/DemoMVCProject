@@ -1,7 +1,8 @@
-﻿@model DemoMVC.Models.FormModel
+﻿@model DemoMVC.WebUi.Models.FormModel
+@using DemoMVC.Models
 @*@using AiRecruitment.Model;*@
 @{
-    //string formCode = AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString();
+    string formCode = AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString();
     if (Model.Id > 0)
     {
         ViewBag.Title = "Edit Form";

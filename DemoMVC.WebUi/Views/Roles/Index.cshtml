@@ -9,6 +9,7 @@
 
 @{
     RoleService _roleService = new RoleService();
+    
     string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
     string formCode = AuthorizeFormAccess.FormAccessCode.ROLES.ToString();
     var formName = FormUtility.GetFormName(formCode);

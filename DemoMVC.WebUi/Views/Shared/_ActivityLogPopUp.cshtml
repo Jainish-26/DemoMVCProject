@@ -1,0 +1,110 @@
+﻿<!-- Include Bootstrap 5 (if not already included) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+    /* Styling for the Activity Log Card */
+    .activity-log-card {
+        max-width: 750px;
+        margin: 30px auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        overflow: hidden;
+        border-left: 5px solid #007bff;
+        padding: 20px;
+    }
+
+    .activity-log-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .activity-log-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+        .activity-log-item:last-child {
+            border-bottom: none;
+        }
+
+    .activity-log-label {
+        font-weight: 600;
+        color: #333;
+        min-width: 160px;
+    }
+
+    .activity-log-value {
+        flex: 1;
+        background: #f8f9fa;
+        padding: 8px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .log-message {
+        width: 100%;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        min-height: 80px;
+        resize: none;
+        font-size: 14px;
+    }
+</style>
+
+<div class="activity-log-card">
+    <div class="activity-log-header">
+        📝 Activity Log Details
+    </div>
+
+    <div class="p-3">
+        <div class="activity-log-item">
+            <span class="activity-log-label">📅 Date:</span>
+            <span class="activity-log-value">@Model.LogDate</span>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">🔗 Page URL:</span>
+            <span class="activity-log-value">@Model.PageUrl</span>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">🌍 IP Address:</span>
+            <span class="activity-log-value">@Model.IPAddress</span>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">📜 Full Message:</span>
+            <textarea class="log-message" readonly>@Model.FullMessage</textarea>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">🌐 Browser Name:</span>
+            <span class="activity-log-value">@Model.BrowserName</span>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">👤 User:</span>
+            <span class="activity-log-value">@Model.UserName</span>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">📁 Controller Name:</span>
+            <span class="activity-log-value">@Model.ControllerName</span>
+        </div>
+
+        <div class="activity-log-item">
+            <span class="activity-log-label">⚙️ Method Name:</span>
+            <span class="activity-log-value">@Model.ActionName</span>
+        </div>
+    </div>
+</div>

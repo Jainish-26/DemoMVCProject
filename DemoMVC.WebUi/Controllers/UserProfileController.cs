@@ -1,12 +1,12 @@
-﻿using DemoMVC.Models;
+﻿using DemoMVC.Helper;
+using DemoMVC.Models;
 using DemoMVC.Service;
+using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.ApplicationServices;
 using System.Web.Mvc;
 using System.Web.Security;
 using WebMatrix.WebData;
@@ -18,11 +18,16 @@ namespace DemoMVC.WebUi.Controllers
     {
         private readonly UserProfileService _userProfileService;
         private readonly RoleService _rolesService;
+        private readonly MessageService _messageService;
+        private readonly FormsService _formsService;
+        private readonly FormRoleMappingService _formRoleMapping;
 
         public UserProfileController()
         {
             _userProfileService = new UserProfileService();
             _rolesService = new RoleService();
+            _messageService = new MessageService();
+            _formRoleMapping = new FormRoleMappingService();
         }
         // GET: UserProfile
         public ActionResult Index()
@@ -120,9 +125,9 @@ namespace DemoMVC.WebUi.Controllers
                 user.IsActive = userProfile.IsActive;
                 user.UpdatedOn = DateTime.UtcNow;
                 user.UpdatedBy = userId;
-                
+
                 int id = _userProfileService.UpdateUserProfile(user);
-                
+
                 foreach (var role in Roles.GetRolesForUser(userProfile.UserName))
                 {
                     Roles.RemoveUserFromRole(userProfile.UserName, role);
@@ -131,7 +136,7 @@ namespace DemoMVC.WebUi.Controllers
             }
             else
             {
-                WebSecurity.CreateUserAndAccount(userProfile.UserName, userProfile.Password, propertyValues: 
+                WebSecurity.CreateUserAndAccount(userProfile.UserName, userProfile.Password, propertyValues:
                                                 new
                                                 {
                                                     Name = userProfile.Name,
@@ -144,8 +149,7 @@ namespace DemoMVC.WebUi.Controllers
                                                     CreatedBy = userId,
                                                     UpdatedOn = DateTime.UtcNow,
                                                     UpdatedBy = userId,
-                                                    //DefaultPageId = (userProfile.DefaultFormId == null ? 0 : userProfile.DefaultFormId.Value) }
-                                                });
+                                                 });
                 Roles.AddUserToRole(userProfile.UserName, userProfile.Role);
             }
         }
@@ -164,6 +168,60 @@ namespace DemoMVC.WebUi.Controllers
         {
             var getallusers = _userProfileService.GetAllUserProfileGrid();
             return Json(getallusers.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult CheckDuplicateUserEmail(string Email, int UserId)
+        {
+            var checkduplicate = _userProfileService.CheckDuplicateUserEmail(Email).ToList();
+            if (UserId > 0)
+            {
+                checkduplicate = checkduplicate.Where(x => x.UserId != UserId).ToList();
+            }
+            if (checkduplicate.Count() > 0)
+            {
+                var message = _messageService.GetMessageByCode(Constants.MessageCode.EMAILEXIST);
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult CheckDuplicateUserName(string UserName, int UserId)
+        {
+            var checkduplicate = _userProfileService.CheckDuplicateUserName(UserName).ToList();
+            if (UserId > 0)
+            {
+                checkduplicate = checkduplicate.Where(x => x.UserId != UserId).ToList();
+            }
+            if (checkduplicate.Count() > 0)
+            {
+                var message = _messageService.GetMessageByCode(Constants.MessageCode.USERNAMEEXIST);
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult CasCadeForm(string Role)
+        {
+            List<SelectListItem> _DefaultFormList = new List<SelectListItem>();
+            _DefaultFormList.Add(new SelectListItem() { Text = "Select Form", Value = "" });
+            if (!string.IsNullOrWhiteSpace(Role))
+            {
+                int RoleId = _rolesService.GetRolesByName(Role).RoleId;
+                List<int> getformId = _formRoleMapping.GetAllRoleRightsByRoleId(RoleId).Select(x => x.MenuId).ToList();
+                var getparentform = _formsService.GetAllForms().Where(x => x.NavigateURL != "#" && getformId.Contains(x.Id)).Select(a => new FormModel { Id = a.Id, Name = a.Name }).OrderBy(a => a.Name);
+
+                foreach (var item in getparentform)
+                {
+                    _DefaultFormList.Add(new SelectListItem() { Text = item.Name, Value = item.Id.ToString() });
+                }
+            }
+            return Json(_DefaultFormList, JsonRequestBehavior.AllowGet);
         }
     }
 }

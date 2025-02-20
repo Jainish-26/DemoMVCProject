@@ -1,5 +1,5 @@
-﻿@model DemoMVC.Models.RolesModel
-
+﻿@model DemoMVC.WebUi.Models.RolesModel
+@using DemoMVC.Models
 @{
     if(Model.Id > 0)
     {
@@ -9,6 +9,7 @@
     {
         ViewBag.Title = "Add Role";
     }
+    string formCode = AuthorizeFormAccess.FormAccessCode.ROLES.ToString();
 }
 
 <!DOCTYPE html>
@@ -152,10 +153,10 @@
                 }
 
             }
-
-
+            @Html.Hidden("hdnFormAccessCode", formCode)
             @using (Html.BeginForm("Create", "Roles", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
+                @Html.HiddenFor(model => model.Id)
                 @Html.AntiForgeryToken()
                 <!-- Name -->
                 <div class="mb-3">

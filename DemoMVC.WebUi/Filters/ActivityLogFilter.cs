@@ -1,8 +1,6 @@
 ﻿using DemoMVC.Models;
 using DemoMVC.Service;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -40,7 +38,7 @@ namespace DemoMVC.WebUi.Filters
             htttpmethod = currentContext.ApplicationInstance.Request.HttpMethod;
             status = currentContext.ApplicationInstance.Response.Status;
             //string fullmessage = "Method:" + htttpmethod + " , " + "Status:" + status;
-            string fullmessage = "AiRecruitment.Controller." + controller + "Controller";
+            string fullmessage = "DemoMVC.Controller." + controller + "Controller";
 
             ActivityLog log = new ActivityLog();
             log.ActionName = action;

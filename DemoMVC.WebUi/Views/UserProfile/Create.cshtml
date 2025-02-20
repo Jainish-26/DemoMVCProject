@@ -1,7 +1,16 @@
-﻿@model DemoMVC.Models.UserProfileModel
-
+﻿@model DemoMVC.WebUi.Models.UserProfileModel
+@using DemoMVC.Models
+@using Kendo.Mvc.UI
 @{
-    ViewBag.Title = "Create";
+    string formCode = AuthorizeFormAccess.FormAccessCode.USER.ToString();
+    if (Model.UserId > 0)
+    {
+        ViewBag.Title = "Edit User";
+    }
+    else
+    {
+        ViewBag.Title = "Add User";
+    }
 }
 
 <!-- Bootstrap 5 -->
@@ -160,6 +169,7 @@
                         @(Model.UserId > 0 ? "Edit User" : "Create New User")
                     </div>
                     <div class="form-body">
+                        @Html.Hidden("hdnFormAccessCode", formCode)
                         @using (Html.BeginForm("Create", "UserProfile", FormMethod.Post, new { id = "frm", enctype = "multipart/form-data", @class = "needs-validation", novalidate = "true" }))
                         {
                             @Html.HiddenFor(m => m.UserId)
@@ -188,6 +198,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                     @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", placeholder = "Choose a username" })
+                                    @Html.ValidationMessageFor(model => model.UserName)
                                 </div>
                             </div>
 
@@ -197,6 +208,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                     @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", placeholder = "Enter email" })
+                                    @Html.ValidationMessageFor(model => model.Email)
                                 </div>
                             </div>
 

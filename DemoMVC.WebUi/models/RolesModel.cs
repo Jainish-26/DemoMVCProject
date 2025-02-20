@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
-namespace DemoMVC.Models
+namespace DemoMVC.WebUi.Models
 {
     public class RolesModel
     {
@@ -20,7 +19,8 @@ namespace DemoMVC.Models
 
         [Required]
         [Display(Name = "Role Code")]
-        //[Remote("CheckDuplicateRoleCode", "Roles", HttpMethod = "Post", AdditionalFields = "Id")]
+        [Remote("CheckDuplicateRoleCode", "Roles", HttpMethod = "Post", AdditionalFields = "Id")]
+        //D:\ASP.NET\DemoMVC\DemoMVC.WebUi\
         public string RoleCode
         {
             get
@@ -40,11 +40,5 @@ namespace DemoMVC.Models
         public int UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
     }
-    public class RolesGridModel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public string RoleCode { get; set; }
-    }
+    
 }

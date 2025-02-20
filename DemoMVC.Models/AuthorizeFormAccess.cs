@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DemoMVC.Models
+﻿namespace DemoMVC.Models
 {
-     public class AuthorizeFormAccess
+    public class AuthorizeFormAccess
     {
         public enum FormAccessCode
         {
@@ -16,7 +10,7 @@ namespace DemoMVC.Models
             //CUSTOMER = 4,
             //PROJECT = 5,
             //CXREP = 6,
-           
+
             //LANGUAGE = 8,
             //COUNTRY = 9,
             FORMMASTER = 10,
@@ -59,20 +53,24 @@ namespace DemoMVC.Models
             //VENDOR = 46,
             //SENDDOCUMENTSTOVENDOR = 47,
             //SENDPHOTO = 48,
-            POSITION =49,
-            INTERVIEWER=50,
-            ORGANIZATION=54,
-            CANDIDATEREQUIREMENTMAPPING=51,
-            SENDMAILTODECIDINGAUTHORITY=52,
-            SCHEDULEINTERVIEW=53,
-            SENDCALENDARINVITE=55,
+            POSITION = 49,
+            INTERVIEWER = 50,
+            ORGANIZATION = 54,
+            CANDIDATEREQUIREMENTMAPPING = 51,
+            SENDMAILTODECIDINGAUTHORITY = 52,
+            SCHEDULEINTERVIEW = 53,
+            SENDCALENDARINVITE = 55,
             ERRORLOG = 56,
-            ACTIVITYLOG =57,
+            ACTIVITYLOG = 57,
             MESSAGE = 58,
             UPDATESTATUS = 59,
-            INTERESTEDCANDIDATES=60,
-            SENDINTERVIEWREMINDER=61,
-            JOBLOCATION = 62
+            INTERESTEDCANDIDATES = 60,
+            SENDINTERVIEWREMINDER = 61,
+            JOBLOCATION = 62,
+
+            //OEMS CODE
+            QUESTION = 63,
+            EXAM = 64
         }
     }
 }

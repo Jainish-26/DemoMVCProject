@@ -5,7 +5,6 @@ using System.Configuration;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Web;
 using static DemoMVC.Helper.Constants;
 
 namespace DemoMVC.WebUi.Helper

@@ -1,13 +1,94 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Error</title>
-</head>
-<body>
-    <hgroup>
-        <h1>Error.</h1>
-        <h2>An error occurred while processing your request.</h2>
-    </hgroup>
-</body>
-</html>
+﻿@if (ViewData["StatusCode"] != null)
+{
+    Layout = "~/Views/Shared/_BlankLayout.cshtml";
+}
+else
+{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+
+    ViewBag.Title = "Error";
+    ViewBag.FormAccessCode = Model.LastFormAccessCode;
+}
+@if (ViewData["StatusCode"] != null)
+{
+    <div class="page_404">
+        <div class="page_404_table">
+            <div class="page_404_table_cell">
+                <div class="center_top">
+                    <h2>Oops - <small>@Html.Raw(ViewData["StatusCode"])</small></h2>
+                    @*<img src="~/Content/Theme/@BMS.Core.Component.ApplicationKey.GetTheme()/Images/ErrorPageImage.jpg" class="img404" alt="">*@
+                    <span>@Html.Raw(ViewData["StatusCode"])</span>
+                    @if (DemoMVC.Models.SessionHelper.UserId == 0)
+                    {
+                        <div></div><a href="@Url.Action("Login", "Account")" class="lnkbtn">Login</a>
+                    }
+                    else
+                    {
+                        <div></div><a href="@Url.Action("Index", "Home")" class="lnkbtn">Back to Home</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+            <h3>@ViewBag.Title</h3>
+            <div class="common_box_inner">
+                <div class="div_labels clearfix">
+                    An error has occurred in the system, please contact your system admin.
+                </div>
+            </div>
+            @if (Request.IsLocal)
+            {
+                <div class="common_box_inner">
+                    <div class="div_labels clearfix">
+                        <div class="left_td">
+                            <label> Page Name</label>
+                        </div>
+                        <div class="right_td">
+                            @Html.Raw(Model.PageName)
+                        </div>
+                    </div>
+                    <div class="div_labels clearfix">
+                        <div class="left_td">
+                            <label> Method Name</label>
+                        </div>
+                        <div class="right_td">
+                            @Html.Raw(Model.MethodName)
+                        </div>
+                    </div>
+                    <div class="div_labels clearfix">
+                        <div class="left_td">
+                            <label> Line Number</label>
+                        </div>
+                        <div class="right_td">
+                            @Html.Raw(Model.LineNumber)
+                        </div>
+                    </div>
+                    <div class="div_labels clearfix">
+                        <div class="left_td">
+                            <label> Description</label>
+                        </div>
+                        <div class="right_td">
+                            @Html.Raw(Model.Description)
+                        </div>
+                    </div>
+                    <div class="div_labels clearfix">
+                        <div class="left_td">
+                            <label> Source</label>
+                        </div>
+                        <div class="right_td">
+                            @Html.Raw(Model.Source)
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

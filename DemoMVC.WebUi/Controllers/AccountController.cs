@@ -1,10 +1,10 @@
 ﻿using DemoMVC.Models;
+using DemoMVC.Service;
+using DemoMVC.WebUi.Filters;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
 using WebMatrix.WebData;
-using DemoMVC.WebUi.Filters;
-using DemoMVC.Service;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -31,7 +31,8 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl) {
+        public ActionResult Login(string returnUrl)
+        {
             LoginModel model = new LoginModel();
             if (SessionHelper.UserId > 0)
             {
@@ -43,7 +44,7 @@ namespace DemoMVC.WebUi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Login(LoginModel model,string returnUrl)
+        public ActionResult Login(LoginModel model, string returnUrl)
         {
             if (ModelState.IsValid && WebSecurity.Login(model.UserName.Trim(), model.Password, persistCookie: model.RememberMe))
             {

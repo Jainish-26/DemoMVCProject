@@ -1,10 +1,7 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Service
 {
@@ -48,9 +45,9 @@ namespace DemoMVC.Service
         {
             return _roleProvider.CheckDuplicateRoleCode(RoleCode);
         }
-        public bool DeleteRole(int id,int userId)
+        public bool DeleteRole(int id, int userId)
         {
-            return _roleProvider.DeleteRole(id,userId);
+            return _roleProvider.DeleteRole(id, userId);
         }
     }
 }

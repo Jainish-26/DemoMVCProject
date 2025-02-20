@@ -1,10 +1,6 @@
 ﻿using DemoMVC.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace DemoMVC.Data
 {
@@ -79,7 +75,6 @@ namespace DemoMVC.Data
                 getuser.UpdatedBy = userprofile.UpdatedBy;
                 getuser.UpdatedOn = userprofile.UpdatedOn;
                 getuser.IsDeleted = userprofile.IsDeleted;
-                //getuser.DefaultPageId = userprofile.DefaultPageId;
                 _db.Entry(getuser).State = System.Data.Entity.EntityState.Modified;
                 _db.SaveChanges();
             }

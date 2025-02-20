@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Models
 {
     public class DemoMVCEntities : DbContext
     {
-        public DemoMVCEntities() : base("DemoMVCConnection") 
+        public DemoMVCEntities() : base("DemoMVCConnection")
         {
 
         }

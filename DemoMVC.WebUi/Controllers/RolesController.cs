@@ -1,13 +1,12 @@
-﻿using DemoMVC.Models;
+﻿
+using DemoMVC.Models;
 using DemoMVC.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using DemoMVC.Helper;
-using Kendo.Mvc.UI;
+using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
+using Kendo.Mvc.UI;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 
 
 namespace DemoMVC.WebUi.Controllers
@@ -16,10 +15,12 @@ namespace DemoMVC.WebUi.Controllers
     public class RolesController : BaseController
     {
         private readonly RoleService _rolesService;
+        private readonly MessageService _messageService;
 
         public RolesController()
         {
             _rolesService = new RoleService();
+            _messageService = new MessageService();
         }
         // GET: Roles
         public ActionResult Index()
@@ -126,23 +127,24 @@ namespace DemoMVC.WebUi.Controllers
             var data = _rolesService.GetAllRolesGrid();
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
-        //public JsonResult CheckDuplicateRoleCode(string RoleCode, int Id)
-        //{
-        //    var getRoleDetails = _rolesService.CheckDuplicateRoleCode(RoleCode);
-        //    if (Id > 0)
-        //    {
-        //        getRoleDetails = getRoleDetails.Where(a => a.RoleId != Id).ToList();
-        //    }
-        //    if (getRoleDetails.Count() > 0)
-        //    {
-        //        var message = _messageService.GetMessageByCode(Constants.MessageCode.CODEEXIST);
-        //        return Json(message, JsonRequestBehavior.AllowGet);
-        //    }
-        //    else
-        //    {
-        //        return Json(true, JsonRequestBehavior.AllowGet);
-        //    }
-        //}
+        public JsonResult CheckDuplicateRoleCode(string RoleCode, int Id)
+        {
+            var getRoleDetails = _rolesService.CheckDuplicateRoleCode(RoleCode);
+            if (Id > 0)
+            {
+                getRoleDetails = getRoleDetails.Where(a => a.RoleId != Id).ToList();
+            }
+            if (getRoleDetails.Count() > 0)
+            {
+                //var message = _messageService.GetMessageByCode(Constants.MessageCode.CODEEXIST);
+                //return Json(message, JsonRequestBehavior.AllowGet);
+                return Json(false);
+            }
+            else
+            {
+                return Json(true);
+            }
+        }
 
         public ActionResult DeleteRole(int? id)
         {
@@ -167,9 +169,9 @@ namespace DemoMVC.WebUi.Controllers
                 }
                 else
                 {
-                    return  Json(new { success = false, message = "Active User Assigned To This Role" });
+                    return Json(new { success = false, message = "Active User Assigned To This Role" });
                 }
-                
+
             }
             catch (Exception ex)
             {

@@ -1,11 +1,10 @@
 ﻿using DemoMVC.Models;
 using DemoMVC.Service;
+using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -74,7 +73,7 @@ namespace DemoMVC.WebUi.Controllers
             {
                 actionPermission = AccessPermission.IsAdd;
             }
-            else if (model.Id  > 0)
+            else if (model.Id > 0)
             {
                 actionPermission = AccessPermission.IsEdit;
             }
@@ -147,9 +146,26 @@ namespace DemoMVC.WebUi.Controllers
         [HttpPost]
         public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
         {
-            
+
             var data = _formsService.GetAllFormsGrid();
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult CheckDuplicateFormAccessCode(string FormAccessCode, int Id)
+        {
+            var checkduplicate = _formsService.CheckDuplicateFormAccessCode(FormAccessCode);
+            if (Id > 0)
+            {
+                checkduplicate = checkduplicate.Where(x => x.Id != Id).ToList();
+            }
+            if (checkduplicate.Count() > 0)
+            {
+                return Json("FormAccessCode is already exist.", JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(true, JsonRequestBehavior.AllowGet);
+            }
+        }      
     }
 }

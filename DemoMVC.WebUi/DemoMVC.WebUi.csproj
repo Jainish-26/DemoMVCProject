@@ -173,6 +173,9 @@
     </Compile>
     <Compile Include="Helper\CommonUtility.cs" />
     <Compile Include="Helper\FormUtility.cs" />
+    <Compile Include="Models\FormModel.cs" />
+    <Compile Include="Models\RolesModel.cs" />
+    <Compile Include="Models\UserProfileModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +192,7 @@
     <Content Include="content\css\style.css" />
     <Content Include="content\css\toast.css" />
     <Content Include="content\images\attach.svg" />
+    <Content Include="content\images\BackImage.png" />
     <Content Include="content\images\BGC_auth_letter_smart_screen_logo.png" />
     <Content Include="content\images\chart_img.jpg" />
     <Content Include="content\images\comment-fill.svg" />
@@ -209,6 +213,7 @@
     <Content Include="content\images\pdf_logo.jpg" />
     <Content Include="content\images\user4.jpg" />
     <Content Include="content\images\UserImage.png" />
+    <Content Include="content\images\Web_Logo.png" />
     <Content Include="content\inc\bootstrap\css\blueimp-file-upload\jquery.fileupload.css" />
     <Content Include="content\inc\bootstrap\css\bootstrap-colorpicker\bootstrap-colorpicker.css" />
     <Content Include="content\inc\bootstrap\css\bootstrap-colorpicker\img\alpha.png" />
@@ -2448,10 +2453,11 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Message\Index.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\_MessageEditor.cshtml" />
+    <Content Include="Views\Shared\_ActivityLogPopUp.cshtml" />
+    <Content Include="Views\Shared\_ErrorLogPopUp.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

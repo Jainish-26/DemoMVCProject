@@ -2,10 +2,8 @@
 using DemoMVC.Service;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -28,7 +26,7 @@ namespace DemoMVC.WebUi.Controllers
         public ActionResult ViewPermission(int Id = 0)
         {
 
-            string role = _roleService.GetRolesById(SessionHelper.UserId).RoleName;
+            string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
             if (role != "sadmin")
             {
                 return RedirectToAction("AccessDenied", "Base");
