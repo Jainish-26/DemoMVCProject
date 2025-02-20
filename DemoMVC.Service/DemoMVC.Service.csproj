@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivityLogService.cs" />
+    <Compile Include="CommonLookupService.cs" />
     <Compile Include="ErrorLogService.cs" />
     <Compile Include="FormRoleMappingService.cs" />
     <Compile Include="FormsService.cs" />
@@ -78,6 +79,10 @@
     <ProjectReference Include="..\DemoMVC.Data\DemoMVC.Data.csproj">
       <Project>{a5789f2d-54a7-4c7d-98ba-268d428e3a8a}</Project>
       <Name>DemoMVC.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DemoMVC.Helper\DemoMVC.Helper.csproj">
+      <Project>{1754dd04-ec7e-4dae-bd58-022758ebcba3}</Project>
+      <Name>DemoMVC.Helper</Name>
     </ProjectReference>
     <ProjectReference Include="..\DemoMVC.Models\DemoMVC.Models.csproj">
       <Project>{AC9A1803-A3BE-41A9-A6C8-97456C2BF490}</Project>

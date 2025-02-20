@@ -24,5 +24,6 @@ namespace DemoMVC.Models
         public DbSet<ErrorLog> ErrorLog { get; set; }
         public DbSet<ActivityLog> ActivityLog { get; set; }
         public DbSet<Message_Mst> Message_Mst { get; set; }
+        public DbSet<CommonLookup> CommonLookup { get; set; }
     }
 }

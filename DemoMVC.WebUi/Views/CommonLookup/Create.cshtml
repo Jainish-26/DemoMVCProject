@@ -1,0 +1,158 @@
+﻿@using Kendo.Mvc.UI
+@model DemoMVC.WebUi.Models.CommonLookupModel
+@using DemoMVC.Models
+
+@{
+    string formCode = AuthorizeFormAccess.FormAccessCode.COMMONLOOKUP.ToString();
+    if (Model.Id > 0)
+    {
+        ViewBag.Title = "Edit Common Lookup";
+    }
+    else
+    {
+        ViewBag.Title = "Add Common Lookup";
+    }
+}
+@Html.Hidden("hdnFormAccessCode", formCode)
+
+@using (Html.BeginForm("Create", "CommonLookup", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="coman_content">
+        <!--This is Title div -->
+        <div class="subheader">
+            <div class="left_title">
+                @if (Model.Id > 0)
+                {
+                    <h2>Edit Common Lookup</h2>
+                }
+                else
+                {
+                    <h2>Add Common Lookup</h2>
+                }
+                <div class="left breadcrumb_list">
+                    <ul>
+                        <li><a href="@Url.Action("Index","Home")"><i class="fa fa-home"></i></a></li>
+                        <li><a href="@Url.Action("Index","CommonLookup")">CommonLookup</a></li>
+                        @if (Model.Id > 0)
+                        {
+                            <li>Edit Common Lookup</li>
+                        }
+                        else
+                        {
+                            <li>Add Common Lookup</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!--END Title div-->
+        @Html.HiddenFor(model => model.Id)
+        <div class="content_box">
+            <div class="common_white_box">
+                <div class="form_element">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label>Type <sup class="span_req"><i class="fa fa-star" aria-hidden="true"></i></sup></label>
+                                    <div class="input_box">
+                                        @Html.TextBoxFor(model => model.Type, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Type)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label>Code <sup class="span_req"><i class="fa fa-star" aria-hidden="true"></i></sup></label>
+                                    <div class="input_box">
+                                        @Html.TextBoxFor(model => model.Code, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Code)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label>Name <sup class="span_req"><i class="fa fa-star" aria-hidden="true"></i></sup></label>
+                                    <div class="input_box">
+                                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Name)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label>Display Order </label>
+                                    <div class="input_box">
+                                        @Html.TextBoxFor(model => model.DisplayOrder, new { @class = "form-control", @type = "number" })
+                                        @Html.ValidationMessageFor(model => model.Name)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label>Badge Code</label>
+                                    <div class="input_box">
+                                        @(Html.Kendo().ColorPalette()
+                                .Name("palette")
+                                .TileSize(s => s.Width(34).Height(19))
+                                .Events(events => events.Change("previewCode"))
+                            )
+                                        @Html.TextBoxFor(m => m.BadgeCode, new { @class = "form-control", @style = "width:150px" })
+                                        @Html.ValidationMessageFor(m => m.BadgeCode)
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label for="">Is Active</label>
+                                    <div class="input_box">
+                                        <div class="on_off_btn sms_not">
+                                            @Html.CheckBoxFor(model => model.IsActive, new { @class = "ch_btn" })
+                                            <i></i>
+                                            <span class="span_yes">Yes</span>
+                                            <span class="span_no">No</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form_input_box">
+                                <div class="form-group">
+                                    <label>Comment</label>
+                                    <div class="input_box">
+                                        @Html.TextAreaFor(model => model.Comment, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Name)
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="button_div">
+                        <div class="form-group">
+                            <label for="">&nbsp;</label>
+                            <div class="input_box">
+                                <button type="submit" class="button button_primary">Save</button>
+                                <a href="@Url.Action("Index", "CommonLookup")" class="button button_cancel">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function previewCode(e) {
+        $("#BadgeCode").val(e.value);
+    }
+</script>
