@@ -18,14 +18,19 @@
 
 <h2 class="text-center fw-bold mt-4">Form List</h2>
 
-<div class="d-flex justify-content-end mb-3">
-    @Html.ActionLink("Create New", "Create", "Form", null, new { @class = "btn btn-success btn rounded-pill px-4 shadow-sm fw-bold" })
+<div class="d-flex justify-content-end m-2">
+    @Html.ActionLink("Create New", "Create", "Form", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
 </div>
 <div class="common_white_box listingpage">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.FormsGridModel>()
             .Name("gridForm")
             .AutoBind(false)
+            .Excel(excel => excel
+              .FileName("FormList.xlsx")
+              .Filterable(true)
+              .AllPages(true))
             .Columns(columns =>
             {
                 columns.Bound(c => c.Name).Width("14%").Title("Form Name");
@@ -62,13 +67,18 @@
              )
         )
 </div>
-</div>
+
 
 <script>
     $(document).ready(function () {
         $('#gridForm').data('kendoGrid').dataSource.read();
         $('#gridForm').data('kendoGrid').refresh();
     });
+
+        function exportToExcel() {
+        var grid = $("#gridForm").data("kendoGrid");
+        grid.saveAsExcel();
+    }
 </script>
 
 

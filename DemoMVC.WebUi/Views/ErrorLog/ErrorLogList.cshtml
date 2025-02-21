@@ -39,6 +39,10 @@
         @(Html.Kendo().Grid<DemoMVC.Models.ErrorLogGridModel>()
           .Name("gridErrorLogs")
           .AutoBind(false)
+          .Excel(excel => excel
+              .FileName("RolesList.xlsx")
+              .Filterable(true)
+              .AllPages(true))
           .Columns(columns =>
           {
               columns.Bound(c => c.RecordDate).Title("Date").Format("{0:" + CommonUtility.GetDateFormat(true) + "}").Width(100).Filterable(false);

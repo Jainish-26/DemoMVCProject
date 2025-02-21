@@ -8,7 +8,6 @@
 
 @{
     RoleService _roleService = new RoleService();
-    
     string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
     string formCode = AuthorizeFormAccess.FormAccessCode.ROLES.ToString();
     var formName = FormUtility.GetFormName(formCode);
@@ -18,32 +17,34 @@
     bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
-    
 }
 
 <h2 class="text-center fw-bold mt-4">Roles List</h2>
-<div class="d-flex justify-content-end mb-3">
-    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold" })
+
+<div class="d-flex justify-content-end m-2">
+    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
 </div>
+
 <div class="common_white_box listingpage">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.RolesGridModel>()
           .Name("gridRoles")
           .AutoBind(false)
+          .Excel(excel => excel
+                .FileName("RolesList.xlsx")
+                .Filterable(true)
+                .AllPages(true))
           .Columns(columns =>
           {
-
               columns.Bound(c => c.Name).Title("Name");
               columns.Bound(c => c.RoleCode).Title("Role Code");
               columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               if (role == "sadmin")
               {
-
-
                   columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'><a title='Permission' style='width:18px;' class='fa fa-cog' href='" + Url.Action("ViewPermission","FormRoleMapping") + "/#=Id#'" + "></a>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width(100).Sortable(false);
                   columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=Id#)'>Delete</button>" : "") +
                   "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
-
               }
               else
               {
@@ -61,72 +62,104 @@
               .PageSizes(new[] {10,20, 50, 100, 200 })
               .ButtonCount(5)
           )
-          // .Filterable(filter => filter
-          //      .Mode(GridFilterMode.Row)
-          //      .Extra(false)
-          //      .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
-          //      .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
-          //)
           .DataSource(dataSource => dataSource
               .Ajax()
               .Read(read => read.Action("GetGridData", "Roles")).PageSize(10)
           ))
 </div>
 
+<!-- 📊 Kendo Chart Container -->
+<h3 class="text-center mt-5">Roles Distribution</h3>
+<div id="roleChart"></div>
+
+
 <script>
     $(document).ready(function () {
         $('#gridRoles').data('kendoGrid').dataSource.read();
         $('#gridRoles').data('kendoGrid').refresh();
+        loadRoleChart(); // Load chart when page loads
     });
 
     function confirmDelete(roleId) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'This role will be permanently deleted!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '@Url.Action("DeleteRole", "Roles")',
-                type: 'POST',
-                data: { id: roleId },
-                success: function (response) {
-                    if (response.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: 'Role deleted successfully.',
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-                        $('#gridRoles').data('kendoGrid').dataSource.read();
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: response.message,
-                            confirmButtonColor: '#d33'
-                        });
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This role will be permanently deleted!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("DeleteRole", "Roles")',
+                    type: 'POST',
+                    data: { id: roleId },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Role deleted successfully.',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            $('#gridRoles').data('kendoGrid').dataSource.read();
+                            loadRoleChart(); // Refresh chart after delete
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message,
+                                confirmButtonColor: '#d33'
+                            });
+                        }
                     }
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'An error occurred while processing your request.',
-                        confirmButtonColor: '#d33'
-                    });
-                }
-            });
-        }
-    });
+                });
+            }
+        });
+    }
+
+    function exportToExcel() {
+        var grid = $("#gridRoles").data("kendoGrid");
+        grid.saveAsExcel();
+    }
+
+    function loadRoleChart() {
+        $.ajax({
+            url: '@Url.Action("GetRoleChartData", "Roles")', // Ensure you have this endpoint
+            type: 'GET',
+            success: function (data) {
+                $("#roleChart").kendoChart({
+                    title: {
+                        text: "Active vs Inactive Roles"
+                    },
+                    legend: {
+                        position: "bottom"
+                    },
+                    seriesDefaults: {
+                        type: "pie",
+                        labels: {
+                            visible: true,
+                            format: "{0}%",
+                            background: "transparent"
+                        }
+                    },
+                    series: [{
+                        data: data // Ensure your API returns correct format
+                    }],
+                    tooltip: {
+                        visible: true,
+                        format: "{0}%"
+                    }
+                });
+            },
+            error: function () {
+                console.error("Error loading role chart data.");
+            }
+        });
     }
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-

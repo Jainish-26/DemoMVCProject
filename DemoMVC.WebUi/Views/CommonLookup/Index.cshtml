@@ -33,7 +33,10 @@
         <div class="subheader_right">
             @if (AllowedAdd)
             {
-                <a class="button button_primary button_rounded" href="@Url.Action("Create", "CommonLookup")">Add</a>
+                <div class="d-flex justify-content-end m-2">
+                    @Html.ActionLink("Create New", "Create", "CommonLookup" ,null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+                    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+                </div>
                 @*<a class="button button_primary button_rounded" href="javascript:void(0);" id="btnAdd">Add</a>*@
             }
         </div>
@@ -44,6 +47,10 @@
         @(Html.Kendo().Grid<DemoMVC.Models.CommonLookUpGridModel>()
           .Name("gridcommonlookup")
           .AutoBind(false)
+          .Excel(excel => excel
+              .FileName("RolesList.xlsx")
+              .Filterable(true)
+              .AllPages(true))
           .Columns(columns =>
           {
               columns.Bound(c => c.Id).Hidden(true);

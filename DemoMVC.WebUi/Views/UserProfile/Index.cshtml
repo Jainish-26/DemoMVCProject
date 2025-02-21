@@ -18,14 +18,19 @@
 
 <h2 class="text-center fw-bold mt-4">User List</h2>
 
-<div class="d-flex justify-content-end mb-3">
-    @Html.ActionLink("Create New", "Create", "UserProfile", null, new { @class = "btn btn-danger btn rounded-pill px-4 shadow-sm fw-bold" })
+<div class="d-flex justify-content-end m-2">
+    @Html.ActionLink("Create New", "Create", "UserProfile",null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
 </div>
 <div class="common_white_box listingpage">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.UserProfileGridModel>()
         .AutoBind(true)
         .Name("gridUserProfile")
+        .Excel(excel => excel
+            .FileName("UserList.xlsx")
+            .Filterable(true)
+            .AllPages(true))
         .Columns(columns =>
         {
             columns.Bound(c => c.UpdatedOn).Hidden(true);
@@ -59,4 +64,9 @@
             .Read(read => read.Action("User_Read", "UserProfile")).PageSize(10)
         ))
 </div>
-
+<script>
+    function exportToExcel() {
+        var grid = $("#gridUserProfile").data("kendoGrid");
+        grid.saveAsExcel();
+    }
+</script>
