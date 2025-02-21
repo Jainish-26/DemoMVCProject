@@ -49,5 +49,10 @@ namespace DemoMVC.Service
         {
             return _roleProvider.DeleteRole(id, userId);
         }
+
+        public List<RoleUserCountModel> GetRolesWithUserCount()
+        {
+            return _roleProvider.GetRolesWithUserCount();
+        }
     }
 }

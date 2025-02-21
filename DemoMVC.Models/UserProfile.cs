@@ -46,4 +46,10 @@ namespace DemoMVC.Models
         public string RoleCode { get; set; }
         public DateTime? UpdatedOn { get; set; }
     }
+
+    public class UserStatusCountModel
+    {
+        public string Status { get; set; }
+        public int Count { get; set; }
+    }
 }

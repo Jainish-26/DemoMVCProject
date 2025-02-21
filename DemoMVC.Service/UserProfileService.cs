@@ -57,6 +57,9 @@ namespace DemoMVC.Service
             return _userProfileProvider.Getwebpages_MembershipByUserId(userId);
         }
 
-
+        public List<UserStatusCountModel> IsActiveUser()
+        {
+            return _userProfileProvider.IsActiveUser();
+        }
     }
 }

@@ -24,4 +24,12 @@ namespace DemoMVC.Models
         public bool IsActive { get; set; }
         public string RoleCode { get; set; }
     }
+
+    public class RoleUserCountModel
+    {
+        public string RoleName { get; set; }
+        public bool IsActive { get; set; }
+        public int UserCount { get; set; }
+    }
+
 }

@@ -1,26 +1,37 @@
 ﻿using System.Web.Mvc;
+using DemoMVC.Service;
+
 
 namespace DemoMVC.WebUi.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly RoleService _roleService;
+        private readonly UserProfileService _userProfileService;
+
+        public HomeController()
+        {
+            _roleService = new RoleService();
+            _userProfileService = new UserProfileService();
+        }
+
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult About()
+        [HttpGet]
+        public JsonResult GetRoleChartData()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            var data = _roleService.GetRolesWithUserCount();
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Contact()
+        [HttpGet]
+        public JsonResult GetUserStatusChartData()
         {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            var data = _userProfileService.IsActiveUser();
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
     }
 }

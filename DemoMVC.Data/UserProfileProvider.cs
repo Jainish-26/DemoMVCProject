@@ -115,5 +115,19 @@ namespace DemoMVC.Data
         {
             return _db.webpages_Membership.Where(x => x.UserId == userId).FirstOrDefault();
         }
+
+        public List<UserStatusCountModel> IsActiveUser()
+        {
+            var data = _db.UserProfile
+            .GroupBy(u => u.IsActive)
+            .Select(group => new UserStatusCountModel
+            {
+                Status = group.Key ? "Active" : "Inactive",
+                Count = group.Count()
+            })
+            .ToList();
+
+            return data;
+        }
     }
 }

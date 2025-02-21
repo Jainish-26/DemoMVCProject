@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 
 namespace DemoMVC.Data
 {
@@ -93,6 +94,20 @@ namespace DemoMVC.Data
             _db.SaveChanges();
 
             return true;
+        }
+
+        public List<RoleUserCountModel> GetRolesWithUserCount()
+        {
+            var data = (from r in _db.webpages_Roles
+                        join ur in _db.webpages_UsersInRoles on r.RoleId equals ur.RoleId into userGroup
+                        select new RoleUserCountModel
+                        {
+                            RoleName = r.RoleName,
+                            IsActive = r.IsActive,
+                            UserCount = userGroup.Count()
+                        }).ToList();
+
+            return data;
         }
 
     }
