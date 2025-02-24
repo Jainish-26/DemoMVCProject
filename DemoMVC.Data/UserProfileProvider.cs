@@ -57,7 +57,7 @@ namespace DemoMVC.Data
                         RoleCode = role.RoleCode,
                         UpdatedOn = user.UpdatedOn == null ? user.CreatedOn : user.UpdatedOn
                     }).AsQueryable();
-        //            .Where(x => x.RoleCode.ToLower() != DemoMVC.Helper.Constants.RoleCode.SADMIN.ToLower()).AsQueryable();
+            //            .Where(x => x.RoleCode.ToLower() != DemoMVC.Helper.Constants.RoleCode.SADMIN.ToLower()).AsQueryable();
         }
         public int UpdateUserProfile(UserProfile userprofile)
         {

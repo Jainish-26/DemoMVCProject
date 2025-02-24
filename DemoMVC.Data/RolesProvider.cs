@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 
 namespace DemoMVC.Data
 {
@@ -15,12 +14,13 @@ namespace DemoMVC.Data
         }
         public List<webpages_Roles> GetAllRoles()
         {
-            var data = (from a in _db.webpages_Roles where a.IsActive==true && a.IsDeleted!=true select a).OrderByDescending(a => a.RoleId).ToList();
+            var data = (from a in _db.webpages_Roles where a.IsActive == true && a.IsDeleted != true select a).OrderByDescending(a => a.RoleId).ToList();
             return data;
         }
         public IQueryable<RolesGridModel> GetAllRolesGrid()
         {
-            return (from role in _db.webpages_Roles where role.IsDeleted != true
+            return (from role in _db.webpages_Roles
+                    where role.IsDeleted != true
                     select new RolesGridModel()
                     {
                         Id = role.RoleId,
@@ -74,7 +74,7 @@ namespace DemoMVC.Data
             return getRoleDetails;
         }
 
-        public bool DeleteRole(int id,int userId)
+        public bool DeleteRole(int id, int userId)
         {
             var role = GetRolesById(id);
 

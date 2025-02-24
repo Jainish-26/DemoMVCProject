@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Models
@@ -40,5 +37,5 @@ namespace DemoMVC.WebUi.Models
         public int UpdatedBy { get; set; }
         public DateTime UpdatedOn { get; set; }
     }
-    
+
 }

@@ -166,6 +166,6 @@ namespace DemoMVC.WebUi.Controllers
             {
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-        }      
+        }
     }
 }

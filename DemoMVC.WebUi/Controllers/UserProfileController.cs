@@ -149,7 +149,7 @@ namespace DemoMVC.WebUi.Controllers
                                                     CreatedBy = userId,
                                                     UpdatedOn = DateTime.UtcNow,
                                                     UpdatedBy = userId,
-                                                 });
+                                                });
                 Roles.AddUserToRole(userProfile.UserName, userProfile.Role);
             }
         }

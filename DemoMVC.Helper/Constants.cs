@@ -7,7 +7,7 @@
             public const string SADMIN = "SADMIN";
             public const string ADMIN = "ADMIN";
         }
-       
+
         public enum EmailCodes
         {
             SENDPROFILETOCANDIDATE,
