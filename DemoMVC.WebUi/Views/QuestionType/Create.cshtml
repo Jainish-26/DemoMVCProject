@@ -44,7 +44,7 @@
             .form-container h2 {
                 text-align: center;
                 margin-bottom: 20px;
-                color: #17a2b8; /* Teal Color */
+                color: #ff8c00; /* Teal Color */
             }
 
         .form-label {
@@ -52,7 +52,7 @@
         }
 
         .input-group-text {
-            background-color: #17a2b8;
+            background-color: #ff8c00;
             color: white;
             border: none;
         }
@@ -63,7 +63,7 @@
         }
 
         .btn-custom {
-            background: #17a2b8;
+            background: #ff8c00;
             color: white;
             border-radius: 5px;
             padding: 10px;
@@ -163,7 +163,7 @@
                 <div class="mb-3">
                     <label class="form-label">Name <span class="required-icon">*</span></label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        <span class="input-group-text"><i class="fa fa-bookmark"></i></span>
                         @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "Enter Subject Name" })
                     </div>
                     @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
@@ -188,7 +188,7 @@
 
                 <!-- Submit & Back Buttons -->
                 <div class="d-flex flex-column gap-2">
-                    <button type="submit" class="btn btn-custom"><i class="fa fa-save"></i> Save Subject</button>
+                    <button type="submit" class="btn btn-custom"><i class="fa fa-save"></i> Save</button>
                     <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back</a>
                 </div>
             }
