@@ -81,6 +81,7 @@
     <Compile Include="MessageProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RolesProvider.cs" />
+    <Compile Include="QuestionTypeProvider.cs" />
     <Compile Include="SubjectProvider.cs" />
     <Compile Include="UserProfileProvider.cs" />
   </ItemGroup>

@@ -164,6 +164,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
+    <Compile Include="Controllers\QuestionTypeController.cs" />
     <Compile Include="Controllers\SubjectController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Filters\ActivityLogFilter.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Helper\FormUtility.cs" />
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\FormModel.cs" />
+    <Compile Include="Models\QuestionTypeModel.cs" />
     <Compile Include="Models\RolesModel.cs" />
     <Compile Include="Models\SubjectModel.cs" />
     <Compile Include="Models\UserProfileModel.cs" />
@@ -2463,6 +2465,8 @@
     <Content Include="Views\CommonLookup\Index.cshtml" />
     <Content Include="Views\Subject\Index.cshtml" />
     <Content Include="Views\Subject\Create.cshtml" />
+    <Content Include="Views\QuestionType\Index.cshtml" />
+    <Content Include="Views\QuestionType\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

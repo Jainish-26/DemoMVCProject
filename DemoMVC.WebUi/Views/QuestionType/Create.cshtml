@@ -1,0 +1,202 @@
+﻿@model DemoMVC.WebUi.Models.QuestionTypeModel
+@using DemoMVC.Models
+@{
+    if (Model.Id > 0)
+    {
+        ViewBag.Title = "Edit QuestionType";
+    }
+    else
+    {
+        ViewBag.Title = "Add QuestionType";
+    }
+    string formCode = AuthorizeFormAccess.FormAccessCode.QUESTIONTYPE.ToString();
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f4f7f6;
+        }
+
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+            .form-container h2 {
+                text-align: center;
+                margin-bottom: 20px;
+                color: #17a2b8; /* Teal Color */
+            }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .input-group-text {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+        }
+
+        .required-icon {
+            color: red;
+            margin-left: 5px;
+        }
+
+        .btn-custom {
+            background: #17a2b8;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+            .btn-custom:hover {
+                background: #138496;
+            }
+
+        .btn-secondary {
+            width: 100%;
+        }
+
+        /* Toggle Button Customization */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-switch {
+            width: 60px;
+            height: 25px;
+            border-radius: 50px;
+            background-color: #ccc;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+
+            .toggle-switch::before {
+                content: '';
+                position: absolute;
+                width: 20px;
+                height: 20px;
+                background: white;
+                border-radius: 50%;
+                top: 50%;
+                left: 5px;
+                transform: translateY(-50%);
+                transition: all 0.3s ease-in-out;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+        .toggle-input:checked + .toggle-switch {
+            background-color: #28a745; /* Green when active */
+        }
+
+            .toggle-input:checked + .toggle-switch::before {
+                left: 40px;
+            }
+
+        .toggle-label {
+            font-weight: bold;
+            margin-left: 10px;
+            color: #dc3545; /* Red when inactive */
+            transition: color 0.3s ease-in-out;
+        }
+
+        .toggle-input:checked + .toggle-switch + .toggle-label {
+            color: #28a745; /* Green when active */
+        }
+
+        /* Hide default checkbox */
+        .toggle-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="form-container">
+            @{
+                if (Model.Id > 0)
+                {
+                    <h2>
+                        <i class="fa fa-book"></i> Edit QuestionType
+                    </h2>
+                }
+                else
+                {
+                    <h2>
+                        <i class="fa fa-book"></i> Create QuestionType
+                    </h2>
+                }
+
+            }
+            @Html.Hidden("hdnFormAccessCode", formCode)
+            @using (Html.BeginForm("Create", "QuestionType", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.HiddenFor(model => model.Id)
+                @Html.AntiForgeryToken()
+                <!-- Name -->
+                <div class="mb-3">
+                    <label class="form-label">Name <span class="required-icon">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = "Enter Subject Name" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Role Code -->
+                <div class="mb-3">
+                    <label class="form-label">Code <span class="required-icon">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-code"></i></span>
+                        @if (Model.Id > 0)
+                        {
+                            @Html.TextBoxFor(model => model.QuestionTypeCode, new { @class = "form-control", @readonly = "readonly" })
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(model => model.QuestionTypeCode, new { @class = "form-control text-uppercase", placeholder = "Enter Subject Code" })
+                        }
+                    </div>
+                    @Html.ValidationMessageFor(model => model.QuestionTypeCode, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- Submit & Back Buttons -->
+                <div class="d-flex flex-column gap-2">
+                    <button type="submit" class="btn btn-custom"><i class="fa fa-save"></i> Save Subject</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back</a>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

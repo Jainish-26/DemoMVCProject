@@ -71,7 +71,8 @@
             //OEMS CODE
             QUESTION = 63,
             EXAM = 64,
-            SUBJECT = 65
+            SUBJECT = 65,
+            QUESTIONTYPE = 66
         }
     }
 }

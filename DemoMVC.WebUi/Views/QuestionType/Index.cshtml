@@ -1,0 +1,127 @@
+﻿@using DemoMVC.Service
+@using Kendo.Mvc.UI
+@using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
+@using DemoMVC.WebUi.Controllers
+
+@model IEnumerable<DemoMVC.Models.QuestionTypesGridModel>
+
+@{
+    RoleService _roleService = new RoleService();
+    string role = _roleService.GetRolesById(SessionHelper.RoleId).RoleName;
+    string formCode = AuthorizeFormAccess.FormAccessCode.QUESTIONTYPE.ToString();
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
+    BaseController _base = new BaseController();
+    bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
+    bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
+}
+
+<h2 class="text-center fw-bold mt-4">Subject List</h2>
+
+<div class="d-flex justify-content-end m-2">
+    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+</div>
+
+<div class="common_white_box listingpage">
+    <div class="page-loader k-loading-image"></div>
+    @(Html.Kendo().Grid<DemoMVC.Models.QuestionTypesGridModel>()
+          .Name("gridQuestionType")
+          .AutoBind(false)
+          //.Excel(excel => excel
+          //      .FileName("RolesList.xlsx")
+          //      .Filterable(true)
+          //      .AllPages(true))
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.Name).Title("Name");
+              columns.Bound(c => c.QuestionTypeCode).Title("Subject Code");
+              if (role == "sadmin")
+              {
+                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "QuestionType") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
+                  //columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=Id#)'>Delete</button>" : "") +
+                  //"</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
+              }
+              else
+              {
+                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "QuestionType") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
+              }
+          })
+          .Events(evt => evt
+              .DataBinding("fnKendoGridCommonDataBinding")
+              .DataBound("fnKendoGridDataBoundEvent")
+          )
+          .NoRecords("No record found")
+          .Sortable()
+          .Pageable(pageable => pageable
+              .Refresh(true)
+              .PageSizes(new[] {10,20, 50, 100, 200 })
+              .ButtonCount(5)
+          )
+          .DataSource(dataSource => dataSource
+              .Ajax()
+              .Read(read => read.Action("GetGridData", "QuestionType")).PageSize(10)
+          ))
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#gridQuestionType').data('kendoGrid').dataSource.read();
+        $('#gridQuestionType').data('kendoGrid').refresh();
+
+    });
+
+    @*function confirmDelete(roleId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This role will be permanently deleted!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '@Url.Action("DeleteRole", "Roles")',
+                    type: 'POST',
+                    data: { id: roleId },
+                    success: function (response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: 'Role deleted successfully.',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                            $('#gridRoles').data('kendoGrid').dataSource.read();
+                            loadRoleChart(); // Refresh chart after delete
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message,
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function exportToExcel() {
+        var grid = $("#gridSubjects").data("kendoGrid");
+        grid.saveAsExcel();
+    }*@
+
+
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
