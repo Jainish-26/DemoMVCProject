@@ -163,6 +163,7 @@
     <Compile Include="Controllers\FormRoleMappingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MessageController.cs" />
+    <Compile Include="Controllers\QuestionController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\QuestionTypeController.cs" />
     <Compile Include="Controllers\SubjectController.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Helper\FormUtility.cs" />
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\FormModel.cs" />
+    <Compile Include="Models\QuestionAndAnswerModel.cs" />
     <Compile Include="Models\QuestionTypeModel.cs" />
     <Compile Include="Models\RolesModel.cs" />
     <Compile Include="Models\SubjectModel.cs" />
@@ -2467,6 +2469,8 @@
     <Content Include="Views\Subject\Create.cshtml" />
     <Content Include="Views\QuestionType\Index.cshtml" />
     <Content Include="Views\QuestionType\Create.cshtml" />
+    <Content Include="Views\Question\Create.cshtml" />
+    <Content Include="Views\Question\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

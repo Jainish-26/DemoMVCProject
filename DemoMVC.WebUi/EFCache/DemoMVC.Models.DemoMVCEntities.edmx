@@ -35,6 +35,67 @@
           <Property Name="MobileNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="PhoneNo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="Answers" customannotation:ClrType="DemoMVC.Models.Answers, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="AnswerId" />
+          </Key>
+          <Property Name="AnswerId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="QuestionId" Type="Int32" Nullable="false" />
+          <Property Name="AnswerText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="IsCorrect" Type="Boolean" Nullable="false" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="Int32" />
+          <Property Name="UpdatedOn" Type="DateTime" />
+          <NavigationProperty Name="Question" Relationship="Self.Answers_Question" FromRole="Answers_Question_Source" ToRole="Answers_Question_Target" />
+        </EntityType>
+        <EntityType Name="Questions" customannotation:ClrType="DemoMVC.Models.Questions, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="QuestionId" />
+          </Key>
+          <Property Name="QuestionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="QuestionText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QuestionImage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Marks" Type="Int32" Nullable="false" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="Difficulty" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QuestionTypeId" Type="Int32" Nullable="false" />
+          <Property Name="SubjectId" Type="Int32" Nullable="false" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" />
+          <Property Name="UpdatedBy" Type="Int32" />
+          <Property Name="UpdatedOn" Type="DateTime" />
+          <Property Name="IsDelete" Type="Boolean" Nullable="false" />
+          <Property Name="DeletedBy" Type="Int32" />
+          <Property Name="DeletedOn" Type="DateTime" />
+          <NavigationProperty Name="QuestionType" Relationship="Self.Questions_QuestionType" FromRole="Questions_QuestionType_Source" ToRole="Questions_QuestionType_Target" />
+          <NavigationProperty Name="Subject" Relationship="Self.Questions_Subject" FromRole="Questions_Subject_Source" ToRole="Questions_Subject_Target" />
+        </EntityType>
+        <EntityType Name="QuestionType" customannotation:ClrType="DemoMVC.Models.QuestionType, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="QuestionTypeId" />
+          </Key>
+          <Property Name="QuestionTypeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="QuestionTypeName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QuestionTypeCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="Int32" />
+          <Property Name="UpdatedOn" Type="DateTime" />
+        </EntityType>
+        <EntityType Name="Subject" customannotation:ClrType="DemoMVC.Models.Subject, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="SubjectId" />
+          </Key>
+          <Property Name="SubjectId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SubjectName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="SubjectCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" />
+          <Property Name="UpdatedBy" Type="Int32" />
+          <Property Name="UpdatedOn" Type="DateTime" />
+        </EntityType>
         <EntityType Name="CommonLookup" customannotation:ClrType="DemoMVC.Models.CommonLookup, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -126,31 +187,6 @@
           <Property Name="ModifiedBy" Type="Int32" />
           <Property Name="ModifiedOn" Type="DateTime" />
         </EntityType>
-        <EntityType Name="QuestionType" customannotation:ClrType="DemoMVC.Models.QuestionType, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <Key>
-            <PropertyRef Name="QuestionTypeId" />
-          </Key>
-          <Property Name="QuestionTypeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="QuestionTypeName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="QuestionTypeCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedBy" Type="Int32" />
-          <Property Name="CreatedOn" Type="DateTime" Nullable="false" />
-          <Property Name="UpdatedBy" Type="Int32" />
-          <Property Name="UpdatedOn" Type="DateTime" />
-        </EntityType>
-        <EntityType Name="Subject" customannotation:ClrType="DemoMVC.Models.Subject, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <Key>
-            <PropertyRef Name="SubjectId" />
-          </Key>
-          <Property Name="SubjectId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="SubjectName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="IsActive" Type="Boolean" Nullable="false" />
-          <Property Name="SubjectCode" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
-          <Property Name="CreatedOn" Type="DateTime" />
-          <Property Name="UpdatedBy" Type="Int32" />
-          <Property Name="UpdatedOn" Type="DateTime" />
-        </EntityType>
         <EntityType Name="webpages_Membership" customannotation:ClrType="DemoMVC.Models.webpages_Membership, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="UserId" />
@@ -208,16 +244,60 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="Questions_QuestionType">
+          <End Role="Questions_QuestionType_Source" Type="Self.Questions" Multiplicity="*" />
+          <End Role="Questions_QuestionType_Target" Type="Self.QuestionType" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Questions_QuestionType_Target">
+              <PropertyRef Name="QuestionTypeId" />
+            </Principal>
+            <Dependent Role="Questions_QuestionType_Source">
+              <PropertyRef Name="QuestionTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Questions_Subject">
+          <End Role="Questions_Subject_Source" Type="Self.Questions" Multiplicity="*" />
+          <End Role="Questions_Subject_Target" Type="Self.Subject" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Questions_Subject_Target">
+              <PropertyRef Name="SubjectId" />
+            </Principal>
+            <Dependent Role="Questions_Subject_Source">
+              <PropertyRef Name="SubjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Answers_Question">
+          <End Role="Answers_Question_Source" Type="Self.Answers" Multiplicity="*" />
+          <End Role="Answers_Question_Target" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="Answers_Question_Target">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="Answers_Question_Source">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="DemoMVCEntities" customannotation:UseClrTypes="true">
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" />
+          <EntitySet Name="Answers" EntityType="Self.Answers" />
+          <EntitySet Name="Questions" EntityType="Self.Questions" />
+          <EntitySet Name="QuestionType" EntityType="Self.QuestionType" />
+          <EntitySet Name="Subject" EntityType="Self.Subject" />
           <EntitySet Name="CommonLookup" EntityType="Self.CommonLookup" />
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" />
-          <EntitySet Name="QuestionType" EntityType="Self.QuestionType" />
-          <EntitySet Name="Subject" EntityType="Self.Subject" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" />
           <EntitySet Name="webpages_Roles" EntityType="Self.webpages_Roles" />
@@ -225,6 +305,18 @@
           <AssociationSet Name="ActivityLog_UserProfile" Association="Self.ActivityLog_UserProfile">
             <End Role="ActivityLog_UserProfile_Source" EntitySet="ActivityLog" />
             <End Role="ActivityLog_UserProfile_Target" EntitySet="UserProfile" />
+          </AssociationSet>
+          <AssociationSet Name="Questions_QuestionType" Association="Self.Questions_QuestionType">
+            <End Role="Questions_QuestionType_Source" EntitySet="Questions" />
+            <End Role="Questions_QuestionType_Target" EntitySet="QuestionType" />
+          </AssociationSet>
+          <AssociationSet Name="Questions_Subject" Association="Self.Questions_Subject">
+            <End Role="Questions_Subject_Source" EntitySet="Questions" />
+            <End Role="Questions_Subject_Target" EntitySet="Subject" />
+          </AssociationSet>
+          <AssociationSet Name="Answers_Question" Association="Self.Answers_Question">
+            <End Role="Answers_Question_Source" EntitySet="Answers" />
+            <End Role="Answers_Question_Target" EntitySet="Questions" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -262,6 +354,68 @@
                 <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
                 <ScalarProperty Name="MobileNo" ColumnName="MobileNo" />
                 <ScalarProperty Name="PhoneNo" ColumnName="PhoneNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Answers">
+            <EntityTypeMapping TypeName="DemoMVC.Models.Answers">
+              <MappingFragment StoreEntitySet="Answers">
+                <ScalarProperty Name="AnswerId" ColumnName="AnswerId" />
+                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
+                <ScalarProperty Name="AnswerText" ColumnName="AnswerText" />
+                <ScalarProperty Name="IsCorrect" ColumnName="IsCorrect" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Questions">
+            <EntityTypeMapping TypeName="DemoMVC.Models.Questions">
+              <MappingFragment StoreEntitySet="Questions">
+                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
+                <ScalarProperty Name="QuestionText" ColumnName="QuestionText" />
+                <ScalarProperty Name="QuestionImage" ColumnName="QuestionImage" />
+                <ScalarProperty Name="Marks" ColumnName="Marks" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="Difficulty" ColumnName="Difficulty" />
+                <ScalarProperty Name="QuestionTypeId" ColumnName="QuestionTypeId" />
+                <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+                <ScalarProperty Name="IsDelete" ColumnName="IsDelete" />
+                <ScalarProperty Name="DeletedBy" ColumnName="DeletedBy" />
+                <ScalarProperty Name="DeletedOn" ColumnName="DeletedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="QuestionType">
+            <EntityTypeMapping TypeName="DemoMVC.Models.QuestionType">
+              <MappingFragment StoreEntitySet="QuestionType">
+                <ScalarProperty Name="QuestionTypeId" ColumnName="QuestionTypeId" />
+                <ScalarProperty Name="QuestionTypeName" ColumnName="QuestionTypeName" />
+                <ScalarProperty Name="QuestionTypeCode" ColumnName="QuestionTypeCode" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Subject">
+            <EntityTypeMapping TypeName="DemoMVC.Models.Subject">
+              <MappingFragment StoreEntitySet="Subject">
+                <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
+                <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="SubjectCode" ColumnName="SubjectCode" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -361,33 +515,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="QuestionType">
-            <EntityTypeMapping TypeName="DemoMVC.Models.QuestionType">
-              <MappingFragment StoreEntitySet="QuestionType">
-                <ScalarProperty Name="QuestionTypeId" ColumnName="QuestionTypeId" />
-                <ScalarProperty Name="QuestionTypeName" ColumnName="QuestionTypeName" />
-                <ScalarProperty Name="QuestionTypeCode" ColumnName="QuestionTypeCode" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
-                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Subject">
-            <EntityTypeMapping TypeName="DemoMVC.Models.Subject">
-              <MappingFragment StoreEntitySet="Subject">
-                <ScalarProperty Name="SubjectId" ColumnName="SubjectId" />
-                <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
-                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
-                <ScalarProperty Name="SubjectCode" ColumnName="SubjectCode" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
-                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="webpages_Membership">
             <EntityTypeMapping TypeName="DemoMVC.Models.webpages_Membership">
               <MappingFragment StoreEntitySet="webpages_Membership">
@@ -472,6 +599,64 @@
           <Property Name="UpdatedBy" Type="int" Nullable="true" />
           <Property Name="MobileNo" Type="nvarchar(max)" Nullable="true" />
           <Property Name="PhoneNo" Type="nvarchar(max)" Nullable="true" />
+        </EntityType>
+        <EntityType Name="Answers">
+          <Key>
+            <PropertyRef Name="AnswerId" />
+          </Key>
+          <Property Name="AnswerId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="QuestionId" Type="int" customannotation:Index="{ Name: IX_QuestionId, Order: 0 }" Nullable="false" />
+          <Property Name="AnswerText" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="IsCorrect" Type="bit" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="int" Nullable="true" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
+        </EntityType>
+        <EntityType Name="Questions">
+          <Key>
+            <PropertyRef Name="QuestionId" />
+          </Key>
+          <Property Name="QuestionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="QuestionText" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="QuestionImage" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="Marks" Type="int" Nullable="false" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="Difficulty" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="QuestionTypeId" Type="int" customannotation:Index="{ Name: IX_QuestionTypeId, Order: 0 }" Nullable="false" />
+          <Property Name="SubjectId" Type="int" customannotation:Index="{ Name: IX_SubjectId, Order: 0 }" Nullable="false" />
+          <Property Name="CreatedBy" Type="int" Nullable="true" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="true" />
+          <Property Name="UpdatedBy" Type="int" Nullable="true" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
+          <Property Name="IsDelete" Type="bit" Nullable="false" />
+          <Property Name="DeletedBy" Type="int" Nullable="true" />
+          <Property Name="DeletedOn" Type="datetime" Nullable="true" />
+        </EntityType>
+        <EntityType Name="QuestionType">
+          <Key>
+            <PropertyRef Name="QuestionTypeId" />
+          </Key>
+          <Property Name="QuestionTypeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="QuestionTypeName" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="QuestionTypeCode" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedBy" Type="int" Nullable="true" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="int" Nullable="true" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
+        </EntityType>
+        <EntityType Name="Subject">
+          <Key>
+            <PropertyRef Name="SubjectId" />
+          </Key>
+          <Property Name="SubjectId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SubjectName" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="SubjectCode" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="true" />
+          <Property Name="UpdatedBy" Type="int" Nullable="true" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
         </EntityType>
         <EntityType Name="CommonLookup">
           <Key>
@@ -564,31 +749,6 @@
           <Property Name="ModifiedBy" Type="int" Nullable="true" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="true" />
         </EntityType>
-        <EntityType Name="QuestionType">
-          <Key>
-            <PropertyRef Name="QuestionTypeId" />
-          </Key>
-          <Property Name="QuestionTypeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="QuestionTypeName" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="QuestionTypeCode" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="CreatedBy" Type="int" Nullable="true" />
-          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
-          <Property Name="UpdatedBy" Type="int" Nullable="true" />
-          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
-        </EntityType>
-        <EntityType Name="Subject">
-          <Key>
-            <PropertyRef Name="SubjectId" />
-          </Key>
-          <Property Name="SubjectId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="SubjectName" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="IsActive" Type="bit" Nullable="false" />
-          <Property Name="SubjectCode" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="CreatedBy" Type="int" Nullable="false" />
-          <Property Name="CreatedOn" Type="datetime" Nullable="true" />
-          <Property Name="UpdatedBy" Type="int" Nullable="true" />
-          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
-        </EntityType>
         <EntityType Name="webpages_Membership">
           <Key>
             <PropertyRef Name="UserId" />
@@ -646,16 +806,60 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="Questions_QuestionType">
+          <End Role="QuestionType" Type="Self.QuestionType" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Questions" Type="Self.Questions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="QuestionType">
+              <PropertyRef Name="QuestionTypeId" />
+            </Principal>
+            <Dependent Role="Questions">
+              <PropertyRef Name="QuestionTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Questions_Subject">
+          <End Role="Subject" Type="Self.Subject" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Questions" Type="Self.Questions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Subject">
+              <PropertyRef Name="SubjectId" />
+            </Principal>
+            <Dependent Role="Questions">
+              <PropertyRef Name="SubjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="Answers_Question">
+          <End Role="Questions" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="Answers" Type="Self.Answers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Questions">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="Answers">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="CodeFirstDatabase">
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" Schema="dbo" Table="ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" Table="UserProfile" />
+          <EntitySet Name="Answers" EntityType="Self.Answers" Schema="dbo" Table="Answers" />
+          <EntitySet Name="Questions" EntityType="Self.Questions" Schema="dbo" Table="Questions" />
+          <EntitySet Name="QuestionType" EntityType="Self.QuestionType" Schema="dbo" Table="QuestionType" />
+          <EntitySet Name="Subject" EntityType="Self.Subject" Schema="dbo" Table="Subject" />
           <EntitySet Name="CommonLookup" EntityType="Self.CommonLookup" Schema="dbo" Table="CommonLookup" />
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" Schema="dbo" Table="ErrorLog" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" Schema="dbo" Table="Message_Mst" />
-          <EntitySet Name="QuestionType" EntityType="Self.QuestionType" Schema="dbo" Table="QuestionType" />
-          <EntitySet Name="Subject" EntityType="Self.Subject" Schema="dbo" Table="Subject" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" Schema="dbo" Table="webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" Schema="dbo" Table="webpages_OAuthMembership" />
           <EntitySet Name="webpages_Roles" EntityType="Self.webpages_Roles" Schema="dbo" Table="webpages_Roles" />
@@ -663,6 +867,18 @@
           <AssociationSet Name="ActivityLog_UserProfile" Association="Self.ActivityLog_UserProfile">
             <End Role="UserProfile" EntitySet="UserProfile" />
             <End Role="ActivityLog" EntitySet="ActivityLog" />
+          </AssociationSet>
+          <AssociationSet Name="Questions_QuestionType" Association="Self.Questions_QuestionType">
+            <End Role="QuestionType" EntitySet="QuestionType" />
+            <End Role="Questions" EntitySet="Questions" />
+          </AssociationSet>
+          <AssociationSet Name="Questions_Subject" Association="Self.Questions_Subject">
+            <End Role="Subject" EntitySet="Subject" />
+            <End Role="Questions" EntitySet="Questions" />
+          </AssociationSet>
+          <AssociationSet Name="Answers_Question" Association="Self.Answers_Question">
+            <End Role="Questions" EntitySet="Questions" />
+            <End Role="Answers" EntitySet="Answers" />
           </AssociationSet>
         </EntityContainer>
       </Schema>

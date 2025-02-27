@@ -53,13 +53,5 @@ namespace DemoMVC.Service
 
     }
 
-    public static class CommonLookupHelper
-    {
-        public static bool EnablePersistentGridState()
-        {
-            CommonLookupService _lookupService = new CommonLookupService();
-            CommonLookup lookupValue = _lookupService.GetLookupByType(LookupType.EnablePersistentGridState).FirstOrDefault();
-            return lookupValue == null || lookupValue.Name.ToLower() != "false";
-        }
-    }
+    
 }

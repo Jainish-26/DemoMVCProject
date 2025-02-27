@@ -13,7 +13,7 @@ namespace DemoMVC.Service
             _subjectProvider = new SubjectProvider();
         }
 
-        public List<Subject> GetAllRoles()
+        public List<Subject> GetAllSubjects()
         {
             return _subjectProvider.GetAllSubjects();
         }

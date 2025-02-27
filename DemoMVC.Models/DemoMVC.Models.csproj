@@ -76,6 +76,7 @@
     <Compile Include="AccessPermission.cs" />
     <Compile Include="AccountModel.cs" />
     <Compile Include="ActivityLog.cs" />
+    <Compile Include="Answers.cs" />
     <Compile Include="AuthorizeFormAccess.cs" />
     <Compile Include="CommonLookup.cs" />
     <Compile Include="DemoMVCContextConfiguration.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="MenuVW.cs" />
     <Compile Include="Message_Mst.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Questions.cs" />
     <Compile Include="QuestionType.cs" />
     <Compile Include="SessionHelper.cs" />
     <Compile Include="Subject.cs" />

@@ -7,21 +7,7 @@
             public const string SADMIN = "SADMIN";
             public const string ADMIN = "ADMIN";
         }
-
-        public enum EmailCodes
-        {
-            SENDPROFILETOCANDIDATE,
-            SENDMAILTODECIDINGAUTHORITY,
-            SENDCALENDARINVITE,
-            FORGOTPASSWORD,
-            OTPTODECIDINGAUTHORITY,
-            SENDINTERVIEWREMINDER,
-            OTPTOINTERVIEWER
-        }
-        public static class ConfigurableValue
-        {
-            public const double InteviewEndTimeMinute = 45;
-        }
+       
         public static class MessageCode
         {
             public const string EMAILSUCCESS = "EMAILSUCCESS";
@@ -43,19 +29,7 @@
             public const string USERLOGGEDOUT = "USERLOGGEDOUT";
             public const string POSITIONEXIST = "POSITIONEXIST";
         }
-        public static class WidgetCode
-        {
-            public const string ACTIVEREQUIREMENTS = "ACTIVEREQUIREMENTS";
-            public const string SHORTLISTED = "SHORTLISTED";
-            public const string INTERVIEWING = "INTERVIEWING";
-            public const string OFFERED = "OFFERED";
-            public const string CURRENTMONTH = "CURRENTMONTH";
-            public const string LASTSIXMONTH = "LASTSIXMONTH";
-        }
-        public static class CommentSourceType
-        {
-            public const string CANDIDATE = "CANDIDATE";
-        }
+       
 
         public static class ConfigurationStaticValues
         {
@@ -71,35 +45,7 @@
             Video = 2,
             Document = 3
         }
-        public static class CandidateStatusCode
-        {
-            public const string DRAFT = "DRAFT";
-            public const string INTERESTED = "INTERESTED";
-            public const string NOREPLY = "NOREPLY";
-            public const string EMAILED = "EMAILED";
-            public const string CALLBACKLATER = "CALLBACKLATER";
-        }
-        public static class HiringStatusCode
-        {
-            public const string INTERESTED = "INTERESTED";
-            public const string READYFORINTERVIEW = "READYFORINTERVIEW";
-            public const string SENTFORINITIALREVIEW = "SENTFORINITIALREVIEW";
-            public const string INITIALREVIEWAPPROVED = "INITIALREVIEWAPPROVED";
-            public const string INITIALREVIEWREJECTED = "INITIALREVIEWREJECTED";
-            public const string INTERVIEWSCHEDULED = "INTERVIEWSCHEDULED";
-            public const string SENTCALENDARINVITE = "SENTCALENDARINVITE";
-            public const string SENTINTERVIEWREMINDER = "SENTINTERVIEWREMINDER";
-            public const string INT1 = "INT1";
-            public const string INT2 = "INT2";
-            public const string FININT = "FININT";
-            public const string INTERVIEWED = "INTERVIEWED";
-            public const string OFFERED = "OFFERED";
-            public const string JOINED = "JOINED";
-            public const string ONNOTICEPERIOD = "ONNOTICEPERIOD";
-            public const string ONHOLD = "ONHOLD";
-            public const string REJECTED = "REJECTED";
-
-        }
+       
         public static class RequirementStatusCode
         {
             public const string OPEN = "OPEN";
@@ -108,6 +54,13 @@
         public static class OTPHelperCode
         {
             public const string OTPEXPIRYMINUTES = "OTPEXPIRYMINUTES";
+        }
+
+        public static class QuestionDifficultyLevel
+        {
+            public const string EASY = "EASY";
+            public const string MEDIUM = "MEDIUM";
+            public const string HARD = "HARD";
         }
     }
 }

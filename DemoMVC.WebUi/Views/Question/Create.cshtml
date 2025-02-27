@@ -1,0 +1,620 @@
+﻿@model DemoMVC.WebUi.Models.QuestionAndAnswerModel
+@using DemoMVC.Models
+@{
+    if(Model.QuestionId > 0)
+    {
+        ViewBag.Title = "Edit Question";
+    }
+    else
+    {
+        ViewBag.Title = "Create Question";
+    }
+    string formCode = AuthorizeFormAccess.FormAccessCode.QUESTION.ToString();
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@Html.Hidden("hdnFormAccessCode", formCode)
+@using (Html.BeginForm("Create", "Question", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+
+    @Html.HiddenFor(model => model.QuestionId)
+    @Html.AntiForgeryToken()
+    <div class="container custom-form p-4">
+        <div class="form-header">
+            <h4 class="text-center">
+                @{ 
+                    if (Model.QuestionId > 0)
+                    {
+                        ViewBag.Title = "Edit Question";
+                    }
+                    else
+                    {
+                        ViewBag.Title = "Create Question";
+                    }
+                }
+
+            </h4>
+            <div class="form-divider"></div>
+        </div>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="mb-4">
+            <label class="form-label">Question Type</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-question-circle"></i></span>
+                @Html.DropDownListFor(model => model.QuestionTypeId, Model._questionTypeList, new { @class = "form-select" })
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Subject</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-book"></i></span>
+                @Html.DropDownListFor(model => model.SubjectId, Model._subjectList, new { @class = "form-select" })
+            </div>
+        </div>
+
+        <div class="mb-4">
+            @Html.LabelFor(model => model.QuestionText, new { @class = "form-label" })
+            @Html.TextAreaFor(model => model.QuestionText, new { @class = "form-control", rows = "3", placeholder = "Enter question..." })
+            @Html.ValidationMessageFor(model => model.QuestionText, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="mb-4">
+            @Html.LabelFor(model => model.QuestionImage, new { @class = "form-label" })
+            <div class="file-input-wrapper">
+                <input type="file" class="form-control" name="QuestionImage" id="questionImageInput" />
+                <label for="questionImageInput" class="file-input-label"><i class="fas fa-upload me-2"></i>Choose file</label>
+                <span class="file-name">No file chosen</span>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            @Html.LabelFor(model => model.Marks, new { @class = "form-label" })
+            @Html.EditorFor(model => model.Marks, new { htmlAttributes = new { @class = "form-control", type = "number", min = "1" } })
+            @Html.ValidationMessageFor(model => model.Marks, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Difficulty</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
+                @Html.DropDownListFor(model => model.Difficulty, Model._difficultyList, new { @class = "form-select" })
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <div class="status-row">
+                <label class="form-label status-label">Status</label>
+                <div class="toggle-container">
+                    <input type="checkbox" id="IsActiveToggle" class="toggle-input" @(Model.IsActive ? "checked" : "")>
+                    <label for="IsActiveToggle" class="toggle-label">
+                        <span class="toggle-on">ON</span>
+                        <span class="toggle-off">OFF</span>
+                    </label>
+                    <span class="status-text">@(Model.IsActive ? "Active" : "Inactive")</span>
+                    @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
+                </div>
+            </div>
+        </div>
+
+        <div class="card answer-section mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>Answers</h5>
+            </div>
+            <div class="card-body">
+                <div id="answer-container">
+                    @if (Model.Answers != null && Model.Answers.Any())
+                    {
+                        for (int i = 0; i < Model.Answers.Count; i++)
+                        {
+                            
+                            <div class="row g-2 answer-item">
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(m => m.Answers[i].AnswerText, new { @class = "form-control", placeholder = "Enter answer" })
+                                </div>
+                                <div class="col-md-3 d-flex align-items-center">
+                                    <div class="toggle-container small-toggle">
+                                        <input type="checkbox" id="IsCorrectToggle_@i" class="toggle-input answer-toggle" @(Model.Answers[i].IsCorrect ? "checked" : "")>
+                                        <label for="IsCorrectToggle_@i" class="toggle-label">
+                                            <span class="toggle-on">ON</span>
+                                            <span class="toggle-off">OFF</span>
+                                        </label>
+                                        <span class="status-text">Correct</span>
+                                        @Html.HiddenFor(m => m.Answers[i].IsCorrect, new { @id = $"IsCorrect_{i}" })
+                                        @Html.HiddenFor(model => model.Answers[i].AnswerId)
+                                    </div>
+                                </div>
+                                <div class="col-md-1 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger remove-answer" data-id="@Model.Answers[i].AnswerId"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <button type="button" id="addAnswerBtn" class="btn btn-success add-answer mt-3"><i class="fas fa-plus me-2"></i>Add Answer</button>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Create</button>
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+}
+
+<style>
+    /* General Styles */
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+        color: #333;
+    }
+
+    .custom-form {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 32px;
+        transition: all 0.3s ease;
+    }
+
+    .form-header {
+        margin-bottom: 30px;
+    }
+
+        .form-header h4 {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+    .form-divider {
+        height: 4px;
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        border-radius: 2px;
+        margin: 0 auto;
+        width: 100px;
+    }
+
+    /* Form Elements */
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 15px;
+    }
+
+    .form-control, .form-select {
+        padding: 12px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #e0e6ed;
+        color: #6c757d;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        outline: none;
+    }
+
+    /* Custom File Input */
+    .file-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    #questionImageInput {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .file-input-label {
+        display: inline-block;
+        padding: 10px 16px;
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 10px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+        .file-input-label:hover {
+            background-color: #e2e6ea;
+        }
+
+    .file-name {
+        color: #6c757d;
+    }
+
+    /* Status toggle */
+    .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f8f9fa;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid #e0e6ed;
+    }
+
+    .status-label {
+        margin-bottom: 0;
+    }
+
+    .toggle-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .toggle-input {
+        height: 0;
+        width: 0;
+        opacity: 0;
+        position: absolute;
+    }
+
+    .toggle-label {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+        background-color: #ccc;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin: 0;
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .small-toggle .toggle-label {
+        width: 46px;
+        height: 24px;
+    }
+
+    .toggle-label:after {
+        content: '';
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: white;
+        top: 3px;
+        left: 3px;
+        transition: 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .small-toggle .toggle-label:after {
+        width: 18px;
+        height: 18px;
+        top: 3px;
+        left: 3px;
+    }
+
+    .toggle-input:checked + .toggle-label {
+        background-color: #2ecc71;
+    }
+
+        .toggle-input:checked + .toggle-label:after {
+            transform: translateX(30px);
+        }
+
+    .small-toggle .toggle-input:checked + .toggle-label:after {
+        transform: translateX(22px);
+    }
+
+    .toggle-on, .toggle-off {
+        color: white;
+        position: absolute;
+        font-size: 10px;
+        font-weight: bold;
+        top: 7px;
+    }
+
+    .toggle-on {
+        left: 10px;
+        display: none;
+    }
+
+    .toggle-off {
+        right: 10px;
+    }
+
+    .toggle-input:checked + .toggle-label .toggle-on {
+        display: inline;
+    }
+
+    .toggle-input:checked + .toggle-label .toggle-off {
+        display: none;
+    }
+
+    .status-text {
+        margin-left: 10px;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    /* Answer Section */
+    .answer-section {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e6ed;
+        padding: 16px 20px;
+    }
+
+        .card-header h5 {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .answer-item {
+        background: #f9f9fa;
+        padding: 16px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        border: 1px solid #e0e6ed;
+        transition: all 0.3s;
+    }
+
+        .answer-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+    .remove-answer {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .remove-answer:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+    .add-answer {
+        background: linear-gradient(to right, #2ecc71, #27ae60);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .add-answer:hover {
+            background: linear-gradient(to right, #27ae60, #219653);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, #3498db, #2980b9);
+        border: none;
+        box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #2980b9, #2573a7);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(52, 152, 219, 0.4);
+        }
+
+    .btn-secondary {
+        background-color: #95a5a6;
+        border: none;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            color: white;
+        }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .custom-form {
+            padding: 20px;
+            margin: 20px 10px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .status-row {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .toggle-container {
+            margin-top: 10px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // File input enhancement
+        const fileInput = document.getElementById('questionImageInput');
+        const fileName = document.querySelector('.file-name');
+
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length > 0) {
+                fileName.textContent = fileInput.files[0].name;
+            } else {
+                fileName.textContent = 'No file chosen';
+            }
+        });
+
+        // IsActive toggle logic
+        var toggleInput = document.getElementById("IsActiveToggle");
+        var hiddenInput = document.getElementById("IsActive");
+        var statusText = document.querySelector(".toggle-container .status-text");
+
+        function updateToggleStatus() {
+            if (toggleInput.checked) {
+                statusText.textContent = "Active";
+                hiddenInput.value = "True";
+            } else {
+                statusText.textContent = "Inactive";
+                hiddenInput.value = "False";
+            }
+        }
+
+        toggleInput.addEventListener("change", updateToggleStatus);
+        updateToggleStatus();
+
+        // Initialize IsCorrect toggle logic for existing answer items
+        function initializeIsCorrectToggles() {
+            document.querySelectorAll('.answer-toggle').forEach(function (toggle) {
+                if (toggle.id && toggle.id.startsWith('IsCorrectToggle_')) {
+                    var index = toggle.id.split('_')[1];
+                    var hiddenField = document.getElementById(`IsCorrect_${index}`);
+
+                    toggle.addEventListener('change', function () {
+                        hiddenField.value = toggle.checked ? "True" : "False";
+                    });
+
+                    // Set initial value
+                    hiddenField.value = toggle.checked ? "True" : "False";
+                }
+            });
+        }
+
+        initializeIsCorrectToggles();
+
+        // Add event handlers for remove buttons
+        function setupRemoveButtons() {
+            document.querySelectorAll('.remove-answer').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    this.closest('.answer-item').remove();
+                });
+            });
+        }
+
+        setupRemoveButtons();
+
+        // Add new answer logic
+        document.getElementById("addAnswerBtn").addEventListener("click", function () {
+            var container = document.getElementById("answer-container");
+            var index = container.children.length;
+            var newAnswer = document.createElement("div");
+            newAnswer.classList.add("row", "g-2", "answer-item");
+            newAnswer.innerHTML = `
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="Answers[${index}].AnswerText" placeholder="Enter answer">
+                </div>
+                <div class="col-md-3 d-flex align-items-center">
+                    <div class="toggle-container small-toggle">
+                        <input type="checkbox" id="IsCorrectToggle_${index}" class="toggle-input answer-toggle">
+                        <label for="IsCorrectToggle_${index}" class="toggle-label">
+                            <span class="toggle-on">ON</span>
+                            <span class="toggle-off">OFF</span>
+                        </label>
+                        <span class="status-text">Correct</span>
+                        <input type="hidden" id="IsCorrect_${index}" name="Answers[${index}].IsCorrect" value="False">
+                    </div>
+                </div>
+                <div class="col-md-1 d-flex align-items-center">
+                    <button type="button" class="btn btn-danger remove-answer"><i class="fas fa-trash"></i></button>
+                </div>`;
+            container.appendChild(newAnswer);
+
+            // Add event listener for the new toggle
+            var newToggle = document.getElementById(`IsCorrectToggle_${index}`);
+            var newHiddenInput = document.getElementById(`IsCorrect_${index}`);
+
+            newToggle.addEventListener('change', function () {
+                newHiddenInput.value = newToggle.checked ? "True" : "False";
+            });
+
+            // Setup remove button for the new answer
+            var newRemoveButton = newAnswer.querySelector('.remove-answer');
+            newRemoveButton.addEventListener('click', function () {
+                newAnswer.remove();
+            });
+        });
+
+        $(document).on("click", ".remove-answer", function () {
+            var button = $(this); 
+            var answerId = button.data("id");
+
+            if (answerId) {
+                $.ajax({
+                    url: '/Question/DeleteAnswer',
+                    type: 'POST', 
+                    data: { id: answerId },
+                    success: function (response) {
+                        if (response.success) { 
+                            button.closest(".answer-item").remove(); 
+                        } else {
+                            console.error("Failed to delete answer:", response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("AJAX error:", error);
+                    }
+                });
+            } else {
+                button.closest(".answer-item").remove(); 
+            }
+        });
+
+    });
+</script>

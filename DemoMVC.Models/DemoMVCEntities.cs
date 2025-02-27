@@ -27,5 +27,8 @@ namespace DemoMVC.Models
         public DbSet<CommonLookup> CommonLookup { get; set; }
         public DbSet<Subject> Subject { get; set; }
         public DbSet<QuestionType> QuestionType { get; set; }
+        public DbSet<Questions> Questions { get; set; }
+        public DbSet<Answers> Answers { get; set; }
+
     }
 }

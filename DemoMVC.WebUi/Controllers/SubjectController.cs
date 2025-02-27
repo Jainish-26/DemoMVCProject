@@ -1,4 +1,5 @@
-﻿using DemoMVC.Models;
+﻿using DemoMVC.Helper;
+using DemoMVC.Models;
 using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
@@ -17,12 +18,11 @@ namespace DemoMVC.WebUi.Controllers
         public SubjectController()
         {
             _subjectService = new SubjectService();
-            _messageService = new MessageService();
         }
         // GET: Subject
         public ActionResult Index()
         {
-            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.SUBJECT.ToString(), AccessPermission.IsView))
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), AccessPermission.IsView))
             {
                 return RedirectToAction("AccessDenied", "Base");
             }
@@ -41,7 +41,7 @@ namespace DemoMVC.WebUi.Controllers
                 actionPermission = AccessPermission.IsEdit;
             }
 
-            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.SUBJECT.ToString(), actionPermission))
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), actionPermission))
             {
                 return RedirectToAction("AccessDenied", "Base");
             }
@@ -72,7 +72,7 @@ namespace DemoMVC.WebUi.Controllers
                 actionPermission = AccessPermission.IsEdit;
             }
 
-            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.SUBJECT.ToString(), actionPermission))
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.ROLES.ToString(), actionPermission))
             {
                 return RedirectToAction("AccessDenied", "Base");
             }
@@ -133,7 +133,7 @@ namespace DemoMVC.WebUi.Controllers
             }
             if (getSubjectDetails.Count() > 0)
             {
-                var message = _messageService.GetMessageByCode(DemoMVC.Helper.Constants.MessageCode.CODEEXIST);
+                var message = _messageService.GetMessageByCode(Constants.MessageCode.CODEEXIST);
                 return Json(message, JsonRequestBehavior.AllowGet);
 
             }
