@@ -32,14 +32,15 @@ namespace DemoMVC.Data
                         Type = q.QuestionType.QuestionTypeName,
                         Subject = q.Subject.SubjectName,
                         QuestionText = q.QuestionText,
-                        QuestionImage = q.QuestionImage,
-                        BadgeCode = (from difficulty in _db.CommonLookup where q.Difficulty == difficulty.Code select difficulty.BadgeCode).FirstOrDefault(), 
+                        QuestionImage = q.QuestionImage, 
+                        BadgeCode = (from difficulty in _db.CommonLookup where q.Difficulty == difficulty.Code select difficulty.BadgeCode).FirstOrDefault(),
                         Marks = q.Marks,
                         Difficulty = q.Difficulty,
                         IsActive = q.IsActive,
 
                     }).AsQueryable();
         }
+
 
         public int CreateQuestion(Questions questiion)
         {

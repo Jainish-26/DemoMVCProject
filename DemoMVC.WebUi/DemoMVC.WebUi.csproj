@@ -2471,9 +2471,11 @@
     <Content Include="Views\QuestionType\Create.cshtml" />
     <Content Include="Views\Question\Create.cshtml" />
     <Content Include="Views\Question\Index.cshtml" />
+    <Content Include="Views\Question\_ImagePopup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="content\QuestionImage\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

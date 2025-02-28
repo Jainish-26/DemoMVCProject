@@ -66,8 +66,14 @@
             <div class="file-input-wrapper">
                 <input type="file" class="form-control" name="QuestionImage" id="questionImageInput" />
                 <label for="questionImageInput" class="file-input-label"><i class="fas fa-upload me-2"></i>Choose file</label>
-                <span class="file-name">No file chosen</span>
+                <span class="file-name">@(string.IsNullOrEmpty(Model.QuestionImage) ? "No file chosen" : Model.QuestionImage)</span>
             </div>
+            @if (!string.IsNullOrEmpty(Model.QuestionImage))
+            {
+                <div class="mt-2">
+                    <img src="@Url.Content("~/content/QuestionImage/" + Model.QuestionImage)" alt="Question Image" class="preview-image" />
+                </div>
+            }
         </div>
 
         <div class="mb-4">
@@ -152,6 +158,15 @@
         color: #333;
     }
 
+    .preview-image {
+        max-width: 150px;
+        max-height: 150px;
+        border-radius: 8px;
+        border: 1px solid #e0e6ed;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+   
     .custom-form {
         background: #fff;
         border-radius: 12px;

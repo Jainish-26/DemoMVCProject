@@ -7,6 +7,7 @@ using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.ApplicationServices;
@@ -94,7 +95,7 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(QuestionAndAnswerModel model)
+        public ActionResult Create(QuestionAndAnswerModel model, HttpPostedFileBase QuestionImage)
         {
             string actionPermission = "";
             if (model.QuestionId == 0)
@@ -112,7 +113,7 @@ namespace DemoMVC.WebUi.Controllers
 
             if (ModelState.IsValid)
             {
-                SaveAndUpdateQuestion(model);
+                SaveAndUpdateQuestion(model,QuestionImage);
                 return RedirectToAction("Index");
             }
             else
@@ -124,30 +125,37 @@ namespace DemoMVC.WebUi.Controllers
             }
         }
 
-        public QuestionAndAnswerModel SaveAndUpdateQuestion(QuestionAndAnswerModel model)
+        public QuestionAndAnswerModel SaveAndUpdateQuestion(QuestionAndAnswerModel model, HttpPostedFileBase QuestionImage)
         {
             int userId = SessionHelper.UserId;
             Questions que = new Questions();
             Answers ans = new Answers();
+
             if (model.QuestionId > 0)
             {
                 que = _questionService.GetById(model.QuestionId);
               
             }
 
-            //que.QuestionId = model.QuestionId;
+            if (QuestionImage != null)
+            {
+                string uniqueCode = new string(Enumerable.Range(0, 10).Select(_ => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[new Random().Next(62)]).ToArray());
+
+                que.QuestionImage = uniqueCode+Path.GetExtension(QuestionImage.FileName);
+                QuestionImage.SaveAs(Server.MapPath("~/content/QuestionImage/") + que.QuestionImage);
+            }
+            
             que.QuestionText = model.QuestionText;
-            que.QuestionImage = model.QuestionImage;
             que.Marks = model.Marks;
             que.IsActive = model.IsActive;
             que.Difficulty = model.Difficulty;
+            que.SubjectId = model.SubjectId;
+            que.QuestionTypeId = model.QuestionTypeId;
 
             if (model.QuestionId == 0)
             {
                 que.CreatedBy = userId;
                 que.CreatedOn = DateTime.UtcNow;
-                que.SubjectId = model.SubjectId;
-                que.QuestionTypeId = model.QuestionTypeId;
                 que.QuestionId = _questionService.CreateQuestion(que);
                 foreach (var answer in model.Answers)
                 {
@@ -194,12 +202,7 @@ namespace DemoMVC.WebUi.Controllers
                             _answerService.UpdateAnswers(existingAnswer);
                             
                         }
-                        else
-                        {
-                            existingAnswer.UpdatedBy = model.CreatedBy;
-                            existingAnswer.UpdatedOn = model.CreatedOn;
-                            _answerService.UpdateAnswers(existingAnswer);
-                        }
+                        
 
                     }
                     else if (answer.AnswerId == 0)
@@ -294,6 +297,18 @@ namespace DemoMVC.WebUi.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+        public ActionResult GetImagePopup(int id)
+        {
+            var question = _questionService.GetAllQuestionsGridModel().FirstOrDefault(q => q.QuestionId == id);
+
+            if (question.QuestionImage == null)
+            {
+                return HttpNotFound();
+            }
+
+            return PartialView("_ImagePopup", question);
+        }
+
 
     }
 }

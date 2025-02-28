@@ -16,8 +16,19 @@
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
-
+<style>
+    .grid-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover; /* Ensures the image fills the space without distortion */
+        display: inline-block;
+        text-align: center;
+        font-size: 50px; /* Adjust for the icon */
+        color: gray; /* Icon color */
+    }
+</style>
 <h2 class="text-center fw-bold mt-4">Question List</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="d-flex justify-content-end m-2">
     @Html.ActionLink("Create New", "Create", "Question", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
@@ -34,7 +45,12 @@
             //  .AllPages(true))
             .Columns(columns =>
             {
-                columns.Bound(c => c.QuestionImage).Width("7%").Title("Image");
+                columns.Bound(c => c.QuestionImage).Width("7%").Title("Image").ClientTemplate(
+                "# if(QuestionImage) { #" +
+                "<img src='/content/QuestionImage/#= QuestionImage #' alt='Question Image' class='grid-image' onclick='openImagePopup(\"#=QuestionId#\")' />" +
+                "# } else { #" +
+                "<i class='fas fa-image grid-image' onclick='openImagePopup(\"#= QuestionId #\")'></i>" +
+                "# } #" );
                 columns.Bound(c => c.Subject).Width("7%").Title("Subject");
                 columns.Bound(c => c.Type).Width("7%").Title("Answer Type");
                 columns.Bound(c => c.QuestionText).Width("50%").Title("Question");
@@ -74,7 +90,7 @@
         )
 </div>
 
-
+<div id="imageModalContainer"></div>
 <script>
     $(document).ready(function () {
         $('#gridQuestion').data('kendoGrid').dataSource.read();
@@ -123,8 +139,30 @@
             });
         }
     });
-}
+    }
+
+   
+    function openImagePopup(QuestionId) {
+        console.log("Question ID:", QuestionId);
+        $.ajax({
+            url: '@Url.Action("GetImagePopup", "Question")',
+            type: 'GET',
+            data: { id: QuestionId },
+            
+            success: function (response) {
+                console.log("Question ID:", response);
+                // Append modal content and show it
+                $("#imageModalContainer").html(response);
+                $("#imageModal").modal("show");
+            },
+            error: function () {
+                alert("Failed to load image.");
+            }
+        });
+    }
 </script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
