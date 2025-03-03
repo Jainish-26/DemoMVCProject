@@ -20,16 +20,19 @@ namespace DemoMVC.WebUi.Models
 
         
         public int QuestionId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Question text is required.")]
         public string QuestionText { get; set; }
         public string QuestionImage { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Marks are required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Marks must be a positive number.")]
         public int Marks { get; set; }
         [Required]
         public bool IsActive { get; set; } = false;
-
+        [Required(ErrorMessage = "Please select a question type.")]
         public int QuestionTypeId { get; set; }
+        [Required(ErrorMessage = "Please select a subject.")]
         public int SubjectId { get; set; }
+        [Required(ErrorMessage = "Please select a difficulty level.")]
         public string Difficulty { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
@@ -50,7 +53,7 @@ namespace DemoMVC.WebUi.Models
         public int AnswerId { get; set; }
         
         public int QuestionId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Please Enter Ans.")]
         public string AnswerText { get; set; }
    
         public bool IsCorrect { get; set; } = false;

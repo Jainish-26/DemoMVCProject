@@ -64,6 +64,10 @@
                     columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=QuestionId#)'>Delete</button>" : "") +
                     "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
                 }
+                else
+                {
+
+                }
             })
             .NoRecords("No record found")
             .Events(evt => evt

@@ -1,7 +1,7 @@
 ﻿@model DemoMVC.WebUi.Models.QuestionAndAnswerModel
 @using DemoMVC.Models
 @{
-    if(Model.QuestionId > 0)
+    if (Model.QuestionId > 0)
     {
         ViewBag.Title = "Edit Question";
     }
@@ -20,134 +20,136 @@
     @Html.HiddenFor(model => model.QuestionId)
     @Html.AntiForgeryToken()
     <div class="container custom-form p-4">
-        <div class="form-header">
-            <h4 class="text-center">
-                @{ 
-                    if (Model.QuestionId > 0)
-                    {
-                        ViewBag.Title = "Edit Question";
-                    }
-                    else
-                    {
-                        ViewBag.Title = "Create Question";
-                    }
-                }
-
-            </h4>
+        <div class="form-header text-center">
+            <h4>@(Model.QuestionId > 0 ? "Edit Question" : "Create Question")</h4>
             <div class="form-divider"></div>
         </div>
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-        <div class="mb-4">
-            <label class="form-label">Question Type</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-question-circle"></i></span>
-                @Html.DropDownListFor(model => model.QuestionTypeId, Model._questionTypeList, new { @class = "form-select" })
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label">Subject</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-book"></i></span>
-                @Html.DropDownListFor(model => model.SubjectId, Model._subjectList, new { @class = "form-select" })
-            </div>
-        </div>
-
-        <div class="mb-4">
-            @Html.LabelFor(model => model.QuestionText, new { @class = "form-label" })
-            @Html.TextAreaFor(model => model.QuestionText, new { @class = "form-control", rows = "3", placeholder = "Enter question..." })
-            @Html.ValidationMessageFor(model => model.QuestionText, "", new { @class = "text-danger" })
-        </div>
-
-        <div class="mb-4">
-            @Html.LabelFor(model => model.QuestionImage, new { @class = "form-label" })
-            <div class="file-input-wrapper">
-                <input type="file" class="form-control" name="QuestionImage" id="questionImageInput" />
-                <label for="questionImageInput" class="file-input-label"><i class="fas fa-upload me-2"></i>Choose file</label>
-                <span class="file-name">@(string.IsNullOrEmpty(Model.QuestionImage) ? "No file chosen" : Model.QuestionImage)</span>
-            </div>
-            @if (!string.IsNullOrEmpty(Model.QuestionImage))
-            {
-                <div class="mt-2">
-                    <img src="@Url.Content("~/content/QuestionImage/" + Model.QuestionImage)" alt="Question Image" class="preview-image" />
-                </div>
-            }
-        </div>
-
-        <div class="mb-4">
-            @Html.LabelFor(model => model.Marks, new { @class = "form-label" })
-            @Html.EditorFor(model => model.Marks, new { htmlAttributes = new { @class = "form-control", type = "number", min = "1" } })
-            @Html.ValidationMessageFor(model => model.Marks, "", new { @class = "text-danger" })
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label">Difficulty</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
-                @Html.DropDownListFor(model => model.Difficulty, Model._difficultyList, new { @class = "form-select" })
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <div class="status-row">
-                <label class="form-label status-label">Status</label>
-                <div class="toggle-container">
-                    <input type="checkbox" id="IsActiveToggle" class="toggle-input" @(Model.IsActive ? "checked" : "")>
-                    <label for="IsActiveToggle" class="toggle-label">
-                        <span class="toggle-on">ON</span>
-                        <span class="toggle-off">OFF</span>
-                    </label>
-                    <span class="status-text">@(Model.IsActive ? "Active" : "Inactive")</span>
-                    @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
-                </div>
-            </div>
-        </div>
-
-        <div class="card answer-section mb-4">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>Answers</h5>
-            </div>
-            <div class="card-body">
-                <div id="answer-container">
-                    @if (Model.Answers != null && Model.Answers.Any())
-                    {
-                        for (int i = 0; i < Model.Answers.Count; i++)
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-md-7">
+                <div class="row g-3">
+                    <!-- Question Type -->
+                    <div class="col-md-4">
+                        <label class="form-label">Question Type</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-question-circle"></i></span>
+                            @Html.DropDownListFor(model => model.QuestionTypeId, Model._questionTypeList, new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.QuestionTypeId, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Subject -->
+                    <div class="col-md-4">
+                        <label class="form-label">Subject</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-book"></i></span>
+                            @Html.DropDownListFor(model => model.SubjectId, Model._subjectList, new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.SubjectId, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Difficulty -->
+                    <div class="col-md-4">
+                        <label class="form-label">Difficulty</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
+                            @Html.DropDownListFor(model => model.Difficulty, Model._difficultyList, new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Difficulty, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Question Text -->
+                    <div class="col-12">
+                        @Html.LabelFor(model => model.QuestionText, new { @class = "form-label" })
+                        @Html.TextAreaFor(model => model.QuestionText, new { @class = "form-control", rows = "2", style = "resize: none; width: 95%;" })
+                        @Html.ValidationMessageFor(model => model.QuestionText, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Marks -->
+                    <div class="col-md-6">
+                        <label class="form-label">Marks</label>
+                        @Html.EditorFor(model => model.Marks, new { htmlAttributes = new { @class = "form-control", type = "text", id = "marksInput" } })
+                        @Html.ValidationMessageFor(model => model.Marks, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- IsActive -->
+                    <div class="col-12 mt-3">
+                        <label class="form-label">Status</label>
+                        <div class="toggle-container">
+                            <input type="checkbox" id="IsActiveToggle" class="toggle-input" @(Model.IsActive ? "checked" : "")>
+                            <label for="IsActiveToggle" class="toggle-label">
+                                <span class="toggle-on">ON</span>
+                                <span class="toggle-off">OFF</span>
+                            </label>
+                            <span class="status-text" style=" padding-left:200px">@(Model.IsActive ? "Active" : "Inactive")</span>
+                            @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
+                        </div>
+                    </div>
+                    <!-- Image -->
+                    <div class="col-12 mt-3">
+                        <label class="form-label">Question Image</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" class="form-control" name="QuestionImage" id="questionImageInput" />
+                            <label for="questionImageInput" class="file-input-label"><i class="fas fa-upload me-2"></i>Choose file</label>
+                            <span class="file-name">@(string.IsNullOrEmpty(Model.QuestionImage) ? "No file chosen" : Model.QuestionImage)</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.QuestionImage))
                         {
-                            
-                            <div class="row g-2 answer-item">
-                                <div class="col-md-8">
-                                    @Html.TextBoxFor(m => m.Answers[i].AnswerText, new { @class = "form-control", placeholder = "Enter answer" })
-                                </div>
-                                <div class="col-md-3 d-flex align-items-center">
-                                    <div class="toggle-container small-toggle">
-                                        <input type="checkbox" id="IsCorrectToggle_@i" class="toggle-input answer-toggle" @(Model.Answers[i].IsCorrect ? "checked" : "")>
-                                        <label for="IsCorrectToggle_@i" class="toggle-label">
-                                            <span class="toggle-on">ON</span>
-                                            <span class="toggle-off">OFF</span>
-                                        </label>
-                                        <span class="status-text">Correct</span>
-                                        @Html.HiddenFor(m => m.Answers[i].IsCorrect, new { @id = $"IsCorrect_{i}" })
-                                        @Html.HiddenFor(model => model.Answers[i].AnswerId)
-                                    </div>
-                                </div>
-                                <div class="col-md-1 d-flex align-items-center">
-                                    <button type="button" class="btn btn-danger remove-answer" data-id="@Model.Answers[i].AnswerId"><i class="fas fa-trash"></i></button>
-                                </div>
+                            <div class="mt-2">
+                                <img src="@Url.Content("~/content/QuestionImage/" + Model.QuestionImage)" alt="Question Image" class="preview-image img-fluid" />
                             </div>
                         }
-                    }
+                    </div>
                 </div>
-                <button type="button" id="addAnswerBtn" class="btn btn-success add-answer mt-3"><i class="fas fa-plus me-2"></i>Add Answer</button>
+            </div>
+
+            <!-- Right Column - Answer Section -->
+            <div class="col-md-5">
+                <div class="card answer-section">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i>Answers</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="answer-container" class="d-flex flex-column gap-2">
+                            @if (Model.Answers != null && Model.Answers.Any())
+                            {
+                                for (int i = 0; i < Model.Answers.Count; i++)
+                                {
+                                    <div class="row g-2 answer-item">
+                                        <div class="col-md-8" style="margin-top:5px">
+                                            @Html.TextAreaFor(m => m.Answers[i].AnswerText, new { @class = "form-control answer-text", placeholder = "Enter answer" })
+                                            @Html.ValidationMessageFor(m => m.Answers[i].AnswerText, "", new { @class = "text-danger answer-error" })
+                                        </div>
+
+                                        <div class="col-md-3 d-flex align-items-center">
+                                            <div class="toggle-container small-toggle">
+                                                <input type="checkbox" id="IsCorrectToggle_@i" class="toggle-input answer-toggle" @(Model.Answers[i].IsCorrect ? "checked" : "")>
+                                                <label for="IsCorrectToggle_@i" class="toggle-label">
+                                                    <span class="toggle-on">ON</span>
+                                                    <span class="toggle-off">OFF</span>
+                                                </label>
+                                                <span class="status-text">Correct</span>
+                                                @Html.HiddenFor(m => m.Answers[i].IsCorrect, new { @id = $"IsCorrect_{i}" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-answer"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" id="addAnswerBtn" class="btn btn-success add-answer mt-3"><i class="fas fa-plus me-2"></i>Add Answer</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Create</button>
+        <div class="form-actions text-center mt-4">
+            <button type="submit" class="btn btn-primary">Save</button>
             @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
         </div>
     </div>
+
+
 }
 
 <style>
@@ -155,6 +157,7 @@
     body {
         background-color: #f5f7fa;
         font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+        max-width: 100%;
         color: #333;
     }
 
@@ -166,12 +169,12 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
-   
+
     .custom-form {
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        max-width: 800px;
+        max-width: 100%;
         margin: 40px auto;
         padding: 32px;
         transition: all 0.3s ease;
@@ -367,7 +370,7 @@
     }
 
     .status-text {
-        margin-left: 10px;
+        margin-left: 0px;
         font-weight: 500;
         color: #2c3e50;
     }
@@ -392,10 +395,10 @@
         }
 
     .card-body {
-        padding: 20px;
+        padding-right: 50px;
     }
 
-    .answer-item {
+    /*    .answer-item {
         background: #f9f9fa;
         padding: 16px;
         border-radius: 8px;
@@ -408,13 +411,13 @@
 
         .answer-item:hover {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
+        }*/
 
     .remove-answer {
         background-color: #e74c3c;
         color: white;
         border: none;
-        padding: 8px;
+        padding-right: 100px;
         border-radius: 8px;
         cursor: pointer;
         transition: 0.3s;
@@ -506,15 +509,11 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         // File input enhancement
-        const fileInput = document.getElementById('questionImageInput');
-        const fileName = document.querySelector('.file-name');
+        const fileInput = document.getElementById("questionImageInput");
+        const fileName = document.querySelector(".file-name");
 
-        fileInput.addEventListener('change', function () {
-            if (fileInput.files.length > 0) {
-                fileName.textContent = fileInput.files[0].name;
-            } else {
-                fileName.textContent = 'No file chosen';
-            }
+        fileInput.addEventListener("change", function () {
+            fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
         });
 
         // IsActive toggle logic
@@ -523,13 +522,8 @@
         var statusText = document.querySelector(".toggle-container .status-text");
 
         function updateToggleStatus() {
-            if (toggleInput.checked) {
-                statusText.textContent = "Active";
-                hiddenInput.value = "True";
-            } else {
-                statusText.textContent = "Inactive";
-                hiddenInput.value = "False";
-            }
+            hiddenInput.value = toggleInput.checked ? "True" : "False";
+            statusText.textContent = toggleInput.checked ? "Active" : "Inactive";
         }
 
         toggleInput.addEventListener("change", updateToggleStatus);
@@ -537,87 +531,74 @@
 
         // Initialize IsCorrect toggle logic for existing answer items
         function initializeIsCorrectToggles() {
-            document.querySelectorAll('.answer-toggle').forEach(function (toggle) {
-                if (toggle.id && toggle.id.startsWith('IsCorrectToggle_')) {
-                    var index = toggle.id.split('_')[1];
-                    var hiddenField = document.getElementById(`IsCorrect_${index}`);
+            document.querySelectorAll(".answer-toggle").forEach(function (toggle) {
+                var index = toggle.id.split("_")[1];
+                var hiddenField = document.getElementById(`IsCorrect_${index}`);
 
-                    toggle.addEventListener('change', function () {
-                        hiddenField.value = toggle.checked ? "True" : "False";
-                    });
-
-                    // Set initial value
+                toggle.addEventListener("change", function () {
                     hiddenField.value = toggle.checked ? "True" : "False";
-                }
+                });
+
+                hiddenField.value = toggle.checked ? "True" : "False";
             });
         }
 
         initializeIsCorrectToggles();
 
-        // Add event handlers for remove buttons
-        function setupRemoveButtons() {
-            document.querySelectorAll('.remove-answer').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    this.closest('.answer-item').remove();
-                });
-            });
-        }
-
-        setupRemoveButtons();
-
-        // Add new answer logic
-        document.getElementById("addAnswerBtn").addEventListener("click", function () {
-            var container = document.getElementById("answer-container");
-            var index = container.children.length;
-            var newAnswer = document.createElement("div");
-            newAnswer.classList.add("row", "g-2", "answer-item");
-            newAnswer.innerHTML = `
-                <div class="col-md-8">
-                    <input type="text" class="form-control" name="Answers[${index}].AnswerText" placeholder="Enter answer">
-                </div>
-                <div class="col-md-3 d-flex align-items-center">
-                    <div class="toggle-container small-toggle">
-                        <input type="checkbox" id="IsCorrectToggle_${index}" class="toggle-input answer-toggle">
-                        <label for="IsCorrectToggle_${index}" class="toggle-label">
-                            <span class="toggle-on">ON</span>
-                            <span class="toggle-off">OFF</span>
-                        </label>
-                        <span class="status-text">Correct</span>
-                        <input type="hidden" id="IsCorrect_${index}" name="Answers[${index}].IsCorrect" value="False">
-                    </div>
-                </div>
-                <div class="col-md-1 d-flex align-items-center">
-                    <button type="button" class="btn btn-danger remove-answer"><i class="fas fa-trash"></i></button>
-                </div>`;
-            container.appendChild(newAnswer);
-
-            // Add event listener for the new toggle
-            var newToggle = document.getElementById(`IsCorrectToggle_${index}`);
-            var newHiddenInput = document.getElementById(`IsCorrect_${index}`);
-
-            newToggle.addEventListener('change', function () {
-                newHiddenInput.value = newToggle.checked ? "True" : "False";
-            });
-
-            // Setup remove button for the new answer
-            var newRemoveButton = newAnswer.querySelector('.remove-answer');
-            newRemoveButton.addEventListener('click', function () {
-                newAnswer.remove();
-            });
+        // Setup remove buttons using event delegation
+        document.getElementById("answer-container").addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-answer")) {
+                event.target.closest(".answer-item").remove();
+                enforceSingleChoiceRule(); // Reapply rules after removing an answer
+            }
         });
 
+        // Add new answer logic
+        let answerIndex = document.querySelectorAll(".answer-item").length; // Get the last index
+
+        document.getElementById("addAnswerBtn").addEventListener("click", function () {
+            const answerContainer = document.getElementById("answer-container");
+            const answerHtml = `
+        <div class="row g-2 answer-item mb-2">
+            <div class="col-md-8">
+                <textarea class="form-control" name="Answers[${answerIndex}].AnswerText" placeholder="Enter answer" rows="2"></textarea>
+                <div class="text-danger answer-error" style="display:none;">Answer text is required.</div>
+            </div>
+            <div class="col-md-3 d-flex align-items-center">
+                <div class="toggle-container small-toggle">
+                    <input type="checkbox" id="IsCorrectToggle_${answerIndex}" class="toggle-input answer-toggle">
+                    <label for="IsCorrectToggle_${answerIndex}" class="toggle-label">
+                        <span class="toggle-on">ON</span>
+                        <span class="toggle-off">OFF</span>
+                    </label>
+                    <span class="status-text">Correct</span>
+                    <input type="hidden" id="IsCorrect_${answerIndex}" name="Answers[${answerIndex}].IsCorrect" value="False">
+                </div>
+            </div>
+            <div class="col-md-1 d-flex align-items-center">
+                <button type="button" class="btn btn-danger remove-answer"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+
+            answerContainer.insertAdjacentHTML("beforeend", answerHtml);
+            answerIndex++; // Increment index for next answer
+            enforceSingleChoiceRule(); // Apply rule on new answers
+        });
+
+        // Delete answer from database
         $(document).on("click", ".remove-answer", function () {
-            var button = $(this); 
+            var button = $(this);
             var answerId = button.data("id");
 
             if (answerId) {
                 $.ajax({
-                    url: '/Question/DeleteAnswer',
-                    type: 'POST', 
+                    url: "/Question/DeleteAnswer",
+                    type: "POST",
                     data: { id: answerId },
                     success: function (response) {
-                        if (response.success) { 
-                            button.closest(".answer-item").remove(); 
+                        if (response.success) {
+                            button.closest(".answer-item").remove();
+                            enforceSingleChoiceRule(); // Reapply rules after deletion
                         } else {
                             console.error("Failed to delete answer:", response.message);
                         }
@@ -627,9 +608,59 @@
                     }
                 });
             } else {
-                button.closest(".answer-item").remove(); 
+                button.closest(".answer-item").remove();
+                enforceSingleChoiceRule();
             }
         });
 
+        // Validate form submission
+        $("form").submit(function (event) {
+            let isValid = true;
+            let correctAnswers = $(".answer-toggle:checked").length;
+            let selectedQuestionType = $("#QuestionTypeId").val();
+
+            if (correctAnswers === 0) {
+                alert("At least one correct answer must be selected.");
+                isValid = false;
+            } else if (selectedQuestionType == "1" && correctAnswers > 1) {
+                alert("Only one correct answer is allowed for Single Choice MCQ.");
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        // Ensure only one correct answer is allowed for Single Choice MCQ
+        function enforceSingleChoiceRule() {
+            let selectedQuestionType = $("#QuestionTypeId").val();
+
+            if (selectedQuestionType == "1") {
+                $(".answer-toggle").off("change").on("change", function () {
+                    if ($(this).is(":checked")) {
+                        $(".answer-toggle").not(this).prop("checked", false).prop("disabled", true);
+                    } else {
+                        if ($(".answer-toggle:checked").length === 0) {
+                            $(".answer-toggle").prop("disabled", false); // Enable all if none checked
+                        }
+                    }
+                });
+            } else {
+                $(".answer-toggle").off("change").on("change", function () {
+                    $(".answer-toggle").prop("disabled", false);
+                });
+            }
+        }
+
+        // Reset selection when Question Type changes
+        $("#QuestionTypeId").on("change", function () {
+            $(".answer-toggle").prop("disabled", false).prop("checked", false);
+            enforceSingleChoiceRule();
+        });
+
+        // Initialize the single choice rule
+        enforceSingleChoiceRule();
     });
+
 </script>

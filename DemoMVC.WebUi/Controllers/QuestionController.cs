@@ -111,7 +111,7 @@ namespace DemoMVC.WebUi.Controllers
                 return RedirectToAction("AccessDenied", "Base");
             }
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && model.Answers.Count!=0)
             {
                 SaveAndUpdateQuestion(model,QuestionImage);
                 return RedirectToAction("Index");
@@ -157,16 +157,30 @@ namespace DemoMVC.WebUi.Controllers
                 que.CreatedBy = userId;
                 que.CreatedOn = DateTime.UtcNow;
                 que.QuestionId = _questionService.CreateQuestion(que);
-                foreach (var answer in model.Answers)
+
+                if (model.Answers == null || !model.Answers.Any(a => a.IsCorrect))
                 {
-                    ans.AnswerText = answer.AnswerText;
-                    ans.IsCorrect = answer.IsCorrect;
-                    ans.QuestionId = que.QuestionId;
-                    if (answer.AnswerId == 0)
+                    ModelState.AddModelError("Answers", "At least one correct answer must be selected.");
+                }
+                else
+                {
+                    foreach (var answer in model.Answers)
                     {
-                        ans.CreatedBy = userId;
-                        ans.CreatedOn = DateTime.UtcNow;
-                        ans.AnswerId = _answerService.CreateAnswer(ans);
+
+                        ans.AnswerText = answer.AnswerText;
+                        ans.IsCorrect = answer.IsCorrect;
+                        ans.QuestionId = que.QuestionId;
+                        if (answer.AnswerId == 0)
+                        {
+
+                            if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
+                            {
+                                ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
+                            }
+                            ans.CreatedBy = userId;
+                            ans.CreatedOn = DateTime.UtcNow;
+                            ans.AnswerId = _answerService.CreateAnswer(ans);
+                        }
                     }
                 }
             }
@@ -187,11 +201,22 @@ namespace DemoMVC.WebUi.Controllers
                     }
                 }
 
+                
+
                 foreach (var answer in model.Answers)
                 {
                     var existingAnswer = existingAnswers.FirstOrDefault(a => a.AnswerId == answer.AnswerId);
                     if (existingAnswer != null)
                     {
+                        
+                        if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
+                        {
+                            ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
+                        }
+                        if (model.Answers == null || !model.Answers.Any(a => a.IsCorrect))
+                        {
+                            ModelState.AddModelError("Answers", "At least one correct answer must be selected.");
+                        }
                         existingAnswer.AnswerText = answer.AnswerText;
                         existingAnswer.IsCorrect = answer.IsCorrect;
 
