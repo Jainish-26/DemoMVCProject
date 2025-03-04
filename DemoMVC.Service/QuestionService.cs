@@ -19,7 +19,8 @@ namespace DemoMVC.Service
             return _questionProvider.GetAllQuestions();
         }
 
-        public IQueryable<QuestionGridModel> GetAllQuestionsGridModel() {
+        public IQueryable<QuestionGridModel> GetAllQuestionsGridModel()
+        {
 
             return _questionProvider.GetAllQuestionsGridModel();
         }
@@ -39,7 +40,15 @@ namespace DemoMVC.Service
         }
         public bool DeleteQuestion(int id)
         {
-           return _questionProvider.DeleteQuestion(id);            
+            return _questionProvider.DeleteQuestion(id);
+        }
+        public bool DeleteQuestionImage(int id)
+        {
+            return _questionProvider.DeleteQuestionImage(id);
+        }
+        public string GetImage(int id)
+        {
+            return _questionProvider.GetImage(id);
         }
     }
 }

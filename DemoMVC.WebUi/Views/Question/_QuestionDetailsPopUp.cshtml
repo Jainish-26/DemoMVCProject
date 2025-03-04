@@ -1,0 +1,184 @@
+@model DemoMVC.WebUi.Models.QuestionAndAnswerModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .answer-badge {
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            margin: 5px;
+            display: inline-block;
+            border-radius: 5px;
+        }
+
+            .answer-badge.correct {
+                background-color: #d4edda;
+            }
+
+        .image-container {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .question-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #6c757d;
+        }
+
+            .placeholder i {
+                font-size: 3rem;
+            }
+
+            .placeholder p {
+                margin-top: 5px;
+                font-size: 1rem;
+            }
+
+        .answer-options {
+            display: flex;
+            flex-direction:column;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input:disabled + label {
+            color: black !important; /* Muted grey */
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="modal fade" id="questionDetailsModal" tabindex="-1" aria-labelledby="questionDetailsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content rounded-3 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">Question Details</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row d-flex align-items-start">
+                            <!-- Left Side: Image -->
+                            <div class="col-md-4 d-flex flex-column align-items-center">
+                                <strong class="mb-2">Image:</strong>
+                                <div class="image-container">
+                                    @if (!string.IsNullOrEmpty(Model.QuestionImage))
+                                    {
+                                        <img src="~/content/QuestionImage/@Model.QuestionImage"
+                                             class="rounded shadow question-image"
+                                             alt="Question Image">
+                                    }
+                                    else
+                                    {
+                                        <div class="placeholder">
+                                            <i class="fas fa-image"></i>
+                                            <p>No Image Available</p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Right Side: Question & Details -->
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="border p-3 rounded bg-light"
+                                         style="word-wrap: break-word; white-space: pre-wrap; min-height: 50px; max-height: 300px; overflow: auto; width: 100%;">
+                                        @Model.QuestionText
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6"><strong>Difficulty:</strong> @Model.Difficulty</div>
+                                    <div class="col-md-6"><strong>Type:</strong> @Model.QuestionType</div>
+                                    <div class="col-md-6"><strong>Subject:</strong> @Model.Subject</div>
+                                    <div class="col-md-6"><strong>Marks:</strong> @Model.Marks</div>
+                                    <div class="col-md-12 mt-2">
+                                        <strong>Status:</strong>
+                                        <span class="badge @(Model.IsActive ? "bg-success" : "bg-danger")">
+                                            @(Model.IsActive ? "Active" : "Inactive")
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Answer Options -->
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <strong>Answers:</strong>
+                                        <div class="answer-options mt-2">
+                                            @if (Model.QuestionType == "Single Choice MCQ") // Single Choice (Radio)
+                                            {
+                                                foreach (var answer in Model.Answers)
+                                                {
+                                                    <div class="answer-item d-flex align-items-center p-2 mb-2">
+                                                        <input type="radio" name="selectedAnswer" value="@answer.AnswerText"
+                                                               @(answer.IsCorrect ? "checked" : "") class="form-check-input me-2" disabled>
+                                                        <label class="form-check-label flex-grow-1">@answer.AnswerText</label>
+                                                    </div>
+                                                }
+                                            }
+                                            else if (Model.QuestionType == "Multiple Choice MCQ") // Multiple Choice (Checkbox)
+                                            {
+                                                foreach (var answer in Model.Answers)
+                                                {
+                                                    <div class="answer-item d-flex align-items-center p-2 mb-2">
+                                                        <input type="checkbox" name="selectedAnswers" value="@answer.AnswerText"
+                                                               @(answer.IsCorrect ? "checked" : "") class="form-check-input me-2" disabled>
+                                                        <label class="form-check-label flex-grow-1">@answer.AnswerText</label>
+                                                    </div>
+                                                }
+                                            }
+                                            else if (Model.QuestionType == "Text Answer" || Model.QuestionType == "SQL Query") // Subjective (Text Input)
+                                            {
+                                                <div class="answer-item p-2 border rounded">
+                                                    <input type="text" class="form-control" placeholder="Enter your answer here"
+                                                           value="@(Model.Answers.FirstOrDefault()?.AnswerText ?? "")" disabled>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted">Invalid Question Type</p>
+                                            }
+                                        </div>
+                                    </div>
+                                </div> <!-- End Answers Row -->
+                                <!-- End Answers Row -->
+                            </div> <!-- End Right Side -->
+                        </div> <!-- End Row -->
+                    </div> <!-- End Container -->
+                </div> <!-- End Modal Body -->
+            </div> <!-- End Modal Content -->
+        </div> <!-- End Modal Dialog -->
+    </div> <!-- End Modal -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

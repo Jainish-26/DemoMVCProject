@@ -1,13 +1,13 @@
 ﻿using DemoMVC.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web;
 
 namespace DemoMVC.Data
 {
-    public class QuestionProvider :BaseProvider
+    public class QuestionProvider : BaseProvider
     {
         private readonly AnswerProvider _answerProvider;
 
@@ -32,7 +32,7 @@ namespace DemoMVC.Data
                         Type = q.QuestionType.QuestionTypeName,
                         Subject = q.Subject.SubjectName,
                         QuestionText = q.QuestionText,
-                        QuestionImage = q.QuestionImage, 
+                        QuestionImage = q.QuestionImage,
                         BadgeCode = (from difficulty in _db.CommonLookup where q.Difficulty == difficulty.Code select difficulty.BadgeCode).FirstOrDefault(),
                         Marks = q.Marks,
                         Difficulty = q.Difficulty,
@@ -50,7 +50,7 @@ namespace DemoMVC.Data
                 _db.SaveChanges();
                 return questiion.QuestionId;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
@@ -91,7 +91,7 @@ namespace DemoMVC.Data
                 }
                 else
                 {
-                    foreach(var a in ans)
+                    foreach (var a in ans)
                     {
                         bool deleted = _answerProvider.DeleteAnswer(a.AnswerId);
 
@@ -112,6 +112,34 @@ namespace DemoMVC.Data
             }
 
             return false;
+        }
+
+        public bool DeleteQuestionImage(int id)
+        {
+            var question = GetAllQuestions().FirstOrDefault(q => q.QuestionId == id);
+
+            if (question != null && !string.IsNullOrEmpty(question.QuestionImage))
+            {
+                // Delete image file from folder
+                string imagePath = Path.Combine(HttpContext.Current.Server.MapPath("~/content/QuestionImage/"), question.QuestionImage);
+
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+
+                // Remove image reference from database
+                question.QuestionImage = null;
+                _db.SaveChanges(); // Save changes to database
+                return true;
+            }
+
+            return false;
+        }
+
+        public string GetImage(int id)
+        {
+            return (from i in _db.Questions where i.QuestionId == id select i.QuestionImage).ToString();
         }
     }
 }

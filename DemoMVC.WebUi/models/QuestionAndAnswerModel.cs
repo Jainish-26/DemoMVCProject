@@ -1,10 +1,6 @@
-﻿using DemoMVC.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Models
@@ -18,7 +14,6 @@ namespace DemoMVC.WebUi.Models
             _difficultyList = new List<SelectListItem>();
         }
 
-        
         public int QuestionId { get; set; }
         [Required(ErrorMessage = "Question text is required.")]
         public string QuestionText { get; set; }
@@ -46,24 +41,23 @@ namespace DemoMVC.WebUi.Models
         public List<SelectListItem> _subjectList { get; set; }
         public List<SelectListItem> _difficultyList { get; set; }
         public List<AnswerViewModel> Answers { get; set; } = new List<AnswerViewModel>();
+
+        public string QuestionType { get; set; }
+        public string Subject { get; set; }
     }
 
     public class AnswerViewModel
     {
         public int AnswerId { get; set; }
-        
         public int QuestionId { get; set; }
         [Required(ErrorMessage = "Please Enter Ans.")]
         public string AnswerText { get; set; }
-   
         public bool IsCorrect { get; set; } = false;
-        
         public int CreatedBy { get; set; }
-        
         public DateTime CreatedOn { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
 
-        
+
     }
 }

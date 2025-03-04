@@ -2,12 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Data
 {
-    public class AnswerProvider: BaseProvider
+    public class AnswerProvider : BaseProvider
     {
         public List<Answers> GetAllAnswers()
         {
@@ -65,7 +63,7 @@ namespace DemoMVC.Data
                     return true;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }

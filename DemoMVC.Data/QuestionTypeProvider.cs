@@ -65,8 +65,8 @@ namespace DemoMVC.Data
         public List<QuestionType> CheckQuestionTypeCode(string QuestionTypeCode)
         {
             var getQuestionTypeDetails = (from qType in _db.QuestionType
-                                     where qType.QuestionTypeCode.ToUpper().Trim() == QuestionTypeCode.ToUpper().Trim()
-                                     select qType).ToList();
+                                          where qType.QuestionTypeCode.ToUpper().Trim() == QuestionTypeCode.ToUpper().Trim()
+                                          select qType).ToList();
             return getQuestionTypeDetails;
         }
 

@@ -54,7 +54,7 @@ namespace DemoMVC.WebUi.Controllers
                 model.Id = id.Value;
                 model.QuestionTypeCode = questionTypeData.QuestionTypeCode;
                 model.Name = questionTypeData.QuestionTypeName;
-                
+
             }
             return View(model);
         }

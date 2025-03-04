@@ -4,14 +4,14 @@ using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
 using System.Web;
-using System.Web.ApplicationServices;
 using System.Web.Mvc;
+using System.Web.UI;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -77,10 +77,10 @@ namespace DemoMVC.WebUi.Controllers
                     model.SubjectId = que.SubjectId;
                     model.QuestionTypeId = que.QuestionTypeId;
                     model.Answers = _answerService.GetByQuestionId(que.QuestionId).Select(
-                        
-                        ans=> new AnswerViewModel
+
+                        ans => new AnswerViewModel
                         {
-                           QuestionId = ans.QuestionId,
+                            QuestionId = ans.QuestionId,
                             AnswerId = ans.AnswerId,
                             AnswerText = ans.AnswerText,
                             IsCorrect = ans.IsCorrect,
@@ -111,10 +111,55 @@ namespace DemoMVC.WebUi.Controllers
                 return RedirectToAction("AccessDenied", "Base");
             }
 
-            if (ModelState.IsValid && model.Answers.Count!=0)
+            if (ModelState.IsValid && model.Answers.Count != 0)
             {
-                SaveAndUpdateQuestion(model,QuestionImage);
-                return RedirectToAction("Index");
+                int CorrectCnt = 0;
+                int OptionCnt = 0;
+                foreach(var ans in model.Answers)
+                {
+                    if (ans.AnswerText!=null && ans.IsCorrect == true)
+                    {
+                        CorrectCnt++;
+                        OptionCnt++;
+                    }
+                    else if (ans.AnswerText != null)
+                    {
+                        OptionCnt++;
+                    }
+                }
+
+                if (CorrectCnt > 0)
+                {
+                    if ((model.QuestionTypeId == 1 || model.QuestionTypeId == 2))
+                    {
+                        if (OptionCnt >= 2)
+                        {
+                            SaveAndUpdateQuestion(model, QuestionImage);
+                            return RedirectToAction("Index");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("Answers", "Minimum 2 options Required");
+                            BindSubject(ref model);
+                            BindLevel(ref model);
+                            BindQuestionType(ref model);
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        SaveAndUpdateQuestion(model, QuestionImage);
+                        return RedirectToAction("Index");
+                    }
+                }
+                else
+                {
+
+                    BindSubject(ref model);
+                    BindLevel(ref model);
+                    BindQuestionType(ref model);
+                    return View(model);
+                }
             }
             else
             {
@@ -134,17 +179,16 @@ namespace DemoMVC.WebUi.Controllers
             if (model.QuestionId > 0)
             {
                 que = _questionService.GetById(model.QuestionId);
-              
             }
 
             if (QuestionImage != null)
             {
                 string uniqueCode = new string(Enumerable.Range(0, 10).Select(_ => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[new Random().Next(62)]).ToArray());
 
-                que.QuestionImage = uniqueCode+Path.GetExtension(QuestionImage.FileName);
+                que.QuestionImage = uniqueCode + Path.GetExtension(QuestionImage.FileName);
                 QuestionImage.SaveAs(Server.MapPath("~/content/QuestionImage/") + que.QuestionImage);
             }
-            
+
             que.QuestionText = model.QuestionText;
             que.Marks = model.Marks;
             que.IsActive = model.IsActive;
@@ -154,100 +198,107 @@ namespace DemoMVC.WebUi.Controllers
 
             if (model.QuestionId == 0)
             {
+                
                 que.CreatedBy = userId;
                 que.CreatedOn = DateTime.UtcNow;
                 que.QuestionId = _questionService.CreateQuestion(que);
 
-                if (model.Answers == null || !model.Answers.Any(a => a.IsCorrect))
+                if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
                 {
-                    ModelState.AddModelError("Answers", "At least one correct answer must be selected.");
+                    ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
+                    return model;
                 }
-                else
+
+                int correctCount = model.Answers.Count(a => a.IsCorrect);
+                if (correctCount == 0)
                 {
-                    foreach (var answer in model.Answers)
+                    HttpNotFound();
+                    return model;
+                }
+
+                foreach (var answer in model.Answers)
+                {
+                    Answers newAnswer = new Answers
                     {
-
-                        ans.AnswerText = answer.AnswerText;
-                        ans.IsCorrect = answer.IsCorrect;
-                        ans.QuestionId = que.QuestionId;
-                        if (answer.AnswerId == 0)
-                        {
-
-                            if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
-                            {
-                                ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
-                            }
-                            ans.CreatedBy = userId;
-                            ans.CreatedOn = DateTime.UtcNow;
-                            ans.AnswerId = _answerService.CreateAnswer(ans);
-                        }
-                    }
+                        AnswerText = answer.AnswerText,
+                        IsCorrect = answer.IsCorrect,
+                        QuestionId = que.QuestionId,
+                        CreatedBy = userId,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    newAnswer.AnswerId = _answerService.CreateAnswer(newAnswer);
                 }
             }
             else
-            {
+            { 
                 que.UpdatedBy = userId;
                 que.UpdatedOn = DateTime.UtcNow;
                 _questionService.UpdateQuestions(que);
 
                 var existingAnswers = _answerService.GetByQuestionId(que.QuestionId);
-                var modelAnswerIds = model.Answers.Select(a => a.AnswerId).ToList();
+
+                var answersToKeep = new List<int>();
+
+                foreach (var answer in model.Answers)
+                {
+                    if (answer.AnswerId > 0)
+                    {
+                        var existingAnswer = existingAnswers.FirstOrDefault(a => a.AnswerId == answer.AnswerId);
+                        if (existingAnswer != null)
+                        {
+                            if (existingAnswer.AnswerText != answer.AnswerText || existingAnswer.IsCorrect != answer.IsCorrect)
+                            {
+                                existingAnswer.AnswerText = answer.AnswerText;
+                                existingAnswer.IsCorrect = answer.IsCorrect;
+                                existingAnswer.UpdatedBy = userId;
+                                existingAnswer.UpdatedOn = DateTime.UtcNow;
+                                _answerService.UpdateAnswers(existingAnswer);
+                            }
+                            answersToKeep.Add(existingAnswer.AnswerId);
+                        }
+                    } 
+                    else
+                    {
+                        var matchingAnswer = existingAnswers.FirstOrDefault(a =>
+                            a.AnswerText == answer.AnswerText &&
+                            !answersToKeep.Contains(a.AnswerId));
+                        if (matchingAnswer != null)
+                        {  
+                            if (matchingAnswer.IsCorrect != answer.IsCorrect)
+                            {
+                                matchingAnswer.IsCorrect = answer.IsCorrect;
+                                matchingAnswer.UpdatedBy = userId;
+                                matchingAnswer.UpdatedOn = DateTime.UtcNow;
+                                _answerService.UpdateAnswers(matchingAnswer);
+                            }
+                            answersToKeep.Add(matchingAnswer.AnswerId);
+                        }
+                        else
+                        {  
+                            Answers newAnswer = new Answers
+                            {
+                                AnswerText = answer.AnswerText,
+                                IsCorrect = answer.IsCorrect,
+                                QuestionId = que.QuestionId,
+                                CreatedBy = userId,
+                                CreatedOn = DateTime.UtcNow
+                            };
+                            var newAnswerId = _answerService.CreateAnswer(newAnswer);
+                            answersToKeep.Add(newAnswerId);
+                        }
+                    }
+                }
 
                 foreach (var existingAnswer in existingAnswers)
                 {
-                    if (!modelAnswerIds.Contains(existingAnswer.AnswerId))
+                    if (!answersToKeep.Contains(existingAnswer.AnswerId))
                     {
                         _answerService.DeleteAnswer(existingAnswer.AnswerId);
                     }
                 }
-
-                
-
-                foreach (var answer in model.Answers)
-                {
-                    var existingAnswer = existingAnswers.FirstOrDefault(a => a.AnswerId == answer.AnswerId);
-                    if (existingAnswer != null)
-                    {
-                        
-                        if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
-                        {
-                            ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
-                        }
-                        if (model.Answers == null || !model.Answers.Any(a => a.IsCorrect))
-                        {
-                            ModelState.AddModelError("Answers", "At least one correct answer must be selected.");
-                        }
-                        existingAnswer.AnswerText = answer.AnswerText;
-                        existingAnswer.IsCorrect = answer.IsCorrect;
-
-                        if (existingAnswer.AnswerText != answer.AnswerText || existingAnswer.IsCorrect != answer.IsCorrect )
-                        {
-                            existingAnswer.UpdatedBy = userId;
-                            existingAnswer.UpdatedOn = DateTime.UtcNow;
-                            _answerService.UpdateAnswers(existingAnswer);
-                            
-                        }
-                        
-
-                    }
-                    else if (answer.AnswerId == 0)
-                    {
-                        Answers newAnswer = new Answers
-                        {
-                            AnswerText = answer.AnswerText,
-                            IsCorrect = answer.IsCorrect,
-                            QuestionId = que.QuestionId,
-                            CreatedBy = userId,
-                            CreatedOn = DateTime.UtcNow
-                        };
-                        newAnswer.AnswerId = _answerService.CreateAnswer(newAnswer);
-                    }
-                }
-                
             }
 
             return model;
-            
         }
 
         [HttpPost]
@@ -318,7 +369,6 @@ namespace DemoMVC.WebUi.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception as needed
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -334,6 +384,61 @@ namespace DemoMVC.WebUi.Controllers
             return PartialView("_ImagePopup", question);
         }
 
+        public ActionResult GetQuestionDetails(int id)
+        {
+            var question = _questionService.GetById(id);
+
+            QuestionAndAnswerModel model = new QuestionAndAnswerModel
+            {
+                QuestionText = question.QuestionText,
+                IsActive = question.IsActive,
+                QuestionImage = question.QuestionImage,
+                Difficulty = question.Difficulty,
+                QuestionType = question.QuestionType.QuestionTypeName,
+                Subject = question.Subject.SubjectName,
+                Marks = question.Marks,
+                Answers = _answerService.GetByQuestionId(id).Select(ans => new AnswerViewModel
+                {
+                    AnswerText = ans.AnswerText,
+                    IsCorrect = ans.IsCorrect
+                }).ToList()
+            };
+
+            return PartialView("_QuestionDetailsPopUp", model);
+        }
+
+        [HttpPost]
+        public JsonResult DeleteQuestionImage(int questionId)
+        {
+            string actionPermission = AccessPermission.IsDelete;
+
+            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.QUESTION.ToString(), actionPermission))
+            {
+                return Json(new { success = false, message = "Access Denied" });
+            }
+
+            int userId = SessionHelper.UserId;
+
+            try
+            {
+                bool ans = _questionService.DeleteQuestionImage(questionId);
+
+
+                if (ans)
+                {
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Image Not Deleted" });
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
 
     }
 }

@@ -7,7 +7,7 @@
             public const string SADMIN = "SADMIN";
             public const string ADMIN = "ADMIN";
         }
-       
+
         public static class MessageCode
         {
             public const string EMAILSUCCESS = "EMAILSUCCESS";
@@ -29,7 +29,7 @@
             public const string USERLOGGEDOUT = "USERLOGGEDOUT";
             public const string POSITIONEXIST = "POSITIONEXIST";
         }
-       
+
 
         public static class ConfigurationStaticValues
         {
@@ -45,7 +45,7 @@
             Video = 2,
             Document = 3
         }
-       
+
         public static class RequirementStatusCode
         {
             public const string OPEN = "OPEN";
