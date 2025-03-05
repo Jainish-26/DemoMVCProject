@@ -155,7 +155,7 @@
 
             }
             @Html.Hidden("hdnFormAccessCode", formCode)
-            @using (Html.BeginForm("Create", "Exam", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            @using (Html.BeginForm("Create", "Exam", FormMethod.Post,new { id="form", enctype = "multipart/form-data" }))
             {
                 @Html.HiddenFor(model => model.ExamId)
                 @Html.AntiForgeryToken()
@@ -191,7 +191,7 @@
                     <label class="form-label">Marks <span class="required-icon">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-sort-numeric-asc"></i></span>
-                        @Html.TextBoxFor(model => model.TotalMarks, new { @class = "form-control", placeholder = "Enter Role Name" })
+                        @Html.TextBoxFor(model => model.TotalMarks, new { @class = "form-control", id="marks",placeholder = "Enter Role Name" })
                     </div>
                     @Html.ValidationMessageFor(model => model.TotalMarks, "", new { @class = "text-danger" })
                 </div>
@@ -211,7 +211,7 @@
                     <label class="form-label">Duration <span class="required-icon">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-clock-o"></i></span>
-                        @Html.TextBoxFor(model => model.DurationMin, new { @class = "form-control", placeholder = "Enter Role Name" })
+                        @Html.TextBoxFor(model => model.DurationMin, new { @class = "form-control", id = "duration", placeholder = "Enter Exam Name" })
                     </div>
                     @Html.ValidationMessageFor(model => model.DurationMin, "", new { @class = "text-danger" })
                 </div>
@@ -260,6 +260,6 @@
             updateLabel(); // Set initial state
         });
     </script>
-
+   
 </body>
 </html>

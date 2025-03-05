@@ -83,8 +83,27 @@ namespace DemoMVC.WebUi.Controllers
 
             if (ModelState.IsValid)
             {
-                SaveAndUpdateExam(exam);
-                return RedirectToAction("Index");
+                if(exam.DurationMin <10 && exam.TotalMarks <20)
+                {
+                    ModelState.AddModelError("DurationMin", "Minimun 10 minutes");
+                    ModelState.AddModelError("TotalMarks", "Minimun 20 Marks");
+                    return View(exam);
+                }
+                else if(exam.DurationMin < 10)
+                {
+                    ModelState.AddModelError("DurationMin", "Minimun 10 minutes");
+                    return View(exam);
+                }
+                else if (exam.TotalMarks < 20)
+                {
+                    ModelState.AddModelError("TotalMarks", "Minimun 20 Marks");
+                    return View(exam);
+                }
+                else
+                {
+                    SaveAndUpdateExam(exam);
+                    return RedirectToAction("Index");
+                }
             }
             else
             {
