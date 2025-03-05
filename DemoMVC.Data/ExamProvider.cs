@@ -1,0 +1,68 @@
+﻿using DemoMVC.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Web;
+
+namespace DemoMVC.Data
+{
+    public class ExamProvider : BaseProvider
+    {
+        public List<Exams> GetAllExam()
+        {
+            var data = (from e in _db.Exams where e.IsActive == true select e).ToList();
+
+            return data;
+        } 
+
+        public IQueryable<ExamsGridModel> GetExamGridModal()
+        {
+            return (from e in _db.Exams
+                    where e.IsActive == true
+                    select new ExamsGridModel
+                    {
+                        ExamId = e.ExamId,
+                        ExamName = e.ExamName,
+                        ExamCode = e.ExamCode,
+                        ExamStatus = e.ExamStatus,
+                        TotalMarks = e.TotalMarks,
+                        DurationMin = e.DurationMin,
+                        IsActive = e.IsActive
+                    }).AsQueryable();
+        }
+
+        public int CreateExam(Exams exam)
+        {
+            try
+            {
+                _db.Exams.Add(exam);
+                _db.SaveChanges();
+                return exam.ExamId;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public Exams GetById(int id)
+        {
+            return _db.Exams.Find(id);
+        }
+
+        public int UpdateExam(Exams exam)
+        {
+            try
+            {
+                _db.Entry(exam).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+                return exam.ExamId;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+    }
+}

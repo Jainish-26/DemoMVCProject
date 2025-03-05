@@ -171,6 +171,7 @@
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CommonLookupController.cs" />
     <Compile Include="Controllers\ErrorLogController.cs" />
+    <Compile Include="Controllers\ExamController.cs" />
     <Compile Include="Controllers\FormController.cs" />
     <Compile Include="Controllers\FormRoleMappingController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Helper\CommonUtility.cs" />
     <Compile Include="Helper\FormUtility.cs" />
     <Compile Include="Models\CommonLookupModel.cs" />
+    <Compile Include="Models\ExamModel.cs" />
     <Compile Include="Models\FormModel.cs" />
     <Compile Include="Models\QuestionAndAnswerModel.cs" />
     <Compile Include="Models\QuestionTypeModel.cs" />
@@ -2485,6 +2487,8 @@
     <Content Include="Views\Question\Index.cshtml" />
     <Content Include="Views\Question\_ImagePopup.cshtml" />
     <Content Include="Views\Question\_QuestionDetailsPopUp.cshtml" />
+    <Content Include="Views\Exam\Index.cshtml" />
+    <Content Include="Views\Exam\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

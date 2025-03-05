@@ -66,6 +66,7 @@
     <Compile Include="AnswerService.cs" />
     <Compile Include="CommonLookupService.cs" />
     <Compile Include="ErrorLogService.cs" />
+    <Compile Include="ExamService.cs" />
     <Compile Include="FormRoleMappingService.cs" />
     <Compile Include="FormsService.cs" />
     <Compile Include="MessageService.cs" />

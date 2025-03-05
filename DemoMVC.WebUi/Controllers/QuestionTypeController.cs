@@ -79,7 +79,7 @@ namespace DemoMVC.WebUi.Controllers
             int userId = SessionHelper.UserId;
             if (ModelState.IsValid)
             {
-                SaveAndUpdateSubject(model);
+                SaveAndUpdateQuestionType(model);
                 return RedirectToAction("Index");
             }
             else
@@ -88,7 +88,7 @@ namespace DemoMVC.WebUi.Controllers
             }
         }
 
-        public QuestionTypeModel SaveAndUpdateSubject(QuestionTypeModel model)
+        public QuestionTypeModel SaveAndUpdateQuestionType(QuestionTypeModel model)
         {
             QuestionType obj = new QuestionType();
             if (model.Id > 0)

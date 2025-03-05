@@ -29,6 +29,7 @@ namespace DemoMVC.Models
         public DbSet<QuestionType> QuestionType { get; set; }
         public DbSet<Questions> Questions { get; set; }
         public DbSet<Answers> Answers { get; set; }
+        public DbSet<Exams> Exams { get; set; }
 
     }
 }

@@ -1,0 +1,102 @@
+﻿@model IEnumerable<DemoMVC.Models.ExamsGridModel>
+@using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
+@using DemoMVC.WebUi.Controllers
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "Index";
+    string role = SessionHelper.RoleName;
+    string formCode = AuthorizeFormAccess.FormAccessCode.EXAM.ToString();
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
+    BaseController _base = new BaseController();
+    bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
+    bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
+}
+<h2 class="text-center fw-bold mt-4">Exam List</h2>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="d-flex justify-content-end m-2">
+    @Html.ActionLink("Create New", "Create", "Exam", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+</div>
+<div class="common_white_box listingpage">
+    <div class="page-loader k-loading-image"></div>
+    @(Html.Kendo().Grid<DemoMVC.Models.ExamsGridModel>()
+            .Name("gridExam")
+            .AutoBind(false)
+            //.Excel(excel => excel
+            //  .FileName("FormList.xlsx")
+            //  .Filterable(true)
+            //  .AllPages(true))
+            .Columns(columns =>
+            {
+
+                columns.Bound(c => c.ExamName).Width("7%").Title("Exam");
+                columns.Bound(c => c.ExamCode).Width("7%").Title("Exam Code Type");
+                columns.Bound(c => c.TotalMarks).Width("7%").Title("Marks");
+                columns.Bound(c => c.DurationMin).Width("7%").Title("Duration");
+                columns.Bound(c => c.ExamStatus).Width("7%").Title("Status");
+                columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+
+                if (role == "sadmin")
+                {
+                    columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("3%").Sortable(false);
+                    columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=ExamId#)'>Delete</button>" : "") +
+                    "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
+                    //columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript://' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
+                    columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedAdd ? "<a title='AddQuestion' href='" + Url.Action("Create", "AddQuestion") + "/#=ExamId#'" + "><i class='fa fa-add'></i></a>" : "") + "</div>").Filterable(false).Title("Add Question").Width("3%").Sortable(false);
+
+                }
+                else
+                {
+
+                }
+            })
+            .NoRecords("No record found")
+            .Events(evt => evt
+               .DataBinding("fnKendoGridCommonDataBinding")
+               .DataBound("fnKendoGridDataBoundEvent")
+            )
+            .Sortable()
+            //.Filterable(filter => filter
+            //    .Mode(GridFilterMode.Row)
+            //    .Extra(false)
+            //    .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
+            //    .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
+            //)
+            .Pageable(pageable => pageable
+                .Refresh(true)
+                .PageSizes(new[] {10,20, 50, 100, 200 })
+                .ButtonCount(5)
+            )
+             .DataSource(dataSource => dataSource
+                 .Ajax()
+                 //.Sort(sortable=>sortable.Add("Name").Ascending())
+                 .Read(read => read.Action("GetGridData", "Exam")).PageSize(10)
+             )
+        )
+</div>
+
+<div id="imageModalContainer"></div>
+<div id="questionModelContainer"></div>
+<script>
+    $(document).ready(function () {
+        $('#gridExam').data('kendoGrid').dataSource.read();
+        $('#gridExam').data('kendoGrid').refresh();
+    });
+
+        function exportToExcel() {
+            var grid = $("#gridExam").data("kendoGrid");
+        grid.saveAsExcel();
+    }
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+

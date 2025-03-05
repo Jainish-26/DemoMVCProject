@@ -135,6 +135,25 @@
           <Property Name="CreatedBy" Type="Int32" />
           <Property Name="CreatedOn" Type="DateTime" />
         </EntityType>
+        <EntityType Name="Exams" customannotation:ClrType="DemoMVC.Models.Exams, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="ExamId" />
+          </Key>
+          <Property Name="ExamId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExamName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TotalMarks" Type="Int32" Nullable="false" />
+          <Property Name="DurationMin" Type="Int32" Nullable="false" />
+          <Property Name="PassingMarks" Type="Int32" Nullable="false" />
+          <Property Name="ExamCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ExamStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="StartTime" Type="DateTime" />
+          <Property Name="IsActive" Type="Boolean" Nullable="false" />
+          <Property Name="EndTime" Type="DateTime" />
+          <Property Name="CreatedBy" Type="Int32" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="Int32" />
+          <Property Name="UpdatedOn" Type="DateTime" />
+        </EntityType>
         <EntityType Name="FormRoleMapping" customannotation:ClrType="DemoMVC.Models.FormRoleMapping, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="Id" />
@@ -295,6 +314,7 @@
           <EntitySet Name="Subject" EntityType="Self.Subject" />
           <EntitySet Name="CommonLookup" EntityType="Self.CommonLookup" />
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" />
+          <EntitySet Name="Exams" EntityType="Self.Exams" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" />
@@ -457,6 +477,26 @@
                 <ScalarProperty Name="IsAjaxRequest" ColumnName="IsAjaxRequest" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Exams">
+            <EntityTypeMapping TypeName="DemoMVC.Models.Exams">
+              <MappingFragment StoreEntitySet="Exams">
+                <ScalarProperty Name="ExamId" ColumnName="ExamId" />
+                <ScalarProperty Name="ExamName" ColumnName="ExamName" />
+                <ScalarProperty Name="TotalMarks" ColumnName="TotalMarks" />
+                <ScalarProperty Name="DurationMin" ColumnName="DurationMin" />
+                <ScalarProperty Name="PassingMarks" ColumnName="PassingMarks" />
+                <ScalarProperty Name="ExamCode" ColumnName="ExamCode" />
+                <ScalarProperty Name="ExamStatus" ColumnName="ExamStatus" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -697,6 +737,25 @@
           <Property Name="CreatedBy" Type="int" Nullable="true" />
           <Property Name="CreatedOn" Type="datetime" Nullable="true" />
         </EntityType>
+        <EntityType Name="Exams">
+          <Key>
+            <PropertyRef Name="ExamId" />
+          </Key>
+          <Property Name="ExamId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ExamName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="TotalMarks" Type="int" Nullable="false" />
+          <Property Name="DurationMin" Type="int" Nullable="false" />
+          <Property Name="PassingMarks" Type="int" Nullable="false" />
+          <Property Name="ExamCode" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ExamStatus" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="StartTime" Type="datetime" Nullable="true" />
+          <Property Name="IsActive" Type="bit" Nullable="false" />
+          <Property Name="EndTime" Type="datetime" Nullable="true" />
+          <Property Name="CreatedBy" Type="int" Nullable="false" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="int" Nullable="true" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="true" />
+        </EntityType>
         <EntityType Name="FormRoleMapping">
           <Key>
             <PropertyRef Name="Id" />
@@ -857,6 +916,7 @@
           <EntitySet Name="Subject" EntityType="Self.Subject" Schema="dbo" Table="Subject" />
           <EntitySet Name="CommonLookup" EntityType="Self.CommonLookup" Schema="dbo" Table="CommonLookup" />
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" Schema="dbo" Table="ErrorLog" />
+          <EntitySet Name="Exams" EntityType="Self.Exams" Schema="dbo" Table="Exams" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" Schema="dbo" Table="Message_Mst" />
