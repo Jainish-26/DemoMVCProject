@@ -32,13 +32,13 @@ namespace DemoMVC.WebUi.Controllers
             _commonLookupService = new CommonLookupService();
         }
         // GET: Question
-        public ActionResult Index()
+        public ActionResult Index(int? ExamId)
         {
-            if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.QUESTION.ToString(), AccessPermission.IsView))
-            {
-                return RedirectToAction("AccessDenied", "Base");
-            }
-
+            //if (!CheckPermission(AuthorizeFormAccess.FormAccessCode.QUESTION.ToString(), AccessPermission.IsView))
+            //{
+            //    return RedirectToAction("AccessDenied", "Base");
+            //}
+            ViewBag.ExamId = ExamId;
             return View();
         }
 
@@ -303,7 +303,7 @@ namespace DemoMVC.WebUi.Controllers
 
         [HttpPost]
         public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
-        {
+         {
             var data = _questionService.GetAllQuestionsGridModel();
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
@@ -384,10 +384,11 @@ namespace DemoMVC.WebUi.Controllers
             return PartialView("_ImagePopup", question);
         }
 
-        public ActionResult GetQuestionDetails(int id)
+        public ActionResult GetQuestionDetails(int id ,string access)
         {
             var question = _questionService.GetById(id);
 
+            ViewBag.Access = access;
             QuestionAndAnswerModel model = new QuestionAndAnswerModel
             {
                 QuestionText = question.QuestionText,

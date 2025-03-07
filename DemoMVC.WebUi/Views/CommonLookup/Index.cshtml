@@ -19,7 +19,7 @@
 @Html.Hidden("hdnKendoGridId", "gridcommonlookup")
 <div class="coman_content">
     <!--This is Title div -->
-    <div class="subheader">
+    <div class="subheader m-4">
         <div class="left_title">
             <h2>@ViewBag.Title</h2>
             <div class="left breadcrumb_list">
@@ -42,7 +42,7 @@
         </div>
     </div>
     <!--END Title div-->
-    <div class="common_white_box listingpage inlinegrid_edit">
+    <div class="common_white_box listingpage inlinegrid_edit m-4">
         <div class="page-loader k-loading-image"></div>
         @(Html.Kendo().Grid<DemoMVC.Models.CommonLookUpGridModel>()
           .Name("gridcommonlookup")

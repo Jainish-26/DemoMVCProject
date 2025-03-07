@@ -135,6 +135,17 @@
           <Property Name="CreatedBy" Type="Int32" />
           <Property Name="CreatedOn" Type="DateTime" />
         </EntityType>
+        <EntityType Name="ExamQuestions" customannotation:ClrType="DemoMVC.Models.ExamQuestions, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="ExamQuestionId" />
+          </Key>
+          <Property Name="ExamQuestionId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExamId" Type="Int32" Nullable="false" />
+          <Property Name="QuestionId" Type="Int32" Nullable="false" />
+          <Property Name="Marks" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Exams" Relationship="Self.ExamQuestions_Exams" FromRole="ExamQuestions_Exams_Source" ToRole="ExamQuestions_Exams_Target" />
+          <NavigationProperty Name="Questions" Relationship="Self.ExamQuestions_Questions" FromRole="ExamQuestions_Questions_Source" ToRole="ExamQuestions_Questions_Target" />
+        </EntityType>
         <EntityType Name="Exams" customannotation:ClrType="DemoMVC.Models.Exams, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="ExamId" />
@@ -305,6 +316,34 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="ExamQuestions_Exams">
+          <End Role="ExamQuestions_Exams_Source" Type="Self.ExamQuestions" Multiplicity="*" />
+          <End Role="ExamQuestions_Exams_Target" Type="Self.Exams" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="ExamQuestions_Exams_Target">
+              <PropertyRef Name="ExamId" />
+            </Principal>
+            <Dependent Role="ExamQuestions_Exams_Source">
+              <PropertyRef Name="ExamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ExamQuestions_Questions">
+          <End Role="ExamQuestions_Questions_Source" Type="Self.ExamQuestions" Multiplicity="*" />
+          <End Role="ExamQuestions_Questions_Target" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="ExamQuestions_Questions_Target">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="ExamQuestions_Questions_Source">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="DemoMVCEntities" customannotation:UseClrTypes="true">
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" />
@@ -314,6 +353,7 @@
           <EntitySet Name="Subject" EntityType="Self.Subject" />
           <EntitySet Name="CommonLookup" EntityType="Self.CommonLookup" />
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" />
+          <EntitySet Name="ExamQuestions" EntityType="Self.ExamQuestions" />
           <EntitySet Name="Exams" EntityType="Self.Exams" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
@@ -337,6 +377,14 @@
           <AssociationSet Name="Answers_Question" Association="Self.Answers_Question">
             <End Role="Answers_Question_Source" EntitySet="Answers" />
             <End Role="Answers_Question_Target" EntitySet="Questions" />
+          </AssociationSet>
+          <AssociationSet Name="ExamQuestions_Exams" Association="Self.ExamQuestions_Exams">
+            <End Role="ExamQuestions_Exams_Source" EntitySet="ExamQuestions" />
+            <End Role="ExamQuestions_Exams_Target" EntitySet="Exams" />
+          </AssociationSet>
+          <AssociationSet Name="ExamQuestions_Questions" Association="Self.ExamQuestions_Questions">
+            <End Role="ExamQuestions_Questions_Source" EntitySet="ExamQuestions" />
+            <End Role="ExamQuestions_Questions_Target" EntitySet="Questions" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -477,6 +525,16 @@
                 <ScalarProperty Name="IsAjaxRequest" ColumnName="IsAjaxRequest" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExamQuestions">
+            <EntityTypeMapping TypeName="DemoMVC.Models.ExamQuestions">
+              <MappingFragment StoreEntitySet="ExamQuestions">
+                <ScalarProperty Name="ExamQuestionId" ColumnName="ExamQuestionId" />
+                <ScalarProperty Name="ExamId" ColumnName="ExamId" />
+                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
+                <ScalarProperty Name="Marks" ColumnName="Marks" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -737,6 +795,15 @@
           <Property Name="CreatedBy" Type="int" Nullable="true" />
           <Property Name="CreatedOn" Type="datetime" Nullable="true" />
         </EntityType>
+        <EntityType Name="ExamQuestions">
+          <Key>
+            <PropertyRef Name="ExamQuestionId" />
+          </Key>
+          <Property Name="ExamQuestionId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ExamId" Type="int" customannotation:Index="{ Name: IX_ExamId, Order: 0 }" Nullable="false" />
+          <Property Name="QuestionId" Type="int" customannotation:Index="{ Name: IX_QuestionId, Order: 0 }" Nullable="false" />
+          <Property Name="Marks" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Exams">
           <Key>
             <PropertyRef Name="ExamId" />
@@ -907,6 +974,34 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="ExamQuestions_Exams">
+          <End Role="Exams" Type="Self.Exams" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ExamQuestions" Type="Self.ExamQuestions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Exams">
+              <PropertyRef Name="ExamId" />
+            </Principal>
+            <Dependent Role="ExamQuestions">
+              <PropertyRef Name="ExamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="ExamQuestions_Questions">
+          <End Role="Questions" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="ExamQuestions" Type="Self.ExamQuestions" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Questions">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="ExamQuestions">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="CodeFirstDatabase">
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" Schema="dbo" Table="ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" Table="UserProfile" />
@@ -916,6 +1011,7 @@
           <EntitySet Name="Subject" EntityType="Self.Subject" Schema="dbo" Table="Subject" />
           <EntitySet Name="CommonLookup" EntityType="Self.CommonLookup" Schema="dbo" Table="CommonLookup" />
           <EntitySet Name="ErrorLog" EntityType="Self.ErrorLog" Schema="dbo" Table="ErrorLog" />
+          <EntitySet Name="ExamQuestions" EntityType="Self.ExamQuestions" Schema="dbo" Table="ExamQuestions" />
           <EntitySet Name="Exams" EntityType="Self.Exams" Schema="dbo" Table="Exams" />
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
@@ -939,6 +1035,14 @@
           <AssociationSet Name="Answers_Question" Association="Self.Answers_Question">
             <End Role="Questions" EntitySet="Questions" />
             <End Role="Answers" EntitySet="Answers" />
+          </AssociationSet>
+          <AssociationSet Name="ExamQuestions_Exams" Association="Self.ExamQuestions_Exams">
+            <End Role="Exams" EntitySet="Exams" />
+            <End Role="ExamQuestions" EntitySet="ExamQuestions" />
+          </AssociationSet>
+          <AssociationSet Name="ExamQuestions_Questions" Association="Self.ExamQuestions_Questions">
+            <End Role="Questions" EntitySet="Questions" />
+            <End Role="ExamQuestions" EntitySet="ExamQuestions" />
           </AssociationSet>
         </EntityContainer>
       </Schema>

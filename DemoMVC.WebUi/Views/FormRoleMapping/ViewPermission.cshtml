@@ -26,7 +26,7 @@
 @Html.HiddenFor(c => c.RoleId)
 <div class="coman_content">
 
-    <div class="subheader">
+    <div class="subheader m-4">
         <div class="left_title">
             <h2>Role- @Model.RoleName</h2>
             <div class="left breadcrumb_list">
@@ -45,7 +45,7 @@
 
         <label id="alertid" class="bg-success text-white"></label>
 
-        <div class="common_white_box listingpage">
+        <div class="common_white_box listingpage m-4">
             <div class="page-loader k-loading-image"></div>
             @(Html.Kendo().Grid<DemoMVC.Models.FormRoleMapping>()
             .Name("RoleRights")
@@ -76,7 +76,7 @@
 
         //if (AccessPermission.Add || AccessPermission.Edit)
         //{
-        <div class="button_div">
+        <div class="button_div m-4">
             <div class="form-group">
                 <div class="input_box">
                     <input id="btnAdd" type="submit" name="save" class="button button_primary" value="Save" />

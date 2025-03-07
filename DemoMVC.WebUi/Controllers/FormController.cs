@@ -69,7 +69,7 @@ namespace DemoMVC.WebUi.Controllers
         public ActionResult Create(FormModel model)
         {
             string actionPermission = "";
-            if (model.Id == null)
+            if (model.Id == 0)
             {
                 actionPermission = AccessPermission.IsAdd;
             }

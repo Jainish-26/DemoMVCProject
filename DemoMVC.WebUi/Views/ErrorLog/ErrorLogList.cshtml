@@ -20,7 +20,7 @@
     @Html.Hidden("hdnKendoGridId", "gridRoles")*@
 <div class="coman_content">
     <!--This is Title div -->
-    <div class="subheader">
+    <div class="subheader m-4">
         <div class="left_title">
             <h2>@ViewBag.Title</h2>
             <div class="left breadcrumb_list">
@@ -34,7 +34,7 @@
     </div>
     <!--END Title div-->
 
-    <div class="common_white_box listingpage">
+    <div class="common_white_box listingpage m-4">
         <div class="page-loader k-loading-image"></div>
         @(Html.Kendo().Grid<DemoMVC.Models.ErrorLogGridModel>()
           .Name("gridErrorLogs")

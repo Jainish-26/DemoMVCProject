@@ -34,7 +34,7 @@
     @Html.ActionLink("Create New", "Create", "Question", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
     <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
 </div>
-<div class="common_white_box listingpage">
+<div class="common_white_box listingpage m-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
             .Name("gridQuestion")
@@ -45,6 +45,7 @@
             //  .AllPages(true))
             .Columns(columns =>
             {
+               
                 columns.Bound(c => c.QuestionImage).Width("7%").Title("Image").ClientTemplate(
                 "# if(QuestionImage) { #" +
                 "<img src='/content/QuestionImage/#= QuestionImage #' alt='Question Image' class='grid-image' onclick='openImagePopup(\"#=QuestionId#\")' />" +
@@ -64,14 +65,10 @@
                     columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Question") + "/#=QuestionId#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("3%").Sortable(false);
                     columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=QuestionId#)'>Delete</button>" : "") +
                     "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
-                    columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript://' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
-
                 }
-                else
-                {
-
-                }
+                columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
             })
+            
             .NoRecords("No record found")
             .Events(evt => evt
                .DataBinding("fnKendoGridCommonDataBinding")
@@ -149,14 +146,14 @@
     });
     }
 
-   
+
     function openImagePopup(QuestionId) {
         console.log("Question ID:", QuestionId);
         $.ajax({
             url: '@Url.Action("GetImagePopup", "Question")',
             type: 'GET',
             data: { id: QuestionId },
-            
+
             success: function (response) {
                 console.log("Question ID:", response);
                 // Append modal content and show it
@@ -184,7 +181,6 @@
         });
     }
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -9,6 +9,11 @@ namespace DemoMVC.Data
 {
     public class ExamProvider : BaseProvider
     {
+        private readonly QuestionProvider _questionProvider;
+        public ExamProvider()
+        {
+            _questionProvider = new QuestionProvider();
+        }
         public List<Exams> GetAllExam()
         {
             var data = (from e in _db.Exams where e.IsActive == true select e).ToList();
@@ -49,6 +54,11 @@ namespace DemoMVC.Data
         public Exams GetById(int id)
         {
             return _db.Exams.Find(id);
+        }
+
+        public string GetExamCode(int id)
+        {
+            return (from e in _db.Exams where e.ExamId == id select e.ExamCode).FirstOrDefault();
         }
 
         public int UpdateExam(Exams exam)

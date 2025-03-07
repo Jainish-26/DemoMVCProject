@@ -18,6 +18,7 @@ namespace DemoMVC.WebUi.Controllers
         public SubjectController()
         {
             _subjectService = new SubjectService();
+            _messageService = new MessageService();
         }
         // GET: Subject
         public ActionResult Index()

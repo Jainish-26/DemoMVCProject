@@ -13,7 +13,7 @@
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
 @Html.Hidden("hdnFormAccessCode", formCode)
-<div class="coman_content">
+<div class="coman_content m-4">
     <!--This is Title div -->
     <div class="subheader">
         <div class="left_title">
@@ -30,7 +30,7 @@
     <!--END Title div-->
 
 
-    <div class="common_white_box listingpage">
+    <div class="common_white_box listingpage m-4">
         <div class="page-loader k-loading-image"></div>
         @(Html.Kendo().Grid<ActivityLogGridModel>()
           .Name("gridActivityLog")

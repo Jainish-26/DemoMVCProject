@@ -14,16 +14,17 @@
     BaseController _base = new BaseController();
     bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedView = _base.CheckPermission(formCode, AccessPermission.IsView);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
 <h2 class="text-center fw-bold mt-4">Exam List</h2>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="d-flex justify-content-end m-2">
+<div class="d-flex justify-content-end"style="margin-left: 50px; margin-right: 50px">
     @Html.ActionLink("Create New", "Create", "Exam", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
     <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
 </div>
-<div class="common_white_box listingpage">
+<div class="common_white_box listingpage" style="margin-left: 50px; margin-right: 50px">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.ExamsGridModel>()
             .Name("gridExam")
@@ -36,7 +37,7 @@
             {
 
                 columns.Bound(c => c.ExamName).Width("7%").Title("Exam");
-                columns.Bound(c => c.ExamCode).Width("7%").Title("Exam Code Type");
+                columns.Bound(c => c.ExamCode).Width("7%").Title("Exam Code");
                 columns.Bound(c => c.TotalMarks).Width("7%").Title("Marks");
                 columns.Bound(c => c.DurationMin).Width("7%").Title("Duration");
                 columns.Bound(c => c.ExamStatus).Width("7%").Title("Status");
@@ -47,9 +48,15 @@
                     columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("3%").Sortable(false);
                     columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=ExamId#)'>Delete</button>" : "") +
                     "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
-                    //columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript://' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
-                    columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedAdd ? "<a title='AddQuestion' href='" + Url.Action("Create", "AddQuestion") + "/#=ExamId#'" + "><i class='fa fa-add'></i></a>" : "") + "</div>").Filterable(false).Title("Add Question").Width("3%").Sortable(false);
-
+                    //columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
+                    columns.Bound(c => c.ExamId)
+                      .HeaderHtmlAttributes(new { @class = "center_text" })
+                      .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                      .ClientTemplate("<button class='btn btn-success add-question' onclick='navigateToViewQuestions(#=ExamId#)'>Show Question</button>")
+                      .Filterable(false)
+                      .Title("Add Question")
+                      .Width("10%")
+                      .Sortable(false);
                 }
                 else
                 {
@@ -94,8 +101,12 @@
         grid.saveAsExcel();
     }
 </script>
-
-
+<script>
+    function navigateToViewQuestions(ExamId) {
+        // Redirect to the ViewQuestion action in the Questions controller
+        window.location.href = '@Url.Action("ViewQuestion", "ExamQuestion")' + '?ExamId=' + ExamId;
+    }
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 

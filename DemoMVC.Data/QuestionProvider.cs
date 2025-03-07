@@ -56,6 +56,11 @@ namespace DemoMVC.Data
             }
         }
 
+        public string GetQuestionText(int id)
+        {
+            return (from q in _db.Questions where q.QuestionId == id select q.QuestionText).FirstOrDefault();
+        }
+
         public Questions GetById(int id)
         {
             return _db.Questions.Find(id);

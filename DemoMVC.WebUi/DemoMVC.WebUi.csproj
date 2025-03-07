@@ -192,6 +192,7 @@
     <Compile Include="Helper\FormUtility.cs" />
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\ExamModel.cs" />
+    <Compile Include="Models\ExamQuestionModel.cs" />
     <Compile Include="Models\FormModel.cs" />
     <Compile Include="Models\QuestionAndAnswerModel.cs" />
     <Compile Include="Models\QuestionTypeModel.cs" />
