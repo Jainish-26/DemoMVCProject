@@ -127,12 +127,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="question-container">
-                        
+
                         <div class="question-text">
                             @Model.QuestionText
                         </div>
 
-                        
+
 
                         @if (!string.IsNullOrEmpty(Model.QuestionImage))
                         {
@@ -146,17 +146,24 @@
 
                         @if (!string.IsNullOrEmpty(access))
                         {
-                           <div class="question-text">
-                               @Model.Difficulty
-                           </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <strong>Difficulty:</strong>
+                                    @*<p class="border p-1 rounded bg-light d-inline-block">@Model.Difficulty</p>*@
+                                    <p class="border p-2 rounded fw-bold d-inline-block text-white"
+                                       style="background-color: @(Model.Difficulty == "HARD" ? "#ed1c24" : Model.Difficulty == "MEDIUM" ? "#00a2e8" : Model.Difficulty == "EASY" ? "#22b14c" : "gray");">
+                                        @Model.Difficulty
+                                    </p>
+                                </div>
+                            </div>
                         }
 
 
-                        
+
                         <div class="answers-section">
                             <div class="answers-heading">Answers:</div>
                             <div class="answer-options" style="padding-left:25px">
-                                @if (Model.QuestionType == "Single Choice MCQ") 
+                                @if (Model.QuestionType == "Single Choice MCQ")
                                 {
                                     foreach (var answer in Model.Answers)
                                     {
@@ -169,7 +176,7 @@
                                         </div>
                                     }
                                 }
-                                else if (Model.QuestionType == "Multiple Choice MCQ") 
+                                else if (Model.QuestionType == "Multiple Choice MCQ")
                                 {
                                     foreach (var answer in Model.Answers)
                                     {

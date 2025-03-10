@@ -184,6 +184,7 @@
                 </div>
             </form>
         </div>
+        <p>Total Selected Marks: <span id="totalMarks">0</span></p>
         <div class="common_white_box listingpage m-4">
             <div class="page-loader k-loading-image"></div>
             @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
@@ -203,7 +204,7 @@
                 columns.Bound(c => c.Type).Width("7%").Title("Answer Type");
                 columns.Bound(c => c.QuestionText).Width("7%").Title("Question")
                 .ClientTemplate("<span>#:QuestionText.substring(0, 80) #</span>");
-                columns.Bound(c => c.Marks).Width("7%").Title("Marks");
+                columns.Bound(c => c.Marks).Width("14%").Title("Marks").ClientTemplate("<input type='number' class='form-control marks-input' value='#=Marks#' data-id='#=QuestionId#' min='1' step='1' />");
                 columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #,'Access')\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width("7%").Sortable(false);
             })
             .NoRecords("No record found")
@@ -225,7 +226,6 @@
             )
              .DataSource(dataSource => dataSource
                  .Ajax()
-
                  //.Sort(sortable=>sortable.Add("Name").Ascending())
                  .Read(read => read.Action("GetGridExamQuestionData", "Exam").Data("sendExamId")).PageSize(10)
              )
@@ -250,10 +250,9 @@
                 columns.Bound(c => c.Type).Width("7%").Title("Answer Type");
                 columns.Bound(c => c.QuestionText).Width("7%").Title("Question")
                 .ClientTemplate("<span>#:QuestionText.substring(0, 80) #</span>");
-                columns.Bound(c => c.Marks).Width("7%").Title("Marks");
+                columns.Bound(c => c.Marks).Width("14%").Title("Marks").ClientTemplate("<input type='number' class='form-control marks-input' value='#=Marks#' data-id='#=QuestionId#' min='1' step='1' />");
                 columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #,'Access')\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width("7%").Sortable(false);
             })
-            .Editable(editable => editable.Mode(GridEditMode.InCell))
             .NoRecords("No record found")
             .Events(evt => evt
                 .DataBinding("fnKendoGridCommonDataBinding")
@@ -273,17 +272,17 @@
             )
                 .DataSource(dataSource => dataSource
                     .Ajax()
-                    .Model(
-                    model =>
-                    {
-                        model.Id(m => m.QuestionId);
-                        model.Field(m => m.QuestionId).Editable(false);
-                        model.Field(m => m.Marks).Editable(true);
-                        model.Field(m => m.QuestionImage).Editable(false);
-                        model.Field(m => m.QuestionText).Editable(false);
-                        model.Field(m => m.Subject).Editable(false);
-                        model.Field(m => m.Type).Editable(false);
-                    })
+                    //.Model(
+                    //model =>
+                    //{
+                    //    model.Id(m => m.QuestionId);
+                    //    model.Field(m => m.QuestionId).Editable(false);
+                    //    model.Field(m => m.Marks).Editable(true);
+                    //    model.Field(m => m.QuestionImage).Editable(false);
+                    //    model.Field(m => m.QuestionText).Editable(false);
+                    //    model.Field(m => m.Subject).Editable(false);
+                    //    model.Field(m => m.Type).Editable(false);
+                    //})
                     //.Sort(sortable=>sortable.Add("Name").Ascending())
                     .Read(read => read.Action("GetGridUnassignedQuestionData", "Exam").Data("sendExamId")).PageSize(10)
                 )
@@ -293,6 +292,40 @@
     <div id="questionModelContainer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function updateTotalMarks() {
+                var totalMarks = 0;
+
+                // Loop through all checked checkboxes and add their corresponding marks
+                $('.toggle-edit').each(function () {
+                    if ($(this).is(':checked')) {
+                        var questionId = $(this).data('id');
+                        var marksInput = $('input.marks-input[data-id="' + questionId + '"]');
+                        var marks = parseInt(marksInput.val()) || 0;
+                        totalMarks += marks;
+                    }
+                });
+
+                // Update total marks display
+                $('#totalMarks').text(totalMarks);
+            }
+
+            // Calculate total on page load (for already checked checkboxes)
+            setTimeout(updateTotalMarks, 500); // Ensure DOM is fully rendered
+
+            // Event listener for checkbox selection
+            $(document).on('change', '.toggle-edit', function () {
+                updateTotalMarks();
+            });
+
+            // Event listener for marks change
+            $(document).on('input', '.marks-input', function () {
+                updateTotalMarks();
+            });
+        });
+
+    </script>
     @*Set ViewBagId For GridData*@
     <script>
     function sendExamId() {
@@ -332,7 +365,12 @@
     @*Send Exam And Questions In Controller By AJAX*@
     <script>
         function saveExamAndQuestions() {
-            // Collect form data
+            var form = $("#form");
+
+            if (!form.valid()) {
+                return;
+            }
+
             var formData = $("#form").serializeArray();
             var formObject = {};
 
@@ -340,7 +378,6 @@
                 formObject[field.name] = field.value;
             });
 
-            // Selected & Unselected Questions from Exam Grid
             var examGrid = $("#gridExamQuestion").data("kendoGrid");
             var selectedExamQuestions = [];
             var deselectedExamQuestions = [];
@@ -348,71 +385,55 @@
             examGrid.tbody.find("tr").each(function () {
                 var row = $(this);
                 var checkbox = row.find(".toggle-edit");
+                var marksInput = row.find(".marks-input"); // Select marks input field
                 var dataItem = examGrid.dataItem(row);
+
+                console.log("Before Update - QuestionId:", dataItem.QuestionId, "Marks:", dataItem.Marks); // Debugging
+
+                // Capture updated marks
+                var updatedMarks = parseFloat(marksInput.val()) || 0;
+
+                console.log("Updated Marks:", updatedMarks); // Debugging
 
                 if (checkbox.is(":checked")) {
                     selectedExamQuestions.push({
                         QuestionId: dataItem.QuestionId,
-                        Marks: dataItem.Marks
+                        Marks: updatedMarks
                     });
                 } else {
                     deselectedExamQuestions.push(dataItem.QuestionId);
                 }
             });
 
-            // Selected Questions from Unassigned Grid
-            var unassignedGrid = $("#gridUnassignedQuestion").data("kendoGrid");
-            var selectedUnassignedQuestions = [];
-
-            unassignedGrid.tbody.find("tr").each(function () {
-                var row = $(this);
-                var checkbox = row.find(".toggle-edit");
-                var dataItem = unassignedGrid.dataItem(row);
-
-                if (checkbox.is(":checked")) {
-                    selectedUnassignedQuestions.push({
-                        QuestionId: dataItem.QuestionId,
-                        Marks: dataItem.Marks
-                    });
-                }
-            });
-
-            // Combine selected questions from both grids
-            var finalSelectedQuestions = selectedExamQuestions.concat(selectedUnassignedQuestions);
-
-            // Prepare the request data
             var requestData = {
                 Exam: formObject,
-                SelectedQuestions: finalSelectedQuestions,
+                SelectedQuestions: selectedExamQuestions,
                 UnselectedQuestions: deselectedExamQuestions
             };
 
-            if (finalSelectedQuestions.length === 0) {
+            if (selectedExamQuestions.length === 0) {
                 Swal.fire("No Questions Selected!", "Please select questions to save.", "warning");
                 return;
             }
 
-            console.log(requestData);
+            console.log("Final Request Data:", requestData); // Debugging
 
-            // Send AJAX request
             $.ajax({
                 url: "/Exam/Create",
                 type: "POST",
                 data: JSON.stringify(requestData),
                 contentType: "application/json",
                 success: function (response) {
-                    if (response.success) {
-                        Swal.fire("Success!", response.message, "success");
-                        window.location.href = "/Exam/Index";
-                    } else {
-                        Swal.fire("Error!", response.message, "error");
-                    }
+                    Swal.fire("Success!", "Exam and questions saved successfully.", "success").then(() => {
+                        location.reload();
+                    });
                 },
                 error: function () {
-                    Swal.fire("Error!", "An error occurred while saving the exam and questions.", "error");
+                    Swal.fire("Error!", "Failed to save data. Please try again.", "error");
                 }
             });
         }
+
     </script>
     <script>
         $(document).ready(function () {

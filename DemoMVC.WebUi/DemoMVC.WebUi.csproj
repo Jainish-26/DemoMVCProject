@@ -2490,6 +2490,7 @@
     <Content Include="Views\Question\_QuestionDetailsPopUp.cshtml" />
     <Content Include="Views\Exam\Index.cshtml" />
     <Content Include="Views\Exam\Create.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\IntegerEditor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

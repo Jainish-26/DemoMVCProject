@@ -62,6 +62,9 @@ namespace DemoMVC.WebUi.Controllers
                     model.ExamCode = exam.ExamCode;
                     model.DurationMin = exam.DurationMin;
                 }
+
+                ViewBag.TotalMarks = (id > 0) ? _examQuestionsService.GetTotalMarks(id) : 0;
+
             }
             return View(model);
         }
@@ -89,7 +92,14 @@ namespace DemoMVC.WebUi.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    return Json(new { success = false, message = "Invalid input data!" });
+                    return Json(new
+                    {
+                        success = false,
+                        errors = ModelState.ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    )
+                    });
                 }
                 if (model.Exam.DurationMin < 10 && model.Exam.TotalMarks < 20)
                 {
@@ -159,16 +169,19 @@ namespace DemoMVC.WebUi.Controllers
                 obj.UpdatedOn = DateTime.UtcNow;
                 _examService.UpdateExam(obj);
 
-               
-                var existingQuestions = _examQuestionsService.GetExamQuestionsById(obj.ExamId).Select(q=>q.QuestionId).ToList();
-                                        
+
+                var existingExamQuestions = _examQuestionsService.GetExamQuestionsById(obj.ExamId).ToList();
+
+                // Selected question IDs for quick lookup
                 var selectedQuestionIds = new HashSet<int>(model.SelectedQuestions.Select(q => q.QuestionId));
 
-                
                 foreach (var question in model.SelectedQuestions)
                 {
-                    if (!existingQuestions.Contains(question.QuestionId)) 
+                    var existingExamQuestion = existingExamQuestions.FirstOrDefault(q => q.QuestionId == question.QuestionId);
+
+                    if (existingExamQuestion == null)
                     {
+                        // Create new exam question if not exists
                         var newExamQuestion = new ExamQuestions
                         {
                             ExamId = obj.ExamId,
@@ -177,15 +190,23 @@ namespace DemoMVC.WebUi.Controllers
                         };
                         _examQuestionsService.CraeteExamQuestion(newExamQuestion);
                     }
-                }
-
-                foreach (var questionId in existingQuestions)
-                {
-                    if (!selectedQuestionIds.Contains(questionId)) 
+                    else if (existingExamQuestion.Marks != question.Marks)
                     {
-                        _examQuestionsService.DeleteExamQuestion( questionId, obj.ExamId);
+                        
+                        existingExamQuestion.Marks = question.Marks;
+                        _examQuestionsService.UpdateExamQuestion(existingExamQuestion);
                     }
                 }
+
+                // Remove questions that are no longer selected
+                foreach (var existingExamQuestion in existingExamQuestions)
+                {
+                    if (!selectedQuestionIds.Contains(existingExamQuestion.QuestionId))
+                    {
+                        _examQuestionsService.DeleteExamQuestion(existingExamQuestion.QuestionId, obj.ExamId);
+                    }
+                }
+
             }
 
             return model;

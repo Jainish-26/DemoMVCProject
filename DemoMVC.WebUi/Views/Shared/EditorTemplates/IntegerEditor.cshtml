@@ -1,0 +1,10 @@
+@model int?
+@using Kendo.Mvc.UI
+
+
+@(Html.Kendo().NumericTextBoxFor(m => m)
+    .Decimals(0)   
+    .Step(1)       
+    .Format("n0") 
+    .Min(5)        
+)

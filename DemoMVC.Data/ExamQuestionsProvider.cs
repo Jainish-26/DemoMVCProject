@@ -71,6 +71,10 @@ namespace DemoMVC.Data
             }
         }
 
+        public int GetTotalMarks(int? ExamId)
+        {
+            return (from eq in _db.ExamQuestions where eq.ExamId == ExamId select eq).Sum(m => m.Marks);
+        }
         public List<ExamQuestions> GetExamQuestionsById(int ExamId)
         {
             return (from i in _db.ExamQuestions where i.ExamId == ExamId select i).ToList();
@@ -81,6 +85,19 @@ namespace DemoMVC.Data
             return (from eq in _db.ExamQuestions where eq.QuestionId == QuestionId && eq.ExamId == ExamId select eq).FirstOrDefault();
         }
 
+        public int UpdateExamQuestion(ExamQuestions examQuestions)
+        {
+            try
+            {
+                _db.Entry(examQuestions).State = System.Data.Entity.EntityState.Modified;
+                _db.SaveChanges();
+                return examQuestions.ExamQuestionId;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
         public bool DeleteExamQuestion(int QuestionId, int ExamId)
         {
             var examQuestion = GetByExamAndQuestionId(QuestionId, ExamId);

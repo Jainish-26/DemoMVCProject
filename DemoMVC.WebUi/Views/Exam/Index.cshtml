@@ -45,18 +45,18 @@
 
                 if (role == "sadmin")
                 {
-                    columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("3%").Sortable(false);
-                    columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=ExamId#)'>Delete</button>" : "") +
-                    "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
-                    //columns.Bound(c => c.ExamId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
                     columns.Bound(c => c.ExamId)
-                      .HeaderHtmlAttributes(new { @class = "center_text" })
-                      .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
-                      .ClientTemplate("<button class='btn btn-success add-question' onclick='navigateToViewQuestions(#=ExamId#)'>Show Question</button>")
-                      .Filterable(false)
-                      .Title("Add Question")
-                      .Width("10%")
-                      .Sortable(false);
+                     .HeaderHtmlAttributes(new { @class = "center_text" })
+                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                     .ClientTemplate("<div class='k_action_table'>" +
+                         (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'><i class='fa fa-edit'></i></a> " : "") +
+                         (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=ExamId#)'><i class='fa fa-trash text-danger'></i></a> " : "") +
+                         (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=ExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
+                     "</div>")
+                     .Filterable(false)
+                     .Title("Action")
+                     .Width("7%")
+                     .Sortable(false);
                 }
                 else
                 {

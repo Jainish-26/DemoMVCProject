@@ -42,9 +42,19 @@
               columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               if (role == "sadmin")
               {
-                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'><a title='Permission' style='width:18px;' class='fa fa-cog' href='" + Url.Action("ViewPermission","FormRoleMapping") + "/#=Id#'" + "></a>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width(100).Sortable(false);
-                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=Id#)'>Delete</button>" : "") +
-                  "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
+                  columns.Bound(c => c.Id)
+                    .HeaderHtmlAttributes(new { @class = "center_text" })
+                    .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                    .ClientTemplate("<div class='k_action_table'>" +
+                        "<a title='Permission' style='width:18px;' class='fa fa-cog' href='" + Url.Action("ViewPermission", "FormRoleMapping") + "/#=Id#'></a> " +
+                        (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Roles") + "/#=Id#'><i class='fa fa-edit'></i></a> " : "") +
+                        (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=Id#)'><i class='fa fa-trash text-danger'></i></a>" : "") +
+                    "</div>")
+                    .Filterable(false)
+                    .Title("Action")
+                    .Width(120)
+                    .Sortable(false);
+
               }
               else
               {

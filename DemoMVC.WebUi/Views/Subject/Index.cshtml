@@ -42,9 +42,19 @@
               columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               if (role == "sadmin")
               {
-                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Subject") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Action").Width("5%").Sortable(false);
-                  columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=Id#)'>Delete</button>" : "") +
-                  "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
+
+                  columns.Bound(c => c.Id)
+                    .HeaderHtmlAttributes(new { @class = "center_text" })
+                    .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                    .ClientTemplate("<div class='k_action_table'>" +
+                        (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Subject") + "/#=Id#'><i class='fa fa-edit'></i></a>" : "") +
+                        (AllowedDelete ? " <a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=Id#)'><i class='fa fa-trash text-danger'></i></a>" : "") +
+                    "</div>")
+                    .Filterable(false)
+                    .Title("Action")
+                    .Width("8%")
+                    .Sortable(false);
+
               }
               else
               {
@@ -72,57 +82,8 @@
     $(document).ready(function () {
         $('#gridSubjects').data('kendoGrid').dataSource.read();
         $('#gridSubjects').data('kendoGrid').refresh();
-       
+
     });
-
-    @*function confirmDelete(roleId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'This role will be permanently deleted!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '@Url.Action("DeleteRole", "Roles")',
-                    type: 'POST',
-                    data: { id: roleId },
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: 'Role deleted successfully.',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                            $('#gridRoles').data('kendoGrid').dataSource.read();
-                            loadRoleChart(); // Refresh chart after delete
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: response.message,
-                                confirmButtonColor: '#d33'
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    function exportToExcel() {
-        var grid = $("#gridSubjects").data("kendoGrid");
-        grid.saveAsExcel();
-    }*@
-
-    
-    
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

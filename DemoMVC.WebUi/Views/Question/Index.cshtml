@@ -62,11 +62,20 @@
 
                 if (role == "sadmin")
                 {
-                    columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Question") + "/#=QuestionId#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("3%").Sortable(false);
-                    columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedDelete ? "<button title='Delete' class='btn btn-sm btn-danger' onclick='confirmDelete(#=QuestionId#)'>Delete</button>" : "") +
-                    "</div>").Filterable(false).Title("Delete").Width("5%").Sortable(false);
+                    columns.Bound(c => c.QuestionId)
+                    .HeaderHtmlAttributes(new { @class = "center_text" })
+                    .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                    .ClientTemplate("<div class='k_action_table'>" +
+                        (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Question") + "/#=QuestionId#'><i class='fa fa-edit'></i></a>" : "") +
+                        (AllowedDelete ? " <a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=QuestionId#)'><i class='fa fa-trash text-danger'></i></a>" : "") +
+                        (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>":" ")+
+                        "</div>")
+                        .Filterable(false)
+                        .Title("Action")
+                        .Width("8%")
+                        .Sortable(false);
+
                 }
-                columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width(70).Sortable(false);
             })
             
             .NoRecords("No record found")

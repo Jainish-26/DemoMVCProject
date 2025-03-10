@@ -41,5 +41,15 @@ namespace DemoMVC.Service
         {
             return _examQuestionsProvider.DeleteExamQuestion(QuestionId, ExamId);
         }
+
+        public int GetTotalMarks(int? ExamId)
+        {
+            return _examQuestionsProvider.GetTotalMarks(ExamId);
+        }
+
+        public int UpdateExamQuestion(ExamQuestions examQuestions)
+        {
+            return _examQuestionsProvider.UpdateExamQuestion(examQuestions);
+        }
     }
 }
