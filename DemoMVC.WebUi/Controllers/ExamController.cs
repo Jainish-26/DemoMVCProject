@@ -4,6 +4,8 @@ using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -24,8 +26,6 @@ namespace DemoMVC.WebUi.Controllers
         {
             return View();
         }
-
-
 
         public ActionResult Create(int? id)
         {
@@ -71,7 +71,7 @@ namespace DemoMVC.WebUi.Controllers
         {
             try
             { 
-                 string actionPermission = "";
+                string actionPermission = "";
                 if (model.Exam.ExamId == 0)
                 {
                     actionPermission = AccessPermission.IsAdd;
@@ -85,25 +85,23 @@ namespace DemoMVC.WebUi.Controllers
                 {
                     return Json(new { success = false, message = "Access Denied!" });
                 }
-
                 int userId = SessionHelper.UserId;
 
                 if (!ModelState.IsValid)
                 {
                     return Json(new { success = false, message = "Invalid input data!" });
                 }
-
                 if (model.Exam.DurationMin < 10 && model.Exam.TotalMarks < 20)
                 {
                     return Json(new { success = false, message = "Minimum duration is 10 minutes and total marks should be at least 20." });
                 }
                 else if (model.Exam.DurationMin < 10)
                 {
-                    return Json(new { success = false, message = "Minimum 10 minutes required." });
+                    return Json(new { success = false, message = "Minimum Duration 10 minutes required." });
                 }
                 else if (model.Exam.TotalMarks < 20)
                 {
-                    return Json(new { success = false, message = "Minimum 20 marks required." });
+                    return Json(new { success = false, message = "Minimum Total 20 marks required." });
                 }
 
                 SaveExamWithQuestions(model);
@@ -137,12 +135,13 @@ namespace DemoMVC.WebUi.Controllers
             obj.EndTime = model.Exam.EndTime;
             obj.ExamStatus = "OnGoing";
 
-            if (model.Exam.ExamId == 0)
+            if (model.Exam.ExamId == 0) 
             {
                 obj.CreatedBy = userId;
                 obj.CreatedOn = DateTime.UtcNow;
                 obj.ExamId = _examService.CreateExam(obj);
 
+             
                 foreach (var question in model.SelectedQuestions)
                 {
                     var examQuestion = new ExamQuestions
@@ -151,17 +150,42 @@ namespace DemoMVC.WebUi.Controllers
                         QuestionId = question.QuestionId,
                         Marks = question.Marks
                     };
-
-                    int ExamQuestionId = _examQuestionsService.CraeteExamQuestion(examQuestion);
+                    _examQuestionsService.CraeteExamQuestion(examQuestion);
                 }
-                            
             }
-            else
+            else 
             {
                 obj.UpdatedBy = userId;
                 obj.UpdatedOn = DateTime.UtcNow;
                 _examService.UpdateExam(obj);
 
+               
+                var existingQuestions = _examQuestionsService.GetExamQuestionsById(obj.ExamId).Select(q=>q.QuestionId).ToList();
+                                        
+                var selectedQuestionIds = new HashSet<int>(model.SelectedQuestions.Select(q => q.QuestionId));
+
+                
+                foreach (var question in model.SelectedQuestions)
+                {
+                    if (!existingQuestions.Contains(question.QuestionId)) 
+                    {
+                        var newExamQuestion = new ExamQuestions
+                        {
+                            ExamId = obj.ExamId,
+                            QuestionId = question.QuestionId,
+                            Marks = question.Marks
+                        };
+                        _examQuestionsService.CraeteExamQuestion(newExamQuestion);
+                    }
+                }
+
+                foreach (var questionId in existingQuestions)
+                {
+                    if (!selectedQuestionIds.Contains(questionId)) 
+                    {
+                        _examQuestionsService.DeleteExamQuestion( questionId, obj.ExamId);
+                    }
+                }
             }
 
             return model;

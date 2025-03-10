@@ -10,6 +10,7 @@ namespace DemoMVC.WebUi.Models
 	{
 		public ExamModel  Exam { get; set; }
         public List<QuestionSelectionModel> SelectedQuestions { get; set; }
+        public List<int> UnSelectedQuestions { get; set; } = new List<int>();
     }
 
     public class QuestionSelectionModel

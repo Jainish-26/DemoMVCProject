@@ -32,9 +32,14 @@ namespace DemoMVC.Service
             return _examQuestionsProvider.GetUnassignedQuestions(examId);
         }
 
-        public ExamQuestions GetExamQuestionsById(int ExamId)
+        public List<ExamQuestions> GetExamQuestionsById(int ExamId)
         {
             return _examQuestionsProvider.GetExamQuestionsById(ExamId);
+        }
+
+        public bool DeleteExamQuestion(int QuestionId, int ExamId)
+        {
+            return _examQuestionsProvider.DeleteExamQuestion(QuestionId, ExamId);
         }
     }
 }

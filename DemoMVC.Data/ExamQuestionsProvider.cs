@@ -71,9 +71,33 @@ namespace DemoMVC.Data
             }
         }
 
-        public ExamQuestions GetExamQuestionsById(int ExamId)
+        public List<ExamQuestions> GetExamQuestionsById(int ExamId)
         {
-            return (from i in _db.ExamQuestions where i.ExamId == ExamId select i).FirstOrDefault();
+            return (from i in _db.ExamQuestions where i.ExamId == ExamId select i).ToList();
+        }
+
+        public ExamQuestions GetByExamAndQuestionId(int QuestionId ,int ExamId)
+        {
+            return (from eq in _db.ExamQuestions where eq.QuestionId == QuestionId && eq.ExamId == ExamId select eq).FirstOrDefault();
+        }
+
+        public bool DeleteExamQuestion(int QuestionId, int ExamId)
+        {
+            var examQuestion = GetByExamAndQuestionId(QuestionId, ExamId);
+            try
+            {
+                if (examQuestion != null)
+                {
+                    _db.ExamQuestions.Remove(examQuestion);
+                    _db.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return false;
         }
     }
 }

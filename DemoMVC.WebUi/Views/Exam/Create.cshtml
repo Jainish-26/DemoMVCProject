@@ -206,7 +206,6 @@
                 columns.Bound(c => c.Marks).Width("7%").Title("Marks");
                 columns.Bound(c => c.QuestionId).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #,'Access')\"><i class='fa fa-eye'></i></a>" : "")).Filterable(false).Title("Action").Width("7%").Sortable(false);
             })
-            .Editable(editable => editable.Mode(GridEditMode.InCell))
             .NoRecords("No record found")
             .Events(evt => evt
                .DataBinding("fnKendoGridCommonDataBinding")
@@ -226,17 +225,7 @@
             )
              .DataSource(dataSource => dataSource
                  .Ajax()
-                 .Model(
-                 model =>
-                 {
-                     model.Id(m => m.QuestionId);
-                     model.Field(m => m.QuestionId).Editable(false);
-                     model.Field(m => m.Marks).Editable(true);
-                     model.Field(m => m.QuestionImage).Editable(false);
-                     model.Field(m => m.QuestionText).Editable(false);
-                     model.Field(m => m.Subject).Editable(false);
-                     model.Field(m => m.Type).Editable(false);
-                 })
+
                  //.Sort(sortable=>sortable.Add("Name").Ascending())
                  .Read(read => read.Action("GetGridExamQuestionData", "Exam").Data("sendExamId")).PageSize(10)
              )
@@ -351,34 +340,61 @@
                 formObject[field.name] = field.value;
             });
 
-            // Collect selected grid questions
-            var grid = $("#gridUnassignedQuestion").data("kendoGrid");
-            var selectedQuestions = [];
+            // Selected & Unselected Questions from Exam Grid
+            var examGrid = $("#gridExamQuestion").data("kendoGrid");
+            var selectedExamQuestions = [];
+            var deselectedExamQuestions = [];
 
-            grid.tbody.find("tr").each(function () {
+            examGrid.tbody.find("tr").each(function () {
                 var row = $(this);
                 var checkbox = row.find(".toggle-edit");
+                var dataItem = examGrid.dataItem(row);
+
                 if (checkbox.is(":checked")) {
-                    var dataItem = grid.dataItem(row);
-                    selectedQuestions.push({
+                    selectedExamQuestions.push({
+                        QuestionId: dataItem.QuestionId,
+                        Marks: dataItem.Marks
+                    });
+                } else {
+                    deselectedExamQuestions.push(dataItem.QuestionId);
+                }
+            });
+
+            // Selected Questions from Unassigned Grid
+            var unassignedGrid = $("#gridUnassignedQuestion").data("kendoGrid");
+            var selectedUnassignedQuestions = [];
+
+            unassignedGrid.tbody.find("tr").each(function () {
+                var row = $(this);
+                var checkbox = row.find(".toggle-edit");
+                var dataItem = unassignedGrid.dataItem(row);
+
+                if (checkbox.is(":checked")) {
+                    selectedUnassignedQuestions.push({
                         QuestionId: dataItem.QuestionId,
                         Marks: dataItem.Marks
                     });
                 }
             });
 
-            // Combine form data and selected questions
+            // Combine selected questions from both grids
+            var finalSelectedQuestions = selectedExamQuestions.concat(selectedUnassignedQuestions);
+
+            // Prepare the request data
             var requestData = {
                 Exam: formObject,
-                SelectedQuestions: selectedQuestions
+                SelectedQuestions: finalSelectedQuestions,
+                UnselectedQuestions: deselectedExamQuestions
             };
 
-            if (selectedQuestions.length === 0) {
+            if (finalSelectedQuestions.length === 0) {
                 Swal.fire("No Questions Selected!", "Please select questions to save.", "warning");
                 return;
             }
+
             console.log(requestData);
-            //Send AJAX request
+
+            // Send AJAX request
             $.ajax({
                 url: "/Exam/Create",
                 type: "POST",
@@ -397,6 +413,14 @@
                 }
             });
         }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#gridExamQuestion").data("kendoGrid").bind("dataBound", function () {
+                // Select all checkboxes in the grid when data is loaded
+                $("#gridExamQuestion").find(".toggle-edit").prop("checked", true);
+            });
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
