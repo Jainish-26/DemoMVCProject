@@ -30,6 +30,7 @@ namespace DemoMVC.Data
                         ExamId = e.ExamId,
                         ExamName = e.ExamName,
                         ExamCode = e.ExamCode,
+                        BadgeCode = (from code in _db.CommonLookup where e.ExamStatus == code.Code select code.BadgeCode).FirstOrDefault(),
                         ExamStatus = e.ExamStatus,
                         TotalMarks = e.TotalMarks,
                         DurationMin = e.DurationMin,

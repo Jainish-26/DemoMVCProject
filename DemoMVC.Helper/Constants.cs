@@ -64,5 +64,11 @@ namespace DemoMVC.Helper
             public const string MEDIUM = "MEDIUM";
             public const string HARD = "HARD";
         }
+
+        public static class ExamStatus
+        {
+            public const string DRAFT = "DRAFT";
+            public const string PUBLISHED = "PUBLISHED";
+        }
     }
 }

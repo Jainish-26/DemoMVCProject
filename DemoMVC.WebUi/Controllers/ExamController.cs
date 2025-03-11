@@ -1,4 +1,5 @@
-﻿using DemoMVC.Models;
+﻿using DemoMVC.Helper;
+using DemoMVC.Models;
 using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
@@ -15,12 +16,14 @@ namespace DemoMVC.WebUi.Controllers
         private readonly ExamService _examService;
         private readonly QuestionService _questionService;
         private readonly ExamQuestionsService _examQuestionsService;
+        private readonly CommonLookupService _commonLookupService;
 
         public ExamController()
         {
             _examService = new ExamService();
             _questionService = new QuestionService();
             _examQuestionsService = new ExamQuestionsService();
+            _commonLookupService = new CommonLookupService();
         }
         public ActionResult Index()
         {
@@ -61,11 +64,13 @@ namespace DemoMVC.WebUi.Controllers
                     model.IsActive = exam.IsActive;
                     model.ExamCode = exam.ExamCode;
                     model.DurationMin = exam.DurationMin;
+                    model.ExamStatus = exam.ExamStatus;
                 }
 
                 ViewBag.TotalMarks = (id > 0) ? _examQuestionsService.GetTotalMarks(id) : 0;
 
             }
+            BindStatus(ref model);
             return View(model);
         }
 
@@ -92,6 +97,8 @@ namespace DemoMVC.WebUi.Controllers
 
                 if (!ModelState.IsValid)
                 {
+                    ExamModel exam = model.Exam;
+                    BindStatus(ref exam);
                     return Json(new
                     {
                         success = false,
@@ -103,14 +110,20 @@ namespace DemoMVC.WebUi.Controllers
                 }
                 if (model.Exam.DurationMin < 10 && model.Exam.TotalMarks < 20)
                 {
+                    ExamModel exam = model.Exam;
+                    BindStatus(ref exam);
                     return Json(new { success = false, message = "Minimum duration is 10 minutes and total marks should be at least 20." });
                 }
                 else if (model.Exam.DurationMin < 10)
                 {
+                    ExamModel exam = model.Exam;
+                    BindStatus(ref exam);
                     return Json(new { success = false, message = "Minimum Duration 10 minutes required." });
                 }
                 else if (model.Exam.TotalMarks < 20)
                 {
+                    ExamModel exam = model.Exam;
+                    BindStatus(ref exam);
                     return Json(new { success = false, message = "Minimum Total 20 marks required." });
                 }
 
@@ -119,6 +132,8 @@ namespace DemoMVC.WebUi.Controllers
             }
             catch (Exception ex)
             {
+                ExamModel exam = model.Exam;
+                BindStatus(ref exam);
                 return Json(new { success = false, message = "An error occurred: " + ex.Message });
             }
         }
@@ -143,7 +158,7 @@ namespace DemoMVC.WebUi.Controllers
             obj.DurationMin = model.Exam.DurationMin;
             obj.StartTime = model.Exam.StartTime;
             obj.EndTime = model.Exam.EndTime;
-            obj.ExamStatus = "OnGoing";
+            obj.ExamStatus = model.Exam.ExamStatus;
 
             if (model.Exam.ExamId == 0) 
             {
@@ -206,9 +221,7 @@ namespace DemoMVC.WebUi.Controllers
                         _examQuestionsService.DeleteExamQuestion(existingExamQuestion.QuestionId, obj.ExamId);
                     }
                 }
-
             }
-
             return model;
         }
 
@@ -231,6 +244,17 @@ namespace DemoMVC.WebUi.Controllers
         {
             var data = _examQuestionsService.GetUnassignedQuestions(ExamId);
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+        }
+
+        private ExamModel BindStatus(ref ExamModel exam)
+        {
+            var data = _commonLookupService.GetLookupByType(LookupType.ExamStatus);
+            exam._statusList.Add(new SelectListItem() { Text = " Status", Value = "" });
+            foreach (var item in data)
+            {
+                exam._statusList.Add(new SelectListItem() { Text = item.Name, Value = item.Code });
+            }
+            return exam;
         }
     }
 }

@@ -40,7 +40,7 @@
                 columns.Bound(c => c.ExamCode).Width("7%").Title("Exam Code");
                 columns.Bound(c => c.TotalMarks).Width("7%").Title("Marks");
                 columns.Bound(c => c.DurationMin).Width("7%").Title("Duration");
-                columns.Bound(c => c.ExamStatus).Width("7%").Title("Status");
+                columns.Bound(c => c.ExamStatus).Width("7%").Title("Status").ClientTemplate("#if(BadgeCode!=null && BadgeCode!=''){#" + "<span class='status' style='background:#=BadgeCode#'>#=ExamStatus#</span>#} else {# #=ExamStatus# #}#");
                 columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
 
                 if (role == "sadmin")

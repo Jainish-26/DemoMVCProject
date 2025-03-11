@@ -51,6 +51,7 @@ namespace DemoMVC.Models
         public string ExamName { get; set; }
         public string ExamCode { get; set; }
         public string ExamStatus { get; set; }
+        public string BadgeCode { get; set; }
         public int TotalMarks { get; set; }
         public bool IsActive { get; set; }
         public int DurationMin { get; set; }
