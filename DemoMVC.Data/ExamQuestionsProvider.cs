@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Data
 {
@@ -28,7 +25,7 @@ namespace DemoMVC.Data
                              {
                                  QuestionId = q.QuestionId,
                                  QuestionText = q.QuestionText,
-                                 Subject=q.Subject.SubjectName,
+                                 Subject = q.Subject.SubjectName,
                                  Type = q.QuestionType.QuestionTypeName,
                                  Marks = eq.Marks
                              }).AsQueryable();
@@ -40,7 +37,7 @@ namespace DemoMVC.Data
         {
             var unassignedQuestions = (from q in _db.Questions
                                        where q.IsActive == true &&
-                                             ! _db.ExamQuestions
+                                             !_db.ExamQuestions
                                                 .Where(eq => eq.ExamId == examId)
                                                 .Select(eq => eq.QuestionId)
                                                 .Contains(q.QuestionId)
@@ -80,7 +77,7 @@ namespace DemoMVC.Data
             return (from i in _db.ExamQuestions where i.ExamId == ExamId select i).ToList();
         }
 
-        public ExamQuestions GetByExamAndQuestionId(int QuestionId ,int ExamId)
+        public ExamQuestions GetByExamAndQuestionId(int QuestionId, int ExamId)
         {
             return (from eq in _db.ExamQuestions where eq.QuestionId == QuestionId && eq.ExamId == ExamId select eq).FirstOrDefault();
         }
@@ -115,6 +112,11 @@ namespace DemoMVC.Data
                 throw e;
             }
             return false;
+        }
+
+        public int GetMarksByQuestionId(int QuestionId)
+        {
+            return (from q in _db.ExamQuestions where QuestionId == q.QuestionId select q.Marks).FirstOrDefault();
         }
     }
 }

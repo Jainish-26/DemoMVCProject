@@ -1,10 +1,7 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Service
 {
@@ -50,6 +47,11 @@ namespace DemoMVC.Service
         public int UpdateExamQuestion(ExamQuestions examQuestions)
         {
             return _examQuestionsProvider.UpdateExamQuestion(examQuestions);
+        }
+
+        public int GetMarksByQuestionId(int QuestionId)
+        {
+            return _examQuestionsProvider.GetMarksByQuestionId(QuestionId);
         }
     }
 }

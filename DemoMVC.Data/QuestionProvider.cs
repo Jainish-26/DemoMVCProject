@@ -146,5 +146,17 @@ namespace DemoMVC.Data
         {
             return (from i in _db.Questions where i.QuestionId == id select i.QuestionImage).ToString();
         }
+
+        public List<Questions> GetQuestionsByExamId(int examId)
+        {
+            var questionIds = _db.ExamQuestions
+                .Where(eq => eq.ExamId == examId)
+                .Select(eq => eq.QuestionId)
+                .ToList();
+
+            return _db.Questions
+                .Where(q => questionIds.Contains(q.QuestionId)) 
+                .ToList();
+        }
     }
 }

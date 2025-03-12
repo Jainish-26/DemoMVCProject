@@ -1,6 +1,4 @@
-﻿using System.Web.WebPages.Scope;
-
-namespace DemoMVC.Helper
+﻿namespace DemoMVC.Helper
 {
     public static class Constants
     {

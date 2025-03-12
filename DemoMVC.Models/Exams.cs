@@ -1,5 +1,4 @@
-﻿using Microsoft.SqlServer.Server;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace DemoMVC.Models
@@ -17,7 +16,7 @@ namespace DemoMVC.Models
         public int TotalMarks { get; set; }
 
         [Required]
-        public int DurationMin { get; set; } 
+        public int DurationMin { get; set; }
 
         [Required]
         public int PassingMarks { get; set; }
@@ -28,7 +27,7 @@ namespace DemoMVC.Models
 
         [Required]
         [StringLength(50)]
-        public string ExamStatus { get; set; } 
+        public string ExamStatus { get; set; }
         public DateTime? StartTime { get; set; }
         public bool IsActive { get; set; }
 

@@ -1,0 +1,78 @@
+@model DemoMVC.WebUi.Models.ExamQuestionViewModel
+@{ 
+    var count = 1;
+}
+
+<!-- Exam Header -->
+<div class="card shadow-sm p-3 mb-4">
+    <h3 class="fw-bold">@Model.Exam.ExamName</h3>
+    <div class="row">
+        <div class="col-md-3"><strong>Exam Code:</strong> @Model.Exam.ExamCode</div>
+        <div class="col-md-3"><strong>Total Marks:</strong> @Model.Exam.TotalMarks</div>
+        <div class="col-md-3"><strong>Passing Marks:</strong> @Model.Exam.PassingMarks</div>
+        <div class="col-md-3"><strong>Duration:</strong> @Model.Exam.DurationMin mins</div>
+    </div>
+</div>
+
+<!-- Questions List -->
+@foreach (var question in Model.Questions)
+{
+    
+    <div class="card shadow-sm p-3 mb-4">
+        <h5 class="fw-bold">Q - @count. @question.QuestionText</h5>
+        
+        <!-- Show Image if Available -->
+        @if (!string.IsNullOrEmpty(question.QuestionImage))
+        {
+            <div class="mb-2">
+                <img src="~/content/QuestionImage/@question.QuestionImage" alt="Question Image" class="img-fluid" style="max-width: 300px; display: block;">
+            </div>
+        }
+
+        <!-- Show Options Based on Question Type -->
+        <div class="answers-section">
+            <div class="answers-heading">Answers:</div>
+            <div class="answer-options">
+                @if (question.QuestionType == "Single Choice MCQ")
+                {
+                    foreach (var answer in question.Answers)
+                    {
+                        <div class="answer-item @(answer.IsCorrect ? "correct" : "")">
+                            <div class="d-flex align-items-center" style="padding-left:25px">
+                                <input type="radio" name="selectedAnswer" value="@answer.AnswerText"
+                                       @(answer.IsCorrect ? "checked" : "") class="form-check-input" disabled>
+                                <span class="answer-text">@answer.AnswerText</span>
+                            </div>
+                        </div>
+                    }
+                }
+                else if (question.QuestionType == "Multiple Choice MCQ")
+                {
+                    foreach (var answer in question.Answers)
+                    {
+                        <div class="answer-item @(answer.IsCorrect ? "correct" : "")">
+                            <div class="d-flex align-items-center" style="padding-left:25px">
+                                <input type="checkbox" name="selectedAnswers" value="@answer.AnswerText"
+                                       @(answer.IsCorrect ? "checked" : "") class="form-check-input" disabled>
+                                <span class="answer-text">@answer.AnswerText</span>
+                            </div>
+                        </div>
+                    }
+                }
+                else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
+                {
+                    <div class="text-answer-box">
+                        <input type="text" class="form-control" style="color: #000; font-weight: 500;"
+                               value="@(question.Answers.FirstOrDefault()?.AnswerText ?? "")" disabled>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Invalid Question Type</p>
+                }
+            </div>
+        </div>
+
+    </div>
+    count++;
+}

@@ -1,9 +1,7 @@
 ﻿using DemoMVC.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Web;
 
 namespace DemoMVC.Data
 {
@@ -19,7 +17,7 @@ namespace DemoMVC.Data
             var data = (from e in _db.Exams where e.IsActive == true select e).ToList();
 
             return data;
-        } 
+        }
 
         public IQueryable<ExamsGridModel> GetExamGridModal()
         {

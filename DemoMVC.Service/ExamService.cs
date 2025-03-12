@@ -1,14 +1,11 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Service
 {
-    public class ExamService 
+    public class ExamService
     {
         private readonly ExamProvider _examProvider;
         public ExamService()

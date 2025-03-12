@@ -4,14 +4,12 @@ using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.UI;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -115,9 +113,9 @@ namespace DemoMVC.WebUi.Controllers
             {
                 int CorrectCnt = 0;
                 int OptionCnt = 0;
-                foreach(var ans in model.Answers)
+                foreach (var ans in model.Answers)
                 {
-                    if (ans.AnswerText!=null && ans.IsCorrect == true)
+                    if (ans.AnswerText != null && ans.IsCorrect == true)
                     {
                         CorrectCnt++;
                         OptionCnt++;
@@ -198,7 +196,7 @@ namespace DemoMVC.WebUi.Controllers
 
             if (model.QuestionId == 0)
             {
-                
+
                 que.CreatedBy = userId;
                 que.CreatedOn = DateTime.UtcNow;
                 que.QuestionId = _questionService.CreateQuestion(que);
@@ -230,7 +228,7 @@ namespace DemoMVC.WebUi.Controllers
                 }
             }
             else
-            { 
+            {
                 que.UpdatedBy = userId;
                 que.UpdatedOn = DateTime.UtcNow;
                 _questionService.UpdateQuestions(que);
@@ -256,14 +254,14 @@ namespace DemoMVC.WebUi.Controllers
                             }
                             answersToKeep.Add(existingAnswer.AnswerId);
                         }
-                    } 
+                    }
                     else
                     {
                         var matchingAnswer = existingAnswers.FirstOrDefault(a =>
                             a.AnswerText == answer.AnswerText &&
                             !answersToKeep.Contains(a.AnswerId));
                         if (matchingAnswer != null)
-                        {  
+                        {
                             if (matchingAnswer.IsCorrect != answer.IsCorrect)
                             {
                                 matchingAnswer.IsCorrect = answer.IsCorrect;
@@ -274,7 +272,7 @@ namespace DemoMVC.WebUi.Controllers
                             answersToKeep.Add(matchingAnswer.AnswerId);
                         }
                         else
-                        {  
+                        {
                             Answers newAnswer = new Answers
                             {
                                 AnswerText = answer.AnswerText,
@@ -303,7 +301,7 @@ namespace DemoMVC.WebUi.Controllers
 
         [HttpPost]
         public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
-         {
+        {
             var data = _questionService.GetAllQuestionsGridModel();
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
@@ -384,7 +382,7 @@ namespace DemoMVC.WebUi.Controllers
             return PartialView("_ImagePopup", question);
         }
 
-        public ActionResult GetQuestionDetails(int id ,string access)
+        public ActionResult GetQuestionDetails(int id, string access)
         {
             var question = _questionService.GetById(id);
 

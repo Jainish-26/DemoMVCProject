@@ -50,5 +50,9 @@ namespace DemoMVC.Service
         {
             return _questionProvider.GetImage(id);
         }
+        public List<Questions> GetQuestionsByExamId(int examId)
+        {
+            return _questionProvider.GetQuestionsByExamId(examId);
+        }
     }
 }

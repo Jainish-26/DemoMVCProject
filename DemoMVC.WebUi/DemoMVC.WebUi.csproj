@@ -193,6 +193,7 @@
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\ExamModel.cs" />
     <Compile Include="Models\ExamQuestionModel.cs" />
+    <Compile Include="Models\ExamQuestionViewModel.cs" />
     <Compile Include="Models\FormModel.cs" />
     <Compile Include="Models\QuestionAndAnswerModel.cs" />
     <Compile Include="Models\QuestionTypeModel.cs" />
@@ -2491,6 +2492,7 @@
     <Content Include="Views\Exam\Index.cshtml" />
     <Content Include="Views\Exam\Create.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\IntegerEditor.cshtml" />
+    <Content Include="Views\Exam\_ExamQuestionsPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
