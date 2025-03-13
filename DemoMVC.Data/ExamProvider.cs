@@ -73,5 +73,12 @@ namespace DemoMVC.Data
                 throw e;
             }
         }
+        public List<Exams> CheckDuplicateExamCode(string ExamCode)
+        {
+            var getExamDetails = (from e in _db.Exams
+                                  where e.ExamCode.ToUpper().Trim() == ExamCode.ToUpper().Trim()
+                                  select e).ToList();
+            return getExamDetails;
+        }
     }
 }

@@ -7,6 +7,7 @@ using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.ApplicationServices;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -18,6 +19,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly ExamQuestionsService _examQuestionsService;
         private readonly CommonLookupService _commonLookupService;
         private readonly AnswerService _answerService;
+        private readonly MessageService _messageService;
 
         public ExamController()
         {
@@ -26,6 +28,7 @@ namespace DemoMVC.WebUi.Controllers
             _examQuestionsService = new ExamQuestionsService();
             _commonLookupService = new CommonLookupService();
             _answerService = new AnswerService();
+            _messageService = new MessageService();
         }
         public ActionResult Index()
         {
@@ -258,6 +261,23 @@ namespace DemoMVC.WebUi.Controllers
             return exam;
         }
 
+        public JsonResult CheckDuplicateExamCode(string ExamCode, int ExamId)
+        {
+            var getExamDetails = _examService.CheckDuplicateExamCode(ExamCode);
+            if (ExamId > 0)
+            {
+                getExamDetails = getExamDetails.Where(a => a.ExamId != ExamId).ToList();
+            }
+            if (getExamDetails.Count() > 0)
+            {
+                var message = _messageService.GetMessageByCode(Constants.MessageCode.CODEEXIST);
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(true);
+            }
+        }
         public ActionResult GetExamQuestionDetails(int ExamId)
         {
             var questions = _questionService.GetQuestionsByExamId(ExamId)
