@@ -30,26 +30,31 @@
     <style>
         .form-container {
             width: 100%;
-            margin-left: 20px auto;
-            padding-left: 25px;
+            margin: 0 auto;
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
         }
 
         .form-label {
             font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
         }
 
         .required-icon {
             color: red;
-            margin-left: 5px;
+            margin-left: 0px;
         }
 
         .small-input {
             width: 100%;
             max-width: 70px;
         }
-        
+
         .same-height {
-            height: 38px; 
+            height: 38px;
+            max-width: 250px;
         }
 
         .form-control.same-height,
@@ -57,6 +62,7 @@
             height: 38px !important;
             min-height: 38px !important;
             box-sizing: border-box !important;
+            padding: 6px 12px;
         }
 
         .toggle-input {
@@ -70,6 +76,7 @@
             background: #ccc;
             position: relative;
             cursor: pointer;
+            display: inline-block;
         }
 
             .toggle-switch::before {
@@ -92,6 +99,15 @@
             .toggle-input:checked + .toggle-switch::before {
                 left: 20px;
             }
+
+        .row.g-3 {
+            margin-bottom: 10px;
+        }
+
+        .text-danger {
+            font-size: 12px;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -111,19 +127,17 @@
         </div>
 
         <!-- Form Container -->
-        <div class="form-container">
+        <div class="form-container p-3 bg-light rounded">
             @Html.Hidden("hdnFormAccessCode", formCode)
             <form id="form" enctype="multipart/form-data">
                 @Html.HiddenFor(model => model.ExamId)
                 @Html.AntiForgeryToken()
-
-                <div class="row g-2 align-items-end">
+                <div class="row g-3 align-items-end">
                     <div class="col-md-3">
                         <label class="form-label">Exam Name <span class="required-icon">*</span></label>
                         @Html.TextBoxFor(model => model.ExamName, new { @class = "form-control same-height", placeholder = "Enter Exam Name" })
                         @Html.ValidationMessageFor(model => model.ExamName, "", new { @class = "text-danger" })
                     </div>
-
                     <div class="col-md-2">
                         <label class="form-label">Exam Code <span class="required-icon">*</span></label>
                         @if (Model.ExamId > 0)
@@ -136,33 +150,28 @@
                         }
                         @Html.ValidationMessageFor(model => model.ExamCode, "", new { @class = "text-danger" })
                     </div>
-
                     <div class="col-md-1">
                         <label class="form-label">Marks <span class="required-icon">*</span></label>
                         @Html.TextBoxFor(model => model.TotalMarks, new { @class = "form-control small-input same-height", placeholder = "Marks" })
                         @Html.ValidationMessageFor(model => model.TotalMarks, "", new { @class = "text-danger" })
                     </div>
-
                     <div class="col-md-1">
-                        <label class="form-label">Passing <span class="required-icon">*</span></label>
+                        <label class="form-label">Passing Marks<span class="required-icon">*</span></label>
                         @Html.TextBoxFor(model => model.PassingMarks, new { @class = "form-control small-input same-height", placeholder = "Pass" })
                         @Html.ValidationMessageFor(model => model.PassingMarks, "", new { @class = "text-danger" })
                     </div>
-
                     <div class="col-md-1">
                         <label class="form-label">Duration(mins)<span class="required-icon">*</span></label>
                         @Html.TextBoxFor(model => model.DurationMin, new { @class = "form-control small-input same-height", placeholder = "Time" })
                         @Html.ValidationMessageFor(model => model.DurationMin, "", new { @class = "text-danger" })
                     </div>
-
                     <div class="col-md-2">
                         <label class="form-label">Status <span class="required-icon">*</span></label>
-                        @Html.DropDownListFor(model => model.ExamStatus, Model._statusList, new { @class = "form-select same-height"})
+                        @Html.DropDownListFor(model => model.ExamStatus, Model._statusList, new { @class = "form-select same-height" })
                         @Html.ValidationMessageFor(model => model.ExamStatus, "", new { @class = "text-danger" })
                     </div>
-
-                    <div class="col-md-1 d-flex align-items-center">
-                        <label class="me-2">Active?</label>
+                    <div class="col-md-2 d-flex align-items-center">
+                        <label class="me-3">Active?</label>
                         <input type="checkbox" id="IsActiveToggle" class="toggle-input" @if (Model.IsActive) { <text> checked</text> }>
                         <label for="IsActiveToggle" class="toggle-switch"></label>
                         @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
@@ -176,10 +185,6 @@
             @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
             .Name("gridExamQuestion")
             .AutoBind(true)
-            //.Excel(excel => excel
-            //  .FileName("FormList.xlsx")
-            //  .Filterable(true)
-            //  .AllPages(true))
             .Columns(columns =>
             {
 
@@ -199,12 +204,6 @@
                .DataBound("fnKendoGridDataBoundEvent")
             )
             .Sortable()
-            //.Filterable(filter => filter
-            //    .Mode(GridFilterMode.Row)
-            //    .Extra(false)
-            //    .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
-            //    .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
-            //)
             .Pageable(pageable => pageable
                 .Refresh(true)
                 .PageSizes(new[] {10,20, 50, 100, 200 })
@@ -212,7 +211,6 @@
             )
              .DataSource(dataSource => dataSource
                  .Ajax()
-                 //.Sort(sortable=>sortable.Add("Name").Ascending())
                  .Read(read => read.Action("GetGridExamQuestionData", "Exam").Data("sendExamId")).PageSize(10)
              )
         )
@@ -222,10 +220,6 @@
             @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
             .Name("gridUnassignedQuestion")
             .AutoBind(true)
-            //.Excel(excel => excel
-            //  .FileName("FormList.xlsx")
-            //  .Filterable(true)
-            //  .AllPages(true))
             .Columns(columns =>
             {
 
@@ -242,7 +236,7 @@
             .NoRecords("No record found")
             .Events(evt => evt
                 .DataBinding("fnKendoGridCommonDataBinding")
-                .DataBound("fnKendoGridDataBoundEvent")
+                .DataBound("onDataBound")
             )
             .Sortable()
             //.Filterable(filter => filter
@@ -258,18 +252,6 @@
             )
                 .DataSource(dataSource => dataSource
                     .Ajax()
-                    //.Model(
-                    //model =>
-                    //{
-                    //    model.Id(m => m.QuestionId);
-                    //    model.Field(m => m.QuestionId).Editable(false);
-                    //    model.Field(m => m.Marks).Editable(true);
-                    //    model.Field(m => m.QuestionImage).Editable(false);
-                    //    model.Field(m => m.QuestionText).Editable(false);
-                    //    model.Field(m => m.Subject).Editable(false);
-                    //    model.Field(m => m.Type).Editable(false);
-                    //})
-                    //.Sort(sortable=>sortable.Add("Name").Ascending())
                     .Read(read => read.Action("GetGridUnassignedQuestionData", "Exam").Data("sendExamId")).ServerOperation(false).PageSize(10)
                 )
         )
@@ -279,37 +261,111 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        var selectedQuestionsByGrid = {}; // Store selected questions from all pages
+
         $(document).ready(function () {
             function updateTotalMarks() {
                 var totalMarks = 0;
 
-                // Loop through all checked checkboxes and add their corresponding marks
-                $('.toggle-edit').each(function () {
-                    if ($(this).is(':checked')) {
-                        var questionId = $(this).data('id');
-                        var marksInput = $('input.marks-input[data-id="' + questionId + '"]');
-                        var marks = parseInt(marksInput.val()) || 0;
-                        totalMarks += marks;
-                    }
+                // ✅ Loop through all selected questions from all pages
+                Object.values(selectedQuestionsByGrid).forEach(gridData => {
+                    Object.values(gridData).forEach(question => {
+                        totalMarks += question.Marks || 0;
+                    });
                 });
 
-                // Update total marks display
-                $('#totalMarks').text(totalMarks);
+                $('#totalMarks').text(totalMarks); // ✅ Update the total marks on UI
             }
 
-            // Calculate total on page load (for already checked checkboxes)
-            setTimeout(updateTotalMarks, 500); // Ensure DOM is fully rendered
+            function restoreSelections(gridId) {
+                var grid = $("#" + gridId).data("kendoGrid");
 
-            // Event listener for checkbox selection
+                grid.tbody.find("tr").each(function () {
+                    var row = $(this);
+                    var dataItem = grid.dataItem(row);
+                    var checkbox = row.find(".toggle-edit");
+                    var marksInput = row.find(".marks-input");
+
+                    if (selectedQuestionsByGrid[gridId] && selectedQuestionsByGrid[gridId][dataItem.QuestionId]) {
+                        checkbox.prop("checked", true);
+                        marksInput.val(selectedQuestionsByGrid[gridId][dataItem.QuestionId].Marks);
+                        marksInput.prop("disabled", false); // ✅ Enable input if checked
+                    } else {
+                        marksInput.prop("disabled", true); // ✅ Disable input if not checked
+                    }
+                });
+            }
+
+            function onDataBound(e) {
+                var gridId = e.sender.element.attr("id");
+                restoreSelections(gridId);
+                updateTotalMarks(); // ✅ Show updated total after each page load
+            }
+
             $(document).on('change', '.toggle-edit', function () {
+                var checkbox = $(this);
+                var row = checkbox.closest("tr");
+                var grid = row.closest(".k-grid").data("kendoGrid");
+                var gridId = grid.element.attr("id");
+                var dataItem = grid.dataItem(row);
+                var marksInput = row.find(".marks-input");
+                var marks = parseFloat(marksInput.val()) || 0;
+
+                if (!selectedQuestionsByGrid[gridId]) {
+                    selectedQuestionsByGrid[gridId] = {};
+                }
+
+                if (checkbox.is(":checked")) {
+                    selectedQuestionsByGrid[gridId][dataItem.QuestionId] = {
+                        QuestionId: dataItem.QuestionId,
+                        Marks: marks
+                    };
+                    marksInput.prop("disabled", false); // ✅ Enable marks input when selected
+                } else {
+                    delete selectedQuestionsByGrid[gridId][dataItem.QuestionId];
+                    marksInput.prop("disabled", true); // ✅ Disable marks input when unchecked
+                }
+
                 updateTotalMarks();
             });
 
-            // Event listener for marks change
             $(document).on('input', '.marks-input', function () {
+                var marksInput = $(this);
+                var row = marksInput.closest("tr");
+                var grid = row.closest(".k-grid").data("kendoGrid");
+                var gridId = grid.element.attr("id");
+                var dataItem = grid.dataItem(row);
+                var updatedMarks = parseFloat(marksInput.val()) || 0;
+
+                if (!selectedQuestionsByGrid[gridId]) {
+                    selectedQuestionsByGrid[gridId] = {};
+                }
+
+                if (selectedQuestionsByGrid[gridId][dataItem.QuestionId]) {
+                    selectedQuestionsByGrid[gridId][dataItem.QuestionId].Marks = updatedMarks;
+                }
+
                 updateTotalMarks();
             });
+
+            // ✅ Store marks data even after page navigation
+            $("#gridExamQuestion").data("kendoGrid").bind("dataBound", onDataBound);
+            $("#gridUnassignedQuestion").data("kendoGrid").bind("dataBound", onDataBound);
+
+            // ✅ Store data in sessionStorage to handle page refresh
+            var savedSelections = sessionStorage.getItem('selectedQuestionsByGrid');
+            if (savedSelections) {
+                selectedQuestionsByGrid = JSON.parse(savedSelections);
+                updateTotalMarks();
+            }
+
+            window.addEventListener('beforeunload', function () {
+                sessionStorage.setItem('selectedQuestionsByGrid', JSON.stringify(selectedQuestionsByGrid));
+            });
+
+            setTimeout(updateTotalMarks, 500);
         });
+
 
     </script>
     @*Set ViewBagId For GridData*@
@@ -350,13 +406,105 @@
     </script>
     @*Send Exam And Questions In Controller By AJAX*@
     <script>
-        function saveExamAndQuestions() {
-         var form = $("#form");
+        var selectedQuestionsByGrid = {};
+        var unselectedQuestionsByGrid = {};
+        var preselectedQuestions = {};
 
-        // Basic validation
-        if (!form.valid()) {
-            return;
+        function restoreSelections(gridId) {
+            var grid = $("#" + gridId).data("kendoGrid");
+
+            grid.tbody.find("tr").each(function () {
+                var row = $(this);
+                var dataItem = grid.dataItem(row);
+                var checkbox = row.find(".toggle-edit");
+
+                // Auto-check the question EXAM-QUESTION TABLE
+                if (gridId === "gridExamQuestion" && preselectedQuestions[dataItem.QuestionId]) {
+                    checkbox.prop("checked", true);
+
+                    if (!selectedQuestionsByGrid[gridId]) {
+                        selectedQuestionsByGrid[gridId] = {};
+                    }
+                    if (!selectedQuestionsByGrid[gridId][dataItem.QuestionId]) {
+                        selectedQuestionsByGrid[gridId][dataItem.QuestionId] = {
+                            QuestionId: dataItem.QuestionId,
+                            Marks: parseFloat(row.find(".marks-input").val()) || 0
+                        };
+                    }
+                }
+
+                if (selectedQuestionsByGrid[gridId] && selectedQuestionsByGrid[gridId][dataItem.QuestionId]) {
+                    checkbox.prop("checked", true);
+                }
+
+                if (gridId === "gridExamQuestion" && unselectedQuestionsByGrid[dataItem.QuestionId]) {
+                    checkbox.prop("checked", false);
+                }
+            });
         }
+
+        function onDataBound(e) {
+            var gridId = e.sender.element.attr("id");
+
+            // Store questions from gridExamQuestion into preselected array
+            if (gridId === "gridExamQuestion") {
+                var grid = $("#" + gridId).data("kendoGrid");
+
+                grid.tbody.find("tr").each(function () {
+                    var row = $(this);
+                    var dataItem = grid.dataItem(row);
+                    preselectedQuestions[dataItem.QuestionId] = true;
+
+                    if (!selectedQuestionsByGrid[gridId]) {
+                        selectedQuestionsByGrid[gridId] = {};
+                    }
+                    if (!selectedQuestionsByGrid[gridId][dataItem.QuestionId]) {
+                        selectedQuestionsByGrid[gridId][dataItem.QuestionId] = {
+                            QuestionId: dataItem.QuestionId,
+                            Marks: parseFloat(row.find(".marks-input").val()) || 0
+                        };
+                    }
+                });
+            }
+
+            restoreSelections(gridId);
+        }
+
+        //Call on change of checkbox
+        $(document).on("change", ".toggle-edit", function () {
+            var checkbox = $(this);
+            var row = checkbox.closest("tr");
+            var grid = row.closest(".k-grid").data("kendoGrid");
+            var gridId = grid.element.attr("id");
+            var dataItem = grid.dataItem(row);
+
+            if (!selectedQuestionsByGrid[gridId]) {
+                selectedQuestionsByGrid[gridId] = {};
+            }
+
+            if (checkbox.is(":checked")) {
+                selectedQuestionsByGrid[gridId][dataItem.QuestionId] = {
+                    QuestionId: dataItem.QuestionId,
+                    Marks: parseFloat(row.find(".marks-input").val()) || 0
+                };
+
+                if (gridId === "gridExamQuestion") {
+                    delete unselectedQuestionsByGrid[dataItem.QuestionId];
+                }
+            } else {
+                delete selectedQuestionsByGrid[gridId][dataItem.QuestionId];
+
+                if (gridId === "gridExamQuestion" && preselectedQuestions[dataItem.QuestionId]) {
+                    unselectedQuestionsByGrid[dataItem.QuestionId] = true;
+                }
+            }
+        });
+
+        // Save method with selected questions from all pages
+        function saveExamAndQuestions() {
+            var form = $("#form");
+
+            if (!form.valid()) return;
 
             var formData = $("#form").serializeArray();
             var formObject = {};
@@ -367,85 +515,56 @@
 
             var totalSelectedMarks = 0;
             var selectedQuestions = [];
-            var deselectedQuestions = [];
-
-            function processGrid(gridId) {
-                var grid = $("#" + gridId).data("kendoGrid");
-
-                grid.tbody.find("tr").each(function () {
-                    var row = $(this);
-                    var checkbox = row.find(".toggle-edit");
-                    var marksInput = row.find(".marks-input");
-                    var dataItem = grid.dataItem(row);
-
-                    var updatedMarks = parseFloat(marksInput.val()) || 0;
-
-                    if (checkbox.is(":checked")) {
-                        selectedQuestions.push({
-                            QuestionId: dataItem.QuestionId,
-                            Marks: updatedMarks
-                        });
-                        totalSelectedMarks += updatedMarks;
-                    } else {
-                        if(gridId == "gridExamQuestion"){
-                            deselectedQuestions.push(dataItem.QuestionId);
-                        }
-                    }
+            
+            Object.values(selectedQuestionsByGrid).forEach(gridData => {
+                Object.values(gridData).forEach(question => {
+                    selectedQuestions.push(question);
+                    totalSelectedMarks += question.Marks;
                 });
+            });
+
+            var examStatus = formObject["ExamStatus"];
+            var totalExamMarks = parseFloat(formObject["TotalMarks"]) || 0;
+
+            if (examStatus === "PUBLISHED" && totalSelectedMarks !== totalExamMarks) {
+                Swal.fire("Validation Error", "Total selected marks must match the exam total marks!", "warning");
+                return;
             }
-            // Process both grids
-        processGrid("gridExamQuestion");
-        processGrid("gridUnassignedQuestion");
 
+            var requestData = {
+                Exam: formObject,
+                SelectedQuestions: selectedQuestions,
+            };
 
-        var examStatus = formObject["ExamStatus"];
-        var totalExamMarks = parseFloat(formObject["TotalMarks"]) || 0;
-
-        if (examStatus === "PUBLISHED" && totalSelectedMarks !== totalExamMarks) {
-            Swal.fire("Validation Error", "Total selected marks must match the exam total marks!", "warning");
-            return;
-        }
-
-        var requestData = {
-            Exam: formObject,
-            SelectedQuestions: selectedQuestions,
-            UnselectedQuestions: deselectedQuestions
-        };
-
-        if(examStatus == "PUBLISHED"){
-            if (selectedQuestions.length === 0) {
+            if (examStatus == "PUBLISHED" && selectedQuestions.length === 0) {
                 Swal.fire("No Questions Selected!", "Please select questions to save.", "warning");
                 return;
             }
-        }
 
-        console.log("Final Request Data:", requestData);
+            console.log("Final Request Data:", requestData);
 
-        $.ajax({
-            url: "/Exam/Create",
-            type: "POST",
-            data: JSON.stringify(requestData),
-            contentType: "application/json",
-            success: function (response) {
-                Swal.fire("Success!", "Exam and questions saved successfully.", "success").then(() => {
-                    location.reload();
-                });
-            },
-            error: function () {
-                Swal.fire("Error!", "Failed to save data. Please try again.", "error");
-            }
+            $.ajax({
+                url: "/Exam/Create",
+                type: "POST",
+                data: JSON.stringify(requestData),
+                contentType: "application/json",
+                success: function (response) {
+                    Swal.fire("Success!", "Exam and questions saved successfully.", "success").then(() => {
+                        location.reload();
+                    });
+                },
+                error: function () {
+                    Swal.fire("Error!", "Failed to save data. Please try again.", "error");
+                }
             });
         }
 
-    </script>
-    <script>
+        // Bind onDataBound event to grids
         $(document).ready(function () {
-            $("#gridExamQuestion").data("kendoGrid").bind("dataBound", function () {
-                // Select all checkboxes in the grid when data is loaded
-                $("#gridExamQuestion").find(".toggle-edit").prop("checked", true);
-            });
+            $("#gridExamQuestion").data("kendoGrid").bind("dataBound", onDataBound);
+            $("#gridUnassignedQuestion").data("kendoGrid").bind("dataBound", onDataBound);
         });
-    </script>
+</script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
