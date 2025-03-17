@@ -191,11 +191,14 @@
                                 }
                                 else if (Model.QuestionType == "Text Answer" || Model.QuestionType == "SQL Query")
                                 {
-                                    <div class="text-answer-box">
-                                        <label class="form-label fw-bold">Answer:</label>
-                                        <input type="text" class="form-control" style="color: #000; font-weight: 500;"
-                                               value="@(Model.Answers.FirstOrDefault()?.AnswerText ?? "")" disabled>
-                                    </div>
+                                    foreach (var answer in Model.Answers)
+                                    {
+                                        <div class="text-answer-box">
+                                            <label class="form-label fw-bold">Answer:</label>
+                                            <input type="text" class="form-control" style="color: #000; font-weight: 500;"
+                                                   value="@(answer.AnswerText ?? "")" disabled>
+                                        </div>
+                                    }
                                 }
                                 else
                                 {
