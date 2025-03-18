@@ -97,6 +97,7 @@
     <Compile Include="BaseProvider.cs" />
     <Compile Include="CommonLookupProvider.cs" />
     <Compile Include="ErrorLogProvider.cs" />
+    <Compile Include="ExamLinkProvider.cs" />
     <Compile Include="ExamProvider.cs" />
     <Compile Include="ExamQuestionsProvider.cs" />
     <Compile Include="FormRoleMappingProvider.cs" />

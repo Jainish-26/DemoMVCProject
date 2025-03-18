@@ -43,7 +43,7 @@ namespace DemoMVC.WebUi.Models
         public int DurationMin { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        [Required(ErrorMessage = "Status is required." )]
+        [Required(ErrorMessage = "Status is required.")]
         public string ExamStatus { get; set; }
         public List<SelectListItem> _statusList { get; set; }
         public bool IsActive { get; set; } = false;

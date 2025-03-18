@@ -180,6 +180,7 @@
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\QuestionTypeController.cs" />
     <Compile Include="Controllers\SubjectController.cs" />
+    <Compile Include="Controllers\UserExamController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Filters\ActivityLogFilter.cs" />
     <Compile Include="Filters\AuthenticationFilter.cs" />
@@ -2493,6 +2494,9 @@
     <Content Include="Views\Exam\Create.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\IntegerEditor.cshtml" />
     <Content Include="Views\Exam\_ExamQuestionsPartial.cshtml" />
+    <Content Include="Views\UserExam\Index.cshtml" />
+    <Content Include="Views\UserExam\UserExamView.cshtml" />
+    <Content Include="Views\UserExam\ExamLinkExpired.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -82,6 +82,7 @@
     <Compile Include="DemoMVCContextConfiguration.cs" />
     <Compile Include="DemoMVCEntities.cs" />
     <Compile Include="ErrorLog.cs" />
+    <Compile Include="ExamLinks.cs" />
     <Compile Include="ExamQuestions.cs" />
     <Compile Include="Exams.cs" />
     <Compile Include="FormRoleMapping.cs" />

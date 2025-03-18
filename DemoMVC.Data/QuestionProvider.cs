@@ -155,7 +155,7 @@ namespace DemoMVC.Data
                 .ToList();
 
             return _db.Questions
-                .Where(q => questionIds.Contains(q.QuestionId)) 
+                .Where(q => questionIds.Contains(q.QuestionId))
                 .ToList();
         }
     }

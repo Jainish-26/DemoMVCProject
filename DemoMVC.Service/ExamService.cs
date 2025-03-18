@@ -33,6 +33,11 @@ namespace DemoMVC.Service
         {
             return _examProvider.UpdateExam(exam);
         }
+
+        public string GetExamCode(int ExamId)
+        {
+            return _examProvider.GetExamCode(ExamId);
+        }
         public List<Exams> CheckDuplicateExamCode(string ExamCode)
         {
             return _examProvider.CheckDuplicateExamCode(ExamCode);

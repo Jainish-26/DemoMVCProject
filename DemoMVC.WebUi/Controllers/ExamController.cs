@@ -7,7 +7,6 @@ using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.ApplicationServices;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -192,7 +191,7 @@ namespace DemoMVC.WebUi.Controllers
 
                 var existingExamQuestions = _examQuestionsService.GetExamQuestionsById(obj.ExamId).ToList();
 
-                
+
                 var selectedQuestionIds = new HashSet<int>(model.SelectedQuestions.Select(q => q.QuestionId));
 
                 foreach (var question in model.SelectedQuestions)
@@ -217,7 +216,7 @@ namespace DemoMVC.WebUi.Controllers
                     }
                 }
 
-                
+
                 foreach (var existingExamQuestion in existingExamQuestions)
                 {
                     if (!selectedQuestionIds.Contains(existingExamQuestion.QuestionId))
@@ -303,12 +302,12 @@ namespace DemoMVC.WebUi.Controllers
 
             ExamModel exam = new ExamModel
             {
-                ExamCode =examDetails.ExamCode,
-                ExamName =examDetails.ExamName,
+                ExamCode = examDetails.ExamCode,
+                ExamName = examDetails.ExamName,
                 PassingMarks = examDetails.PassingMarks,
-                ExamStatus =examDetails.ExamStatus,
-                DurationMin =examDetails.DurationMin,
-                TotalMarks =examDetails.TotalMarks,
+                ExamStatus = examDetails.ExamStatus,
+                DurationMin = examDetails.DurationMin,
+                TotalMarks = examDetails.TotalMarks,
             };
 
             ExamQuestionViewModel eqvm = new ExamQuestionViewModel

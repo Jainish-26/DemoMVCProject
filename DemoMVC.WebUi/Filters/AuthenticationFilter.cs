@@ -10,16 +10,29 @@ namespace DemoMVC.WebUi.Filters
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             Controller controller = filterContext.Controller as Controller;
-            if (controller != null && !(controller is AccountController)
-               && SessionHelper.UserId == 0)
+            string controllerName = filterContext.RouteData.Values["controller"].ToString();
+            string actionName = filterContext.RouteData.Values["action"].ToString();
+
+            if (controllerName == "UserExam" && actionName == "UserExamView")
             {
-                filterContext.Result =
-                       new RedirectToRouteResult(
-                           new RouteValueDictionary {
-                           { "controller", "Account" },
-                           { "action", "Login" },
-                            { "returnUrl", filterContext.HttpContext.Request.RawUrl }
-                       });
+                return;
+            }
+
+            if (controllerName == "UserExam" && actionName == "Index")
+            {
+                filterContext.Result = new RedirectResult("~/UserExam/UserExamView");
+                return;
+            }
+            if (controller != null && !(controller is AccountController)
+                && SessionHelper.UserId == 0)
+            {
+                filterContext.Result = new RedirectToRouteResult(
+                    new RouteValueDictionary {
+                 { "controller", "Account" },
+                 { "action", "Login" },
+                 { "returnUrl", filterContext.HttpContext.Request.RawUrl }
+                    });
+                return;
             }
             base.OnActionExecuting(filterContext);
         }

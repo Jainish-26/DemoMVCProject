@@ -1,0 +1,39 @@
+﻿@model DemoMVC.Models.Exams
+
+@{
+    ViewBag.Title = "Exam Details";
+}
+
+<h2>Exam Details</h2>
+
+@if (Model != null)
+{
+    <table class="table table-bordered">
+        <tr>
+            <th>Exam Name:</th>
+            <td>@Model.ExamName</td>
+        </tr>
+        <tr>
+            <th>Subject:</th>
+            <td>@Model.ExamCode</td>
+        </tr>
+        <tr>
+            <th>Duration:</th>
+            <td>@Model.DurationMin minutes</td>
+        </tr>
+        <tr>
+            <th>Total Marks:</th>
+            <td>@Model.TotalMarks</td>
+        </tr>
+        <tr>
+            <th>Exam Date:</th>
+            <td>@Model.ExamStatus</td>
+        </tr>
+    </table>
+}
+else
+{
+    <div class="alert alert-danger">
+        <strong>Exam not found or expired.</strong>
+    </div>
+}
