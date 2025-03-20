@@ -114,9 +114,9 @@ namespace DemoMVC.Data
             return false;
         }
 
-        public int GetMarksByQuestionId(int QuestionId)
+        public int GetMarksByQuestionId(int QuestionId , int ExamId)
         {
-            return (from q in _db.ExamQuestions where QuestionId == q.QuestionId select q.Marks).FirstOrDefault();
+            return (from q in _db.ExamQuestions where QuestionId == q.QuestionId && ExamId== q.ExamId select q.Marks).FirstOrDefault();
         }
     }
 }

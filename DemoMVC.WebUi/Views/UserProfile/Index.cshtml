@@ -38,7 +38,7 @@
             columns.Bound(c => c.UserName).Width("14%").Title("User Name");
             columns.Bound(c => c.Email).Width("14%").Title("Email");
             columns.Bound(c => c.Role).Width("14%").Title("Role");
-            columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+            columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close' style='color: red;'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
             columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "UserProfile") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("5%").Sortable(false);
         })
         .NoRecords("No record found")

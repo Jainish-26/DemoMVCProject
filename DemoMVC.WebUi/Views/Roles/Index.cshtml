@@ -39,7 +39,7 @@
           {
               columns.Bound(c => c.Name).Title("Name");
               columns.Bound(c => c.RoleCode).Title("Role Code");
-              columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+              columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close' style='color: red;'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               if (role == "sadmin")
               {
                   columns.Bound(c => c.Id)

@@ -44,7 +44,7 @@
               columns.Bound(c => c.Code).Title("Code").ClientTemplate("<span class='uppercase' >#=Code#</span>");
               columns.Bound(c => c.Message).Title("Message");
               columns.Bound(c => c.Comment).Title("Comment").Width(300);
-              columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+              columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close' style='color: red;'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               columns.Command(command => { command.Edit(); }).Width(50).Hidden(!(AllowedAdd || AllowedEdit)).Title("Edit");
           })
           .ToolBar(toolbar => toolbar.Create())

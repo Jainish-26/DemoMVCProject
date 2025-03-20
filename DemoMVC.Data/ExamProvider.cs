@@ -22,7 +22,6 @@ namespace DemoMVC.Data
         public IQueryable<ExamsGridModel> GetExamGridModal()
         {
             return (from e in _db.Exams
-                    where e.IsActive == true
                     select new ExamsGridModel
                     {
                         ExamId = e.ExamId,

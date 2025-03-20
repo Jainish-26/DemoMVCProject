@@ -1,39 +1,371 @@
-﻿@model DemoMVC.Models.Exams
+﻿@model DemoMVC.WebUi.Models.ExamQuestionViewModel
 
 @{
-    ViewBag.Title = "Exam Details";
+    ViewBag.Title = "Exam Questions";
+    int totalQuestions = Model.Questions.Count;
+    Layout = null;
+    int durationMin = Model.Exam.DurationMin;
+    var viewBagExamId = ViewBag.ExamId;
 }
 
-<h2>Exam Details</h2>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 10px;
+    }
 
-@if (Model != null)
-{
-    <table class="table table-bordered">
-        <tr>
-            <th>Exam Name:</th>
-            <td>@Model.ExamName</td>
-        </tr>
-        <tr>
-            <th>Subject:</th>
-            <td>@Model.ExamCode</td>
-        </tr>
-        <tr>
-            <th>Duration:</th>
-            <td>@Model.DurationMin minutes</td>
-        </tr>
-        <tr>
-            <th>Total Marks:</th>
-            <td>@Model.TotalMarks</td>
-        </tr>
-        <tr>
-            <th>Exam Date:</th>
-            <td>@Model.ExamStatus</td>
-        </tr>
-    </table>
-}
-else
-{
-    <div class="alert alert-danger">
-        <strong>Exam not found or expired.</strong>
+    .exam-header {
+        position: sticky;
+        top: 0;
+        background: #fff;
+        /*        padding: 20px;*/
+        border-bottom: 3px solid #ddd;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .question-container {
+        margin-top: 20px;
+        padding: 25px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        min-height: 550px;
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 20px;
+        font-weight: bold;
+        padding-bottom: 10px;
+    }
+
+    .question-marks {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    h3 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .text-answer-box textarea {
+        width: 100%;
+        min-height: 120px;
+        resize: vertical;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .question-page {
+        display: none;
+    }
+
+        .question-page.active {
+            display: block;
+        }
+
+    .answer-item {
+        padding: 10px;
+        font-size: 18px;
+    }
+
+    img {
+        max-width: 400px;
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .navigation-buttons {
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 25px;
+        background: #fff;
+    }
+
+    .btn-custom {
+        padding: 10px 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-prev {
+        background-color: #6c757d;
+    }
+
+    .btn-next {
+        background-color: #007bff;
+    }
+
+    .btn-prev:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-next:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-prev:disabled, .btn-next:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+</style>
+
+
+<div class="exam-header">
+    <div><h2>@Model.Exam.ExamName</h2></div>
+    <div><p><strong>Exam Code:</strong> @Model.Exam.ExamCode</p></div>
+    <div><p><strong>Total Marks:</strong> @Model.Exam.TotalMarks</p></div>
+    <div><p><strong>Passing Marks:</strong> @Model.Exam.PassingMarks</p></div>
+    <div><p><strong>Time Left:</strong> <span id="time" style=" color:red">@Model.Exam.DurationMin</span></p></div>
+</div>
+
+
+<div class="question-container">
+    @for (int i = 0; i < totalQuestions; i++)
+    {
+        var question = Model.Questions[i];
+        @*@Html.HiddenFor(Model.Questions[i].QuestionId);*@
+        <div class="question-page @(i == 0 ? "active" : "")" id="question-@i">
+            <div class="question-header">
+                <h3>Q@(i + 1): @question.QuestionText</h3>
+                <span class="question-marks">Marks: @question.Marks</span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(question.QuestionImage))
+            {
+                <div class="mb-2">
+                    <img src="~/content/QuestionImage/@question.QuestionImage" alt="Question Image">
+                </div>
+            }
+
+            @if (question.QuestionType == "Single Choice MCQ")
+            {
+                foreach (var answer in question.Answers)
+                {
+
+                    <div class="answer-item">
+                        <div class="d-flex align-items-center">
+                            <input type="radio" name="selectedAnswer_@i" value="@answer.AnswerText" class="form-check-input">
+                            <span class="answer-text">@answer.AnswerText</span>
+                        </div>
+                    </div>
+                }
+            }
+            else if (question.QuestionType == "Multiple Choice MCQ")
+            {
+                foreach (var answer in question.Answers)
+                {
+                    <div class="answer-item">
+                        <div class="d-flex align-items-center">
+                            <input type="checkbox" name="selectedAnswers_@i" value="@answer.AnswerText" class="form-check-input">
+                            <span class="answer-text">@answer.AnswerText</span>
+                        </div>
+                    </div>
+                }
+            }
+            else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
+            {
+                <div class="text-answer-box">
+                    <textarea class="form-control" name="textAnswer_@i" rows="4" placeholder="Type your answer here..."></textarea>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Invalid Question Type</p>
+            }
+        </div>
+
+    }
+
+    <!-- Fixed Navigation Buttons -->
+    <div class="navigation-buttons">
+        <button class="btn-custom btn-prev" onclick="showQuestion(-1)" disabled>Previous</button>
+        <button class="btn-custom btn-next" onclick="showQuestion(1)">Next</button>
     </div>
-}
+</div>
+<script>
+    const examId = @ViewBag.ExamId;
+    const modelData = @Html.Raw(ViewBag.QuestionsJson);
+    const totalQuestions = @totalQuestions;
+    let currentIndex = 0;
+
+    console.log("Exam ID:", examId);
+    console.log("Questions:", modelData);
+
+    function startTimer(duration, display) {
+        const startTimeKey = `timerStartTime-exam-${examId}`;
+        const remainingTimeKey = `remainingTime-exam-${examId}`;
+
+        let startTime = localStorage.getItem(startTimeKey);
+        let remainingTime = localStorage.getItem(remainingTimeKey);
+        let timer;
+
+        if (startTime) {
+            // Calculate elapsed time
+            let elapsedTime = Math.floor((Date.now() - parseInt(startTime)) / 1000);
+            timer = duration - elapsedTime;
+
+            if (timer <= 0) {
+                handleTimeUp();
+                return;
+            }
+        } else if (remainingTime) {
+            // Use remaining time if it exists
+            timer = parseInt(remainingTime);
+        } else {
+            // First time starting the timer
+            localStorage.setItem(startTimeKey, Date.now().toString());
+            timer = duration;
+        }
+
+        const interval = setInterval(function () {
+            if (timer <= 0) {
+                clearInterval(interval);
+                handleTimeUp();
+                return;
+            }
+
+            let minutes = Math.floor(timer / 60);
+            let seconds = timer % 60;
+
+            display.textContent =
+                (minutes < 10 ? "0" : "") + minutes + ":" +
+                (seconds < 10 ? "0" : "") + seconds;
+
+            localStorage.setItem(remainingTimeKey, timer);
+            timer--;
+        }, 1000);
+    }
+
+    function handleTimeUp() {
+        localStorage.removeItem(`timerStartTime-exam-${examId}`);
+        localStorage.removeItem(`remainingTime-exam-${examId}`);
+
+        Swal.fire("Time is up!", "Only attempted questions are counted as given.", "info")
+            .then(function (result) {
+                if (result.isConfirmed) {
+                    closeTab();
+                }
+            });
+    }
+
+    function closeTab() {
+        window.open('', '_self').close();
+    }
+
+    function loadStoredAnswers() {
+        for (let i = 0; i < totalQuestions; i++) {
+            const questionId = modelData[i].QuestionId;
+            const storedAnswer = localStorage.getItem(`exam-${examId}-question-${questionId}-answers`);
+
+            if (storedAnswer) {
+                const { answers } = JSON.parse(storedAnswer);
+
+                if (modelData[i].QuestionType === "Multiple Choice MCQ") {
+                    answers.forEach(answer => {
+                        const checkbox = document.querySelector(`input[name="selectedAnswers_${i}"][value="${answer}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                } else if (modelData[i].QuestionType === "Single Choice MCQ") {
+                    const radio = document.querySelector(`input[name="selectedAnswer_${i}"][value="${answers[0]}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                    }
+                } else if (modelData[i].QuestionType === "Text Answer" || modelData[i].QuestionType === "SQL Query") {
+                    const textarea = document.querySelector(`#question-${i} textarea`);
+                    if (textarea) {
+                        textarea.value = answers[0];
+                    }
+                }
+            }
+        }
+    }
+
+    function storeAnswer(questionId, questionType, currentIndex) {
+        const selectedAnswers = [];
+
+        if (questionType === "Multiple Choice MCQ") {
+            document.querySelectorAll(`input[name="selectedAnswers_${currentIndex}"]:checked`).forEach(checkbox =>
+                selectedAnswers.push(checkbox.value)
+            );
+        } else if (questionType === "Single Choice MCQ") {
+            const radio = document.querySelector(`input[name="selectedAnswer_${currentIndex}"]:checked`);
+            if (radio) {
+                selectedAnswers.push(radio.value);
+            }
+        } else if (questionType === "Text Answer" || questionType === "SQL Query") {
+            const textarea = document.querySelector(`#question-${currentIndex} textarea`);
+            if (textarea) {
+                selectedAnswers.push(textarea.value);
+            }
+        }
+
+        localStorage.setItem(`exam-${examId}-question-${questionId}-answers`, JSON.stringify({
+            examId: examId,
+            questionId: questionId,
+            answers: selectedAnswers
+        }));
+
+        console.log(`Stored answers for Exam ID ${examId}, Question ID ${questionId}:`, selectedAnswers);
+    }
+
+    function showQuestion(change) {
+        let newIndex = currentIndex + change;
+
+        if (newIndex < 0 || newIndex >= totalQuestions) return;
+
+        const currentQuestion = modelData[currentIndex];
+        const questionId = currentQuestion.QuestionId;
+        const questionType = currentQuestion.QuestionType;
+
+        document.querySelectorAll('.question-page').forEach((el, i) => {
+            el.classList.remove('active');
+            if (i === newIndex) el.classList.add('active');
+        });
+
+        storeAnswer(questionId, questionType, currentIndex);
+        currentIndex = newIndex;
+
+        document.querySelector('.btn-prev').disabled = (currentIndex === 0);
+        document.querySelector('.btn-next').disabled = (currentIndex === totalQuestions - 1);
+
+        loadStoredAnswers();
+    }
+
+    window.onload = function () {
+        var duration = 60 * @durationMin;
+        var display = document.querySelector('#time');
+        startTimer(duration, display);
+        loadStoredAnswers();
+    };
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -48,9 +48,9 @@
                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
                     .ClientTemplate("<div class='k_action_table'>" +
                     (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'><i class='fa fa-edit'></i></a> " : "") +
-                    (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=ExamId#)'><i class='fa fa-trash text-danger'></i></a> " : "") +
+                    (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=ExamId#)'><i class='fa fa-trash'></i></a> " : "") +
                     (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=ExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
-                    "<a href='javascript:void(0);' title='Generate Link' onclick='generateExamLink(#=ExamId#)'><i class='fa fa-link text-primary'></i></a>" +
+                    "<a href='javascript:void(0);' title='Generate Link' onclick='generateExamLink(#=ExamId#)'><i class='fa fa-link'></i></a>" +
                     "</div>")
                     .Filterable(false)
                     .Title("Action")

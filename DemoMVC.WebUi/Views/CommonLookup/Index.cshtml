@@ -59,7 +59,7 @@
               columns.Bound(c => c.Name).Title("Name");
               columns.Bound(c => c.DisplayOrder).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).Title("Display Order").Filterable(false).Width(80);
               columns.Bound(c => c.Comment).Title("Comment").Width(300);
-              columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close'></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
+              columns.Bound(c => c.IsActive).Width("5%").HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center-text" }).ClientTemplate("# if(IsActive == true) {#<i class='fa fa-check'></i># } else { #<i class='fa fa-close' style='color: red;' ></i># } #").Title("Active").Filterable(filterable => filterable.Messages(m => m.IsFalse("No").IsTrue("Yes")));
               columns.Bound(c => c.Id).HeaderHtmlAttributes(new { @class = "center_text" }).HtmlAttributes(new { @class = "kendogrid_Action center_text" }).ClientTemplate("<div class='k_action_table'>" + (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "CommonLookup") + "/#=Id#'" + "><i class='fa fa-edit'></i></a>" : "") + "</div>").Filterable(false).Title("Edit").Width("5%").Sortable(false);
           })
           .Events(evt => evt

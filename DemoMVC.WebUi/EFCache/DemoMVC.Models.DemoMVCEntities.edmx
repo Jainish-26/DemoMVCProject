@@ -141,7 +141,7 @@
           </Key>
           <Property Name="ExamLinkId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="ExamId" Type="Int32" Nullable="false" />
-          <Property Name="Link" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Token" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="CreatedBy" Type="Int32" Nullable="false" />
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" />
           <Property Name="ExpiryTime" Type="DateTime" Nullable="false" />
@@ -567,7 +567,7 @@
               <MappingFragment StoreEntitySet="ExamLinks">
                 <ScalarProperty Name="ExamLinkId" ColumnName="ExamLinkId" />
                 <ScalarProperty Name="ExamId" ColumnName="ExamId" />
-                <ScalarProperty Name="Link" ColumnName="Link" />
+                <ScalarProperty Name="Token" ColumnName="Token" />
                 <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ExpiryTime" ColumnName="ExpiryTime" />
@@ -850,7 +850,7 @@
           </Key>
           <Property Name="ExamLinkId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ExamId" Type="int" customannotation:Index="{ Name: IX_ExamId, Order: 0 }" Nullable="false" />
-          <Property Name="Link" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Token" Type="nvarchar" MaxLength="500" Nullable="false" />
           <Property Name="CreatedBy" Type="int" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="ExpiryTime" Type="datetime" Nullable="false" />
