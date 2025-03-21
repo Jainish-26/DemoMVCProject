@@ -624,38 +624,38 @@
         });
 
         
-        //$("form").submit(function (event) {
-        //    $(".answer-toggle").each(function () {
-        //        let isChecked = $(this).is(":checked");
-        //        let hiddenInput = $(this).closest(".answer-item").find("input[type='hidden']");
-        //        hiddenInput.val(isChecked ? "True" : "False");
-        //    });
+        $("form").submit(function (event) {
+            $(".answer-toggle").each(function () {
+                let isChecked = $(this).is(":checked");
+                let hiddenInput = $(this).closest(".answer-item").find("input[type='hidden']");
+                hiddenInput.val(isChecked ? "True" : "False");
+            });
 
-        //    let isValid = true;
-        //    let correctAnswers = $(".answer-toggle:checked").length;
-        //    let totalAnswers = $(".answer-item").length;
-        //    let selectedQuestionType = $("#QuestionTypeId").val();
+            let isValid = true;
+            let correctAnswers = $(".answer-toggle:checked").length;
+            let totalAnswers = $(".answer-item").length;
+            let selectedQuestionType = $("#QuestionTypeId").val();
 
            
-        //    if (selectedQuestionType == "1" || selectedQuestionType == "2") {
-        //        if (totalAnswers < 2) {
-        //            alert("At least two answer options are required for MCQ questions.");
-        //            isValid = false;
-        //        }
-        //    }
+            if (selectedQuestionType == "1" || selectedQuestionType == "2") {
+                if (totalAnswers < 2) {
+                    alert("At least two answer options are required for MCQ questions.");
+                    isValid = false;
+                }
+            }
 
-        //    if (correctAnswers === 0) {
-        //        alert("At least one correct answer must be selected.");
-        //        isValid = false;
-        //    } else if (selectedQuestionType == "1" && correctAnswers > 1) {
-        //        alert("Only one correct answer is allowed for Single Choice MCQ.");
-        //        isValid = false;
-        //    }
+            if (correctAnswers === 0) {
+                alert("At least one correct answer must be selected.");
+                isValid = false;
+            } else if (selectedQuestionType == "1" && correctAnswers > 1) {
+                alert("Only one correct answer is allowed for Single Choice MCQ.");
+                isValid = false;
+            }
 
-        //    if (!isValid) {
-        //        event.preventDefault();
-        //    }
-        //});
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
 
 
         

@@ -68,5 +68,17 @@
             public const string DRAFT = "DRAFT";
             public const string PUBLISHED = "PUBLISHED";
         }
+        public static class UserExamStatus
+        {
+            public const string PENDING = "PENDING";
+            public const string ONGOING = "ONGOING";
+            public const string COMPLETED = "COMPLETED";
+        }
+        public static class ResultStatus
+        {
+            public const string PENDING = "PENDING";
+            public const string PASS = "PASS";
+            public const string FAIL = "FAIL";
+        }
     }
 }

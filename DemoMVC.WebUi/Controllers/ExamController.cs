@@ -318,5 +318,13 @@ namespace DemoMVC.WebUi.Controllers
 
             return PartialView("_ExamQuestionsPartial", eqvm);
         }
+
+        public ActionResult GetEmailPartial(int ExamId)
+        {
+            var model = new UserExamModel { ExamId = ExamId };
+            return PartialView("_EmailInputPartial", model);
+        }
+
+
     }
 }

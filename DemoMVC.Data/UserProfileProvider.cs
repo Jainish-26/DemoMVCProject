@@ -17,7 +17,7 @@ namespace DemoMVC.Data
         }
         public UserProfile GetUserByEmailId(string emailId)
         {
-            return _db.UserProfile.Where(a => a.Email == emailId && a.IsActive && !a.IsDeleted).FirstOrDefault();
+            return _db.UserProfile.Where(a => a.Email == emailId && !a.IsDeleted).FirstOrDefault();
         }
         public List<UserProfile> GetAllUserProfile(string rolecode = "")
         {
@@ -128,6 +128,11 @@ namespace DemoMVC.Data
             .ToList();
 
             return data;
+        }
+
+        public List<string> GetAllEmails()
+        {
+            return (from e in _db.UserProfile select e.Email).ToList();
         }
     }
 }

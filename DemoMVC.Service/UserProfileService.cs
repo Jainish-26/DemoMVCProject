@@ -61,5 +61,9 @@ namespace DemoMVC.Service
         {
             return _userProfileProvider.IsActiveUser();
         }
+        public List<string> GetAllEmails()
+        {
+            return _userProfileProvider.GetAllEmails();
+        }
     }
 }

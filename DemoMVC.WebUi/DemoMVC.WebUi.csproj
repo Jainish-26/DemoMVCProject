@@ -189,6 +189,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helper\AESCrypto.cs" />
     <Compile Include="Helper\CommonUtility.cs" />
     <Compile Include="Helper\FormUtility.cs" />
     <Compile Include="Models\CommonLookupModel.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="Models\QuestionTypeModel.cs" />
     <Compile Include="Models\RolesModel.cs" />
     <Compile Include="Models\SubjectModel.cs" />
+    <Compile Include="Models\UserExamModel.cs" />
     <Compile Include="Models\UserProfileModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -2494,9 +2496,10 @@
     <Content Include="Views\Exam\Create.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\IntegerEditor.cshtml" />
     <Content Include="Views\Exam\_ExamQuestionsPartial.cshtml" />
-    <Content Include="Views\UserExam\Index.cshtml" />
     <Content Include="Views\UserExam\UserExamView.cshtml" />
     <Content Include="Views\UserExam\ExamLinkExpired.cshtml" />
+    <Content Include="Views\Exam\_EmailInputPartial.cshtml" />
+    <Content Include="Views\UserExam\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

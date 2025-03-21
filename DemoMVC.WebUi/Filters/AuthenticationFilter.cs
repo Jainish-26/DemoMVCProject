@@ -1,5 +1,6 @@
 ﻿using DemoMVC.Models;
 using DemoMVC.WebUi.Controllers;
+using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -9,30 +10,20 @@ namespace DemoMVC.WebUi.Filters
     {
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            Controller controller = filterContext.Controller as Controller;
-            string controllerName = filterContext.RouteData.Values["controller"].ToString();
-            string actionName = filterContext.RouteData.Values["action"].ToString();
+            // Check if the action has AllowAnonymous attribute
+            bool hasAllowAnonymous = filterContext.ActionDescriptor.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any() ||
+                                    filterContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes(typeof(AllowAnonymousAttribute), true).Any();
 
-            if (controllerName == "UserExam" && actionName == "UserExamView")
+            // Only redirect to login if not anonymous and user is not authenticated
+            if (!hasAllowAnonymous && !(filterContext.Controller is AccountController) && SessionHelper.UserId == 0)
             {
-                return;
-            }
-
-            if (controllerName == "UserExam" && actionName == "Index")
-            {
-                filterContext.Result = new RedirectResult("~/UserExam/UserExamView");
-                return;
-            }
-            if (controller != null && !(controller is AccountController)
-                && SessionHelper.UserId == 0)
-            {
-                filterContext.Result = new RedirectToRouteResult(
-                    new RouteValueDictionary {
-                 { "controller", "Account" },
-                 { "action", "Login" },
+                filterContext.Result =
+                       new RedirectToRouteResult(
+                           new RouteValueDictionary {
+                { "controller", "Account" },
+                { "action", "Login" },
                  { "returnUrl", filterContext.HttpContext.Request.RawUrl }
-                    });
-                return;
+                       });
             }
             base.OnActionExecuting(filterContext);
         }

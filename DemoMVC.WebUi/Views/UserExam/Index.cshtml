@@ -1,0 +1,118 @@
+﻿@model IEnumerable<DemoMVC.Models.UserExamGrid>
+@using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
+@using DemoMVC.WebUi.Controllers
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "Index";
+    string role = SessionHelper.RoleName;
+    string formCode = AuthorizeFormAccess.FormAccessCode.EXAM.ToString();
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
+    BaseController _base = new BaseController();
+    bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
+    bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
+    bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
+}
+<h2 class="text-center">UserExamList</h2>
+<div class="common_white_box listingpage m-5" style="margin-left: 50px; margin-right: 50px">
+    <div class="page-loader k-loading-image"></div>
+    @(Html.Kendo().Grid<DemoMVC.Models.UserExamGrid>()
+            .Name("gridUserExam")
+            .AutoBind(true)
+            //.Excel(excel => excel
+            //  .FileName("FormList.xlsx")
+            //  .Filterable(true)
+            //  .AllPages(true))
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.Email).Width("7%").Title("Email");
+                columns.Bound(c => c.ExamName).Width("7%").Title("Exam");
+                columns.Bound(c => c.UserToken).Width("7%").Title("Token");
+                columns.Bound(c => c.ExamStatus).Width("7%").Title("Status").ClientTemplate("#if(ExamBadgeCode!=null && ExamBadgeCode!=''){#" + "<span class='status' style='background:#=ExamBadgeCode#'>#=ExamStatus#</span>#} else {# #=ExamStatus# #}#");
+                columns.Bound(c => c.Result).Width("7%").Title("Result");
+                columns.Bound(c => c.ResultStatus).Width("7%").Title("Result Status").ClientTemplate("#if(ResultBadgeCode!=null && ResultBadgeCode!=''){#" + "<span class='status' style='background:#=ResultBadgeCode#'>#=ResultStatus#</span>#} else {# #=ExamStatus# #}#");
+                if (role == "sadmin")
+                {
+                    columns.Bound(c => c.UserExamId)
+                    .HeaderHtmlAttributes(new { @class = "center_text" })
+                    .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                    .ClientTemplate("<div class='k_action_table'>" +
+                    (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=UserExamId#)'><i class='fa fa-trash'></i></a> " : "") +
+                    (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=UserExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
+                    "<a href='javascript:void(0);' title='Generate Link'  onclick=\"showUrl(#=UserExamId#)\"><i class='fa fa-link'></i></a>" +
+                    "</div>")
+                    .Filterable(false)
+                    .Title("Action")
+                    .Width("7%")
+                    .Sortable(false);
+                }
+                else
+                {
+
+                }
+            })
+            .NoRecords("No record found")
+            .Events(evt => evt
+               .DataBinding("fnKendoGridCommonDataBinding")
+               .DataBound("fnKendoGridDataBoundEvent")
+            )
+            .Sortable()
+            .Pageable(pageable => pageable
+                .Refresh(true)
+                .PageSizes(new[] {10,20, 50, 100, 200 })
+                .ButtonCount(5)
+            )
+             .DataSource(dataSource => dataSource
+                 .Ajax()
+                 //.Sort(sortable=>sortable.Add("Name").Ascending())
+                 .Read(read => read.Action("GetGridData", "UserExam")).PageSize(10)
+             )
+        )
+</div>
+<script>
+    function showUrl(UserExamId) {
+        $.ajax({
+            url: '/UserExam/UserExamLink', // Your endpoint
+            type: 'POST',
+            data: { userExamId: UserExamId },
+            success: function (response) {
+                if (response.success) {
+                    let generatedLink = response.link;
+                    Swal.fire({
+                        title: "Generated Link",
+                        text: generatedLink,
+                        icon: "success",
+                        showCancelButton: true,
+                        confirmButtonText: "Copy Link",
+                        cancelButtonText: "Close"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            copyToClipboard(generatedLink);
+                            Swal.fire("Copied!", "The link has been copied to your clipboard.", "success");
+                        }
+                    });
+                } else {
+                    Swal.fire("Error!", "Failed to generate link.", "error");
+                }
+            },
+            error: function () {
+                Swal.fire("Error!", "Something went wrong.", "error");
+            }
+        });
+    }
+
+    // Function to copy link to clipboard
+    function copyToClipboard(text) {
+        var tempInput = document.createElement("input");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

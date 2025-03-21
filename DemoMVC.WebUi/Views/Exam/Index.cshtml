@@ -50,7 +50,7 @@
                     (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'><i class='fa fa-edit'></i></a> " : "") +
                     (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=ExamId#)'><i class='fa fa-trash'></i></a> " : "") +
                     (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=ExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
-                    "<a href='javascript:void(0);' title='Generate Link' onclick='generateExamLink(#=ExamId#)'><i class='fa fa-link'></i></a>" +
+                    "<a href='javascript:void(0);' title='Generate Link' onclick=\"openEmailPopup(#=ExamId#)\"><i class='fa fa-link'></i></a>" +
                     "</div>")
                     .Filterable(false)
                     .Title("Action")
@@ -96,7 +96,19 @@
         </div>
     </div>
 </div>
-<p id="examLinkOutput"></p>
+<div class="modal fade" id="emailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter Emails</h5>
+            </div>
+            <div class="modal-body" id="emailModalBody">
+                @Html.Partial("_EmailInputPartial")
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
         $('#gridExam').data('kendoGrid').dataSource.read();
@@ -127,6 +139,22 @@
             }
         });
     }
+    function openEmailPopup(examId) {
+        $.ajax({
+            url: '/Exam/GetEmailPartial',
+            type: 'GET',
+            data: { ExamId: examId },
+            success: function (response) {
+                $("#emailModalBody").html(response);
+                $("#emailModal").modal("show"); 
+            },
+            error: function () {
+                Swal.fire("Error", "Failed to load email input form.", "error");
+            }
+        });
+    }
+
+
     function generateExamLink(examId) {
         $.ajax({
             url: '/UserExam/GenerateExamLink',
