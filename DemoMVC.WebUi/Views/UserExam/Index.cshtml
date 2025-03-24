@@ -86,12 +86,11 @@
                         text: generatedLink,
                         icon: "success",
                         showCancelButton: true,
-                        confirmButtonText: "Copy Link",
+                        confirmButtonText: "Send Email",
                         cancelButtonText: "Close"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            copyToClipboard(generatedLink);
-                            Swal.fire("Copied!", "The link has been copied to your clipboard.", "success");
+                            sendEmail(UserExamId, generatedLink);
                         }
                     });
                 } else {
@@ -104,15 +103,24 @@
         });
     }
 
-    // Function to copy link to clipboard
-    function copyToClipboard(text) {
-        var tempInput = document.createElement("input");
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
+    function sendEmail(userExamId, generatedLink) {
+        $.ajax({
+            url: '/SendMail/SendExamEmail', 
+            type: 'POST',
+            data: { userExamId: userExamId, generatedLink: generatedLink },
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire("Success!", "Exam link sent to the candidate's email.", "success");
+                } else {
+                    Swal.fire("Error!", response.message, "error");
+                }
+            },
+            error: function () {
+                Swal.fire("Error!", "Failed to send email.", "error");
+            }
+        });
     }
+
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

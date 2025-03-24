@@ -46,21 +46,20 @@ namespace DemoMVC.Data
         }
 
         public IQueryable<UserExamGrid> GetUserExamGrids()
-        {
-            var data = (from e in _db.UserExams
-                        select new UserExamGrid
-                        {
-                            UserExamId = e.UserExamId,
-                            Email = (from u in _db.UserProfile where e.UserId == u.UserId select u.Email).FirstOrDefault(),
-                            ExamName = (from i in _db.Exams where e.ExamId == i.ExamId select i.ExamName).FirstOrDefault(),
-                            ExamBadgeCode = (from code in _db.CommonLookup where e.ExamStatus == code.Code select code.BadgeCode).FirstOrDefault(),
-                            UserToken = e.UserToken,
-                            ExamStatus = e.ExamStatus,
-                            Result = e.Result,
-                            ResultStatus = e.ResultStatus,
-                            ResultBadgeCode = (from code in _db.CommonLookup where e.ResultStatus == code.Code select code.BadgeCode).FirstOrDefault()
-                        }).AsQueryable();
-            return data;
+        { 
+            return (from e in _db.UserExams
+                    select new UserExamGrid
+                    {
+                        UserExamId = e.UserExamId,
+                        Email = (from u in _db.UserProfile where e.UserId == u.UserId select u.Email).FirstOrDefault(),
+                        ExamName = (from i in _db.Exams where e.ExamId == i.ExamId select i.ExamName).FirstOrDefault(),
+                        ExamBadgeCode = (from code in _db.CommonLookup where e.ExamStatus == code.Code select code.BadgeCode).FirstOrDefault(),
+                        UserToken = e.UserToken,
+                        ExamStatus = e.ExamStatus,
+                        Result = e.Result,
+                        ResultStatus = e.ResultStatus,
+                        ResultBadgeCode = (from code in _db.CommonLookup where e.ResultStatus == code.Code select code.BadgeCode).FirstOrDefault()
+                    }).AsQueryable(); 
         }
 
         public UserExams GetByUserExamId(int UserExamId)

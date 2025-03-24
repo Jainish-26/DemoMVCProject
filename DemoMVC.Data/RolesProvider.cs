@@ -20,7 +20,7 @@ namespace DemoMVC.Data
         public IQueryable<RolesGridModel> GetAllRolesGrid()
         {
             return (from role in _db.webpages_Roles
-                    where role.IsDeleted != true && role.RoleCode != "SADMIN"
+                    where role.IsDeleted != true 
                     select new RolesGridModel()
                     {
                         Id = role.RoleId,

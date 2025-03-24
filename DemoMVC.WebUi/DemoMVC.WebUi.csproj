@@ -179,6 +179,7 @@
     <Compile Include="Controllers\QuestionController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\QuestionTypeController.cs" />
+    <Compile Include="Controllers\SendMailController.cs" />
     <Compile Include="Controllers\SubjectController.cs" />
     <Compile Include="Controllers\UserExamController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
@@ -195,11 +196,11 @@
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\ExamModel.cs" />
     <Compile Include="Models\ExamQuestionModel.cs" />
-    <Compile Include="Models\ExamQuestionViewModel.cs" />
     <Compile Include="Models\FormModel.cs" />
     <Compile Include="Models\QuestionAndAnswerModel.cs" />
     <Compile Include="Models\QuestionTypeModel.cs" />
     <Compile Include="Models\RolesModel.cs" />
+    <Compile Include="Models\StartTestModel.cs" />
     <Compile Include="Models\SubjectModel.cs" />
     <Compile Include="Models\UserExamModel.cs" />
     <Compile Include="Models\UserProfileModel.cs" />
@@ -2500,10 +2501,13 @@
     <Content Include="Views\UserExam\ExamLinkExpired.cshtml" />
     <Content Include="Views\Exam\_EmailInputPartial.cshtml" />
     <Content Include="Views\UserExam\Index.cshtml" />
+    <Content Include="Views\UserExam\UserExamLogIn.cshtml" />
+    <Content Include="Views\UserExam\_StartTestPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="content\QuestionImage\" />
+    <Folder Include="Views\SendMail\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -211,12 +211,10 @@
 </div>
 <script>
     const examId = @ViewBag.ExamId;
-    const modelData = @Html.Raw(ViewBag.QuestionsJson);
     const totalQuestions = @totalQuestions;
     let currentIndex = 0;
 
-    console.log("Exam ID:", examId);
-    console.log("Questions:", modelData);
+   
 
     function startTimer(duration, display) {
         const startTimeKey = `timerStartTime-exam-${examId}`;
@@ -279,92 +277,27 @@
         window.open('', '_self').close();
     }
 
-    function loadStoredAnswers() {
-        for (let i = 0; i < totalQuestions; i++) {
-            const questionId = modelData[i].QuestionId;
-            const storedAnswer = localStorage.getItem(`exam-${examId}-question-${questionId}-answers`);
-
-            if (storedAnswer) {
-                const { answers } = JSON.parse(storedAnswer);
-
-                if (modelData[i].QuestionType === "Multiple Choice MCQ") {
-                    answers.forEach(answer => {
-                        const checkbox = document.querySelector(`input[name="selectedAnswers_${i}"][value="${answer}"]`);
-                        if (checkbox) {
-                            checkbox.checked = true;
-                        }
-                    });
-                } else if (modelData[i].QuestionType === "Single Choice MCQ") {
-                    const radio = document.querySelector(`input[name="selectedAnswer_${i}"][value="${answers[0]}"]`);
-                    if (radio) {
-                        radio.checked = true;
-                    }
-                } else if (modelData[i].QuestionType === "Text Answer" || modelData[i].QuestionType === "SQL Query") {
-                    const textarea = document.querySelector(`#question-${i} textarea`);
-                    if (textarea) {
-                        textarea.value = answers[0];
-                    }
-                }
-            }
-        }
-    }
-
-    function storeAnswer(questionId, questionType, currentIndex) {
-        const selectedAnswers = [];
-
-        if (questionType === "Multiple Choice MCQ") {
-            document.querySelectorAll(`input[name="selectedAnswers_${currentIndex}"]:checked`).forEach(checkbox =>
-                selectedAnswers.push(checkbox.value)
-            );
-        } else if (questionType === "Single Choice MCQ") {
-            const radio = document.querySelector(`input[name="selectedAnswer_${currentIndex}"]:checked`);
-            if (radio) {
-                selectedAnswers.push(radio.value);
-            }
-        } else if (questionType === "Text Answer" || questionType === "SQL Query") {
-            const textarea = document.querySelector(`#question-${currentIndex} textarea`);
-            if (textarea) {
-                selectedAnswers.push(textarea.value);
-            }
-        }
-
-        localStorage.setItem(`exam-${examId}-question-${questionId}-answers`, JSON.stringify({
-            examId: examId,
-            questionId: questionId,
-            answers: selectedAnswers
-        }));
-
-        console.log(`Stored answers for Exam ID ${examId}, Question ID ${questionId}:`, selectedAnswers);
-    }
-
     function showQuestion(change) {
         let newIndex = currentIndex + change;
 
         if (newIndex < 0 || newIndex >= totalQuestions) return;
-
-        const currentQuestion = modelData[currentIndex];
-        const questionId = currentQuestion.QuestionId;
-        const questionType = currentQuestion.QuestionType;
 
         document.querySelectorAll('.question-page').forEach((el, i) => {
             el.classList.remove('active');
             if (i === newIndex) el.classList.add('active');
         });
 
-        storeAnswer(questionId, questionType, currentIndex);
         currentIndex = newIndex;
 
         document.querySelector('.btn-prev').disabled = (currentIndex === 0);
         document.querySelector('.btn-next').disabled = (currentIndex === totalQuestions - 1);
 
-        loadStoredAnswers();
     }
 
     window.onload = function () {
         var duration = 60 * @durationMin;
         var display = document.querySelector('#time');
         startTimer(duration, display);
-        loadStoredAnswers();
     };
 </script>
 

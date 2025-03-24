@@ -73,6 +73,7 @@
             EXAM = 64,
             SUBJECT = 65,
             QUESTIONTYPE = 66,
+            USEREXAM = 67
         }
     }
 }

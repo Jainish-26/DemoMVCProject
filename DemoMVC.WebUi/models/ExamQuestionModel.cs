@@ -13,4 +13,10 @@ namespace DemoMVC.WebUi.Models
         public int QuestionId { get; set; }
         public int Marks { get; set; }
     }
+
+    public class ExamQuestionViewModel
+    {
+        public ExamModel Exam { get; set; }
+        public List<QuestionAndAnswerModel> Questions { get; set; }
+    }
 }

@@ -10,6 +10,9 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Security;
 using WebMatrix.WebData;
+using System.Web.Helpers;
+using System.Xml.Linq;
+using DemoMVC.Helper;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -22,6 +25,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly UserProfileService _userProfileService;
         private readonly UserExamService _userExamService;
         private readonly ExamQuestionsService _examQuestionsService;
+        private readonly MessageService _messageService;
 
         public UserExamController()
         {
@@ -31,12 +35,130 @@ namespace DemoMVC.WebUi.Controllers
             _userProfileService = new UserProfileService();
             _userExamService = new UserExamService();
             _examQuestionsService = new ExamQuestionsService();
+            _messageService = new MessageService();
         }
         public ActionResult Index()
         {
             return View();
         }
 
+        [AllowAnonymous]
+        public ActionResult UserExamLogIn(string userToken)
+        {
+            var userExamDetails = _userExamService.GetByUserToken(userToken);
+            var userDetails = _userProfileService.GetUserById(userExamDetails.UserId);
+            if (userToken == null || userExamDetails == null || userExamDetails.UserToken == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (userExamDetails.ExpiryDate < DateTime.UtcNow)
+            {
+                return View("ExamLinkExpired");
+            }
+
+            if (userDetails == null)
+            {
+                return HttpNotFound();
+            }
+
+            var model = new UserExamViewModel
+            {
+                Email = userDetails.Email,
+                ExamId = userExamDetails.ExamId
+            };
+            ViewBag.UserToken = userToken;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public JsonResult SaveUserAndExamDetails(string userToken, string userName, string userEmail,string name)
+        {
+            try
+            {
+                var userExamDetails = _userExamService.GetByUserToken(userToken);
+                var userDetails = _userProfileService.GetUserByEmailId(userEmail);
+                if (userDetails == null)
+                {
+                    return Json(new { success = false, message = "user not found." });
+                }
+                if (userExamDetails == null)
+                {
+                    return Json(new { success = false, message = "Invalid token" });
+                }
+
+                userDetails.UserName = userName;
+                userDetails.Name = name;
+                int userId = _userProfileService.UpdateUserProfile(userDetails);
+
+                if(userId > 0)
+                {
+                    userExamDetails.StartTime = DateTime.UtcNow;
+                    userExamDetails.ExamStatus = "ONGOING";
+
+                    int userExamId = _userExamService.UpdateUserExam(userExamDetails);
+                    if(userExamId > 0)
+                    {
+                        var redirectUrl = Url.Action("UserExamView", "UserExam", new { userToken });
+
+                        return Json(new { success = true, redirectUrl });
+                    }
+                }
+                else
+                {
+                    return Json(new { success = false, message = "user not found." });
+                }
+
+                
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+
+            return Json(new { success = false });
+        }
+
+
+        public ActionResult UserExamView(string userToken)
+        {
+            var userExamDetails = _userExamService.GetByUserToken(userToken);
+            var exam = _examService.GetById(userExamDetails.ExamId);
+
+            var examModel = new ExamModel
+            {
+                ExamId = exam.ExamId,
+                ExamName = exam.ExamName,
+                ExamCode = exam.ExamCode,
+                TotalMarks = exam.TotalMarks,
+                PassingMarks = exam.PassingMarks,
+                DurationMin = exam.DurationMin
+            };
+
+            var questions = _questionService.GetQuestionsByExamId(userExamDetails.ExamId)
+            .Select(q => new QuestionAndAnswerModel
+            {
+                QuestionId = q.QuestionId,
+                QuestionText = q.QuestionText,
+                QuestionImage = q.QuestionImage,
+                QuestionType = q.QuestionType.QuestionTypeName,
+                Marks = _examQuestionsService.GetMarksByQuestionId(q.QuestionId, userExamDetails.ExamId),
+                Answers = _answerService.GetByQuestionId(q.QuestionId)
+                    .Select(ans => new AnswerViewModel
+                    {
+                        AnswerText = ans.AnswerText,
+                    }).ToList()
+            }).ToList();
+
+            var model = new ExamQuestionViewModel
+            {
+                Exam = examModel,
+                Questions = questions
+            };
+            ViewBag.ExamId = examModel.ExamId;
+            return View(model);
+        }
         [HttpPost]
         public JsonResult GenerateExamLink(UserExamModel model)
         {
@@ -160,13 +282,53 @@ namespace DemoMVC.WebUi.Controllers
                 var userExamDetails = _userExamService.GetByUserExamId(userExamId);
                 string newUniqueId = Guid.NewGuid().ToString();
                 string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-                string generatedLink = baseUrl + Url.Action("UserExamView", "UserExam", new { userToken = userExamDetails.UserToken});
+                string generatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam", new { userToken = userExamDetails.UserToken});
 
                 return Json(new { success = true, link = generatedLink });
             }
             catch (Exception)
             {
                 return Json(new { success = false });
+            }
+        }
+
+        public ActionResult LoadStartTest(UserExamViewModel userExamModel)
+        {
+            var userToken = Request.Headers["UserToken"];
+
+            var examDetails = _examService.GetById(userExamModel.ExamId);
+
+            var model = new StartTestModel
+            {
+                ExamId = userExamModel.ExamId,
+                UserName = userExamModel.UserName,
+                UserToken = userToken,
+                Name = userExamModel.Name,
+                UserEmail = userExamModel.Email,
+                ExamName = examDetails.ExamName,
+                Duration = examDetails.DurationMin,
+                TotalMarks = examDetails.TotalMarks,
+                PassingMarks = examDetails.PassingMarks
+            };
+
+            return PartialView("_StartTestPartial", model);
+        }
+
+        public JsonResult CheckDuplicateUserName(string UserName)
+        {
+            var checkduplicate = _userProfileService.CheckDuplicateUserName(UserName).ToList();
+            //if (UserId > 0)
+            //{
+            //    checkduplicate = checkduplicate.Where(x => x.UserId != UserId).ToList();
+            //}
+            if (checkduplicate.Count() > 0)
+            {
+                var message = _messageService.GetMessageByCode(Constants.MessageCode.USERNAMEEXIST);
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(true, JsonRequestBehavior.AllowGet);
             }
         }
     }
