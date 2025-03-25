@@ -34,7 +34,7 @@
         <div class="page-loader k-loading-image"></div>
         @(Html.Kendo().Grid<ActivityLogGridModel>()
           .Name("gridActivityLog")
-          .AutoBind(false)
+          .AutoBind(true)
           .Columns(columns =>
           {
               columns.Bound(c => c.LogDate).Title("Date").Format("{0:" + CommonUtility.GetDateFormat(false) + "}").Width(100).Filterable(false);

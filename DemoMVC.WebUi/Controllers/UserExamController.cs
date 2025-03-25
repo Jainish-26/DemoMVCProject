@@ -1,4 +1,5 @@
-﻿using DemoMVC.Models;
+﻿using DemoMVC.Helper;
+using DemoMVC.Models;
 using DemoMVC.Service;
 using DemoMVC.WebUi.Helper;
 using DemoMVC.WebUi.Models;
@@ -6,13 +7,9 @@ using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.Security;
 using WebMatrix.WebData;
-using System.Web.Helpers;
-using System.Xml.Linq;
-using DemoMVC.Helper;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -62,7 +59,7 @@ namespace DemoMVC.WebUi.Controllers
                 return HttpNotFound();
             }
 
-            var model = new UserExamViewModel
+            var model = new StartTestModel
             {
                 Email = userDetails.Email,
                 ExamId = userExamDetails.ExamId
@@ -73,7 +70,7 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public JsonResult SaveUserAndExamDetails(string userToken, string userName, string userEmail,string name)
+        public JsonResult SaveUserAndExamDetails(string userToken, string userName, string userEmail, string name)
         {
             try
             {
@@ -92,13 +89,13 @@ namespace DemoMVC.WebUi.Controllers
                 userDetails.Name = name;
                 int userId = _userProfileService.UpdateUserProfile(userDetails);
 
-                if(userId > 0)
+                if (userId > 0)
                 {
                     userExamDetails.StartTime = DateTime.UtcNow;
                     userExamDetails.ExamStatus = "ONGOING";
 
                     int userExamId = _userExamService.UpdateUserExam(userExamDetails);
-                    if(userExamId > 0)
+                    if (userExamId > 0)
                     {
                         var redirectUrl = Url.Action("UserExamView", "UserExam", new { userToken });
 
@@ -110,7 +107,7 @@ namespace DemoMVC.WebUi.Controllers
                     return Json(new { success = false, message = "user not found." });
                 }
 
-                
+
             }
             catch (Exception ex)
             {
@@ -156,20 +153,20 @@ namespace DemoMVC.WebUi.Controllers
                 Exam = examModel,
                 Questions = questions
             };
-            ViewBag.ExamId = examModel.ExamId;
+            ViewBag.UserExamId = userExamDetails.UserExamId;
             return View(model);
         }
         [HttpPost]
         public JsonResult GenerateExamLink(UserExamModel model)
         {
-            if ( model.Email.Count == 0)
+            if (model.Email.Count == 0)
             {
                 return Json(new { success = false, message = "At least one email is required." });
             }
 
             int userId = SessionHelper.UserId;
             UserExams userExams = new UserExams();
-            foreach(var item in model.Email)
+            foreach (var item in model.Email)
             {
                 //Get All Emails From UserProfile
                 var emailList = _userProfileService.GetAllEmails();
@@ -194,7 +191,7 @@ namespace DemoMVC.WebUi.Controllers
                         userExams.CreatedOn = DateTime.UtcNow;
 
                         int userExamId = _userExamService.CreateUserExam(userExams);
-                        if(userExamId > 0)
+                        if (userExamId > 0)
                         {
                             continue;
                         }
@@ -206,7 +203,7 @@ namespace DemoMVC.WebUi.Controllers
                     //If Token Available Check Expired Or Not
                     else
                     {
-                        if(userExamDetails.ExpiryDate < DateTime.UtcNow)
+                        if (userExamDetails.ExpiryDate < DateTime.UtcNow)
                         {
                             userExams.UserToken = AESCrypto.Encrypt(userExamDetails.UserId.ToString());
                             userExams.ExpiryDate = DateTime.UtcNow.AddDays(2);
@@ -280,11 +277,32 @@ namespace DemoMVC.WebUi.Controllers
             try
             {
                 var userExamDetails = _userExamService.GetByUserExamId(userExamId);
-                string newUniqueId = Guid.NewGuid().ToString();
-                string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-                string generatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam", new { userToken = userExamDetails.UserToken});
+                if(userExamDetails.ExpiryDate < DateTime.UtcNow)
+                {
+                    int userId = int.Parse(AESCrypto.Decrypt(userExamDetails.UserToken));
+                    userExamDetails.UserToken = AESCrypto.Encrypt(userId.ToString());
+                    userExamDetails.ExpiryDate = DateTime.UtcNow.AddDays(2);
 
-                return Json(new { success = true, link = generatedLink });
+                    _userExamService.UpdateUserExam(userExamDetails);
+
+                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+                    string updatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam", 
+                        new { 
+                            userToken = userExamDetails.UserToken
+                        });
+                    return Json(new { success = true, link = updatedLink });
+                }
+                else
+                {
+                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+                    string generatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam",
+                        new
+                        {
+                            userToken = userExamDetails.UserToken
+                        });
+
+                    return Json(new { success = true, link = generatedLink });
+                }
             }
             catch (Exception)
             {
@@ -304,7 +322,7 @@ namespace DemoMVC.WebUi.Controllers
                 UserName = userExamModel.UserName,
                 UserToken = userToken,
                 Name = userExamModel.Name,
-                UserEmail = userExamModel.Email,
+                Email = userExamModel.Email,
                 ExamName = examDetails.ExamName,
                 Duration = examDetails.DurationMin,
                 TotalMarks = examDetails.TotalMarks,
@@ -317,10 +335,7 @@ namespace DemoMVC.WebUi.Controllers
         public JsonResult CheckDuplicateUserName(string UserName)
         {
             var checkduplicate = _userProfileService.CheckDuplicateUserName(UserName).ToList();
-            //if (UserId > 0)
-            //{
-            //    checkduplicate = checkduplicate.Where(x => x.UserId != UserId).ToList();
-            //}
+
             if (checkduplicate.Count() > 0)
             {
                 var message = _messageService.GetMessageByCode(Constants.MessageCode.USERNAMEEXIST);

@@ -1,4 +1,4 @@
-﻿@model DemoMVC.WebUi.Models.UserExamViewModel
+﻿@model DemoMVC.WebUi.Models.StartTestModel
 @{
     Layout = null;
 }
@@ -106,8 +106,8 @@
     <script>
         function validateAndSubmit() {
             var form = $("#examForm");
-            if (form.valid()) { // Check if the form is valid
-                var requestData = form.serialize(); // Serialize form data
+            if (form.valid()) { 
+                var requestData = form.serialize();
 
                 $.ajax({
                     url: '@Url.Action("LoadStartTest", "UserExam")',

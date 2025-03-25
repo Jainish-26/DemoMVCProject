@@ -49,9 +49,9 @@ namespace DemoMVC.Service
             return _examQuestionsProvider.UpdateExamQuestion(examQuestions);
         }
 
-        public int GetMarksByQuestionId(int QuestionId , int ExamId)
+        public int GetMarksByQuestionId(int QuestionId, int ExamId)
         {
-            return _examQuestionsProvider.GetMarksByQuestionId(QuestionId , ExamId);
+            return _examQuestionsProvider.GetMarksByQuestionId(QuestionId, ExamId);
         }
     }
 }

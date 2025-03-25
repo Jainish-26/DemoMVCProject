@@ -217,6 +217,18 @@
           <Property Name="ModifiedBy" Type="Int32" />
           <Property Name="ModifiedOn" Type="DateTime" />
         </EntityType>
+        <EntityType Name="UserAnswers" customannotation:ClrType="DemoMVC.Models.UserAnswers, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="UserAnswerId" />
+          </Key>
+          <Property Name="UserAnswerId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserExamId" Type="Int32" Nullable="false" />
+          <Property Name="QuestionId" Type="Int32" Nullable="false" />
+          <Property Name="AnswerText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ObtainedMarks" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Question" Relationship="Self.UserAnswers_Question" FromRole="UserAnswers_Question_Source" ToRole="UserAnswers_Question_Target" />
+          <NavigationProperty Name="UserExam" Relationship="Self.UserAnswers_UserExam" FromRole="UserAnswers_UserExam_Source" ToRole="UserAnswers_UserExam_Target" />
+        </EntityType>
         <EntityType Name="UserExams" customannotation:ClrType="DemoMVC.Models.UserExams, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="UserExamId" />
@@ -365,6 +377,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="UserAnswers_Question">
+          <End Role="UserAnswers_Question_Source" Type="Self.UserAnswers" Multiplicity="*" />
+          <End Role="UserAnswers_Question_Target" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="UserAnswers_Question_Target">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="UserAnswers_Question_Source">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="UserExams_Exam">
           <End Role="UserExams_Exam_Source" Type="Self.UserExams" Multiplicity="*" />
           <End Role="UserExams_Exam_Target" Type="Self.Exams" Multiplicity="1">
@@ -393,6 +419,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="UserAnswers_UserExam">
+          <End Role="UserAnswers_UserExam_Source" Type="Self.UserAnswers" Multiplicity="*" />
+          <End Role="UserAnswers_UserExam_Target" Type="Self.UserExams" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="UserAnswers_UserExam_Target">
+              <PropertyRef Name="UserExamId" />
+            </Principal>
+            <Dependent Role="UserAnswers_UserExam_Source">
+              <PropertyRef Name="UserExamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="DemoMVCEntities" customannotation:UseClrTypes="true">
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" />
@@ -407,6 +447,7 @@
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" />
+          <EntitySet Name="UserAnswers" EntityType="Self.UserAnswers" />
           <EntitySet Name="UserExams" EntityType="Self.UserExams" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" />
@@ -436,6 +477,10 @@
             <End Role="ExamQuestions_Questions_Source" EntitySet="ExamQuestions" />
             <End Role="ExamQuestions_Questions_Target" EntitySet="Questions" />
           </AssociationSet>
+          <AssociationSet Name="UserAnswers_Question" Association="Self.UserAnswers_Question">
+            <End Role="UserAnswers_Question_Source" EntitySet="UserAnswers" />
+            <End Role="UserAnswers_Question_Target" EntitySet="Questions" />
+          </AssociationSet>
           <AssociationSet Name="UserExams_Exam" Association="Self.UserExams_Exam">
             <End Role="UserExams_Exam_Source" EntitySet="UserExams" />
             <End Role="UserExams_Exam_Target" EntitySet="Exams" />
@@ -443,6 +488,10 @@
           <AssociationSet Name="UserExams_User" Association="Self.UserExams_User">
             <End Role="UserExams_User_Source" EntitySet="UserExams" />
             <End Role="UserExams_User_Target" EntitySet="UserProfile" />
+          </AssociationSet>
+          <AssociationSet Name="UserAnswers_UserExam" Association="Self.UserAnswers_UserExam">
+            <End Role="UserAnswers_UserExam_Source" EntitySet="UserAnswers" />
+            <End Role="UserAnswers_UserExam_Target" EntitySet="UserExams" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -668,6 +717,17 @@
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserAnswers">
+            <EntityTypeMapping TypeName="DemoMVC.Models.UserAnswers">
+              <MappingFragment StoreEntitySet="UserAnswers">
+                <ScalarProperty Name="UserAnswerId" ColumnName="UserAnswerId" />
+                <ScalarProperty Name="UserExamId" ColumnName="UserExamId" />
+                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
+                <ScalarProperty Name="AnswerText" ColumnName="AnswerText" />
+                <ScalarProperty Name="ObtainedMarks" ColumnName="ObtainedMarks" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -953,6 +1013,16 @@
           <Property Name="ModifiedBy" Type="int" Nullable="true" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="true" />
         </EntityType>
+        <EntityType Name="UserAnswers">
+          <Key>
+            <PropertyRef Name="UserAnswerId" />
+          </Key>
+          <Property Name="UserAnswerId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserExamId" Type="int" customannotation:Index="{ Name: IX_UserExamId, Order: 0 }" Nullable="false" />
+          <Property Name="QuestionId" Type="int" customannotation:Index="{ Name: IX_QuestionId, Order: 0 }" Nullable="false" />
+          <Property Name="AnswerText" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="ObtainedMarks" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="UserExams">
           <Key>
             <PropertyRef Name="UserExamId" />
@@ -1099,6 +1169,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="UserAnswers_Question">
+          <End Role="Questions" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UserAnswers" Type="Self.UserAnswers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Questions">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="UserAnswers">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="UserExams_Exam">
           <End Role="Exams" Type="Self.Exams" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -1127,6 +1211,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="UserAnswers_UserExam">
+          <End Role="UserExams" Type="Self.UserExams" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="UserAnswers" Type="Self.UserAnswers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserExams">
+              <PropertyRef Name="UserExamId" />
+            </Principal>
+            <Dependent Role="UserAnswers">
+              <PropertyRef Name="UserExamId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="CodeFirstDatabase">
           <EntitySet Name="ActivityLog" EntityType="Self.ActivityLog" Schema="dbo" Table="ActivityLog" />
           <EntitySet Name="UserProfile" EntityType="Self.UserProfile" Schema="dbo" Table="UserProfile" />
@@ -1141,6 +1239,7 @@
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" Schema="dbo" Table="Message_Mst" />
+          <EntitySet Name="UserAnswers" EntityType="Self.UserAnswers" Schema="dbo" Table="UserAnswers" />
           <EntitySet Name="UserExams" EntityType="Self.UserExams" Schema="dbo" Table="UserExams" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" Schema="dbo" Table="webpages_Membership" />
           <EntitySet Name="webpages_OAuthMembership" EntityType="Self.webpages_OAuthMembership" Schema="dbo" Table="webpages_OAuthMembership" />
@@ -1170,6 +1269,10 @@
             <End Role="Questions" EntitySet="Questions" />
             <End Role="ExamQuestions" EntitySet="ExamQuestions" />
           </AssociationSet>
+          <AssociationSet Name="UserAnswers_Question" Association="Self.UserAnswers_Question">
+            <End Role="Questions" EntitySet="Questions" />
+            <End Role="UserAnswers" EntitySet="UserAnswers" />
+          </AssociationSet>
           <AssociationSet Name="UserExams_Exam" Association="Self.UserExams_Exam">
             <End Role="Exams" EntitySet="Exams" />
             <End Role="UserExams" EntitySet="UserExams" />
@@ -1177,6 +1280,10 @@
           <AssociationSet Name="UserExams_User" Association="Self.UserExams_User">
             <End Role="UserProfile" EntitySet="UserProfile" />
             <End Role="UserExams" EntitySet="UserExams" />
+          </AssociationSet>
+          <AssociationSet Name="UserAnswers_UserExam" Association="Self.UserAnswers_UserExam">
+            <End Role="UserExams" EntitySet="UserExams" />
+            <End Role="UserAnswers" EntitySet="UserAnswers" />
           </AssociationSet>
         </EntityContainer>
       </Schema>

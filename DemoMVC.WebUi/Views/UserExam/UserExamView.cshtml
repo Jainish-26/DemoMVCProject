@@ -5,7 +5,7 @@
     int totalQuestions = Model.Questions.Count;
     Layout = null;
     int durationMin = Model.Exam.DurationMin;
-    var viewBagExamId = ViewBag.ExamId;
+    int viewBagUserExamId = ViewBag.UserExamId;
 }
 
 <style>
@@ -150,8 +150,8 @@
     @for (int i = 0; i < totalQuestions; i++)
     {
         var question = Model.Questions[i];
-        @*@Html.HiddenFor(Model.Questions[i].QuestionId);*@
-        <div class="question-page @(i == 0 ? "active" : "")" id="question-@i">
+
+        <div class="question-page @(i == 0 ? "active" : "")" id="question-@i" data-question-id="@question.QuestionId">
             <div class="question-header">
                 <h3>Q@(i + 1): @question.QuestionText</h3>
                 <span class="question-marks">Marks: @question.Marks</span>
@@ -168,7 +168,6 @@
             {
                 foreach (var answer in question.Answers)
                 {
-
                     <div class="answer-item">
                         <div class="d-flex align-items-center">
                             <input type="radio" name="selectedAnswer_@i" value="@answer.AnswerText" class="form-check-input">
@@ -200,105 +199,145 @@
                 <p class="text-muted">Invalid Question Type</p>
             }
         </div>
-
     }
 
-    <!-- Fixed Navigation Buttons -->
+
     <div class="navigation-buttons">
         <button class="btn-custom btn-prev" onclick="showQuestion(-1)" disabled>Previous</button>
         <button class="btn-custom btn-next" onclick="showQuestion(1)">Next</button>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    const examId = @ViewBag.ExamId;
-    const totalQuestions = @totalQuestions;
-    let currentIndex = 0;
+let currentIndex = 0;
+let totalQuestions = @totalQuestions;
+let userExamId = @viewBagUserExamId;
+let isNavigating = false; // Prevents double-click issue
 
-   
+    function getSelectedAnswer(questionIndex) {
+        let selectedAnswers = [];
+        let questionContainer = document.querySelector(`#question-${questionIndex}`);
+        if (!questionContainer) return selectedAnswers;
 
-    function startTimer(duration, display) {
-        const startTimeKey = `timerStartTime-exam-${examId}`;
-        const remainingTimeKey = `remainingTime-exam-${examId}`;
+        questionContainer.querySelectorAll(`input[name="selectedAnswers_${questionIndex}"]:checked,
+                                            input[name="selectedAnswer_${questionIndex}"]:checked`)
+                         .forEach(el => selectedAnswers.push(el.value));
 
-        let startTime = localStorage.getItem(startTimeKey);
-        let remainingTime = localStorage.getItem(remainingTimeKey);
-        let timer;
+        let textArea = questionContainer.querySelector(`textarea[name="textAnswer_${questionIndex}"]`);
+        if (textArea && textArea.value.trim()) selectedAnswers.push(textArea.value.trim());
 
-        if (startTime) {
-            // Calculate elapsed time
-            let elapsedTime = Math.floor((Date.now() - parseInt(startTime)) / 1000);
-            timer = duration - elapsedTime;
+        return selectedAnswers;
+    }
 
-            if (timer <= 0) {
-                handleTimeUp();
-                return;
-            }
-        } else if (remainingTime) {
-            // Use remaining time if it exists
-            timer = parseInt(remainingTime);
-        } else {
-            // First time starting the timer
-            localStorage.setItem(startTimeKey, Date.now().toString());
-            timer = duration;
+function storeUserAnswer(questionId, questionIndex, callback) {
+    let selectedAnswers = getSelectedAnswer(questionIndex);
+
+    if (selectedAnswers.length === 0) {
+        return callback && callback(false);
+    }
+
+    $.ajax({
+        url: '@Url.Action("StoreUserAnswer", "UserAnswer")',
+        type: 'POST',
+        contentType: "application/json",
+        data: JSON.stringify({ UserExamId: userExamId, QuestionId: parseInt(questionId), Answer: selectedAnswers }),
+        success: function () {
+            if (callback) callback(true);
+        },
+        error: function () {
+            if (callback) callback(false);
         }
+    });
+}
 
-        const interval = setInterval(function () {
-            if (timer <= 0) {
-                clearInterval(interval);
-                handleTimeUp();
-                return;
+function prefillUserAnswer(questionIndex, storedAnswers) {
+    let questionContainer = document.querySelector(`#question-${questionIndex}`);
+    if (!questionContainer) return;
+
+    questionContainer.querySelectorAll(`input[name="selectedAnswers_${questionIndex}"],
+                                        input[name="selectedAnswer_${questionIndex}"]`)
+                     .forEach(el => el.checked = storedAnswers.includes(el.value));
+
+    let textArea = questionContainer.querySelector(`textarea[name="textAnswer_${questionIndex}"]`);
+    if (textArea) textArea.value = storedAnswers.length > 0 ? storedAnswers[0] : "";
+}
+
+function getUserAnswer(questionId, questionIndex, callback) {
+    // Show loader on both buttons
+    $(".btn-next").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
+    $(".btn-prev").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
+
+    $.ajax({
+        url: '@Url.Action("GetUserAnswer", "UserAnswer")',
+        type: 'GET',
+        data: { UserExamId: userExamId, QuestionId: questionId },
+        success: function (response) {
+            if (response.success && Array.isArray(response.answer)) {
+                prefillUserAnswer(questionIndex, response.answer);
             }
 
-            let minutes = Math.floor(timer / 60);
-            let seconds = timer % 60;
+            // Reset buttons after loading
+            $(".btn-next").prop("disabled", false).html("Next");
+            $(".btn-prev").prop("disabled", false).html("Previous");
 
-            display.textContent =
-                (minutes < 10 ? "0" : "") + minutes + ":" +
-                (seconds < 10 ? "0" : "") + seconds;
+            if (callback) callback(response.success);
+        },
+        error: function () {
+            $(".btn-next").prop("disabled", false).html("Next");
+            $(".btn-prev").prop("disabled", false).html("Previous");
+            if (callback) callback(false);
+        }
+    });
+}
 
-            localStorage.setItem(remainingTimeKey, timer);
-            timer--;
-        }, 1000);
-    }
+function switchQuestion(newIndex) {
+    isNavigating = true;
 
-    function handleTimeUp() {
-        localStorage.removeItem(`timerStartTime-exam-${examId}`);
-        localStorage.removeItem(`remainingTime-exam-${examId}`);
+    document.querySelectorAll('.question-page').forEach((el, i) => el.classList.toggle('active', i === newIndex));
+    currentIndex = newIndex;
 
-        Swal.fire("Time is up!", "Only attempted questions are counted as given.", "info")
-            .then(function (result) {
-                if (result.isConfirmed) {
-                    closeTab();
-                }
-            });
-    }
-
-    function closeTab() {
-        window.open('', '_self').close();
-    }
-
-    function showQuestion(change) {
-        let newIndex = currentIndex + change;
-
-        if (newIndex < 0 || newIndex >= totalQuestions) return;
-
-        document.querySelectorAll('.question-page').forEach((el, i) => {
-            el.classList.remove('active');
-            if (i === newIndex) el.classList.add('active');
+    let questionElement = document.querySelector(`#question-${currentIndex}`);
+    if (questionElement) {
+        getUserAnswer(questionElement.getAttribute("data-question-id"), currentIndex, () => {
+            isNavigating = false;
         });
-
-        currentIndex = newIndex;
-
-        document.querySelector('.btn-prev').disabled = (currentIndex === 0);
-        document.querySelector('.btn-next').disabled = (currentIndex === totalQuestions - 1);
-
     }
 
-    window.onload = function () {
-        var duration = 60 * @durationMin;
-        var display = document.querySelector('#time');
-        startTimer(duration, display);
-    };
-</script>
+    $(".btn-prev").prop("disabled", currentIndex === 0);
+    $(".btn-next").prop("disabled", currentIndex === totalQuestions - 1);
+}
 
+function showQuestion(change) {
+    if (isNavigating) return;
+
+    let newIndex = currentIndex + change;
+    if (newIndex < 0 || newIndex >= totalQuestions) return;
+
+    let questionElement = document.querySelector(`#question-${currentIndex}`);
+
+    // Show loader and disable both buttons
+    $(".btn-next").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
+    $(".btn-prev").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
+
+    storeUserAnswer(questionElement.getAttribute("data-question-id"), currentIndex, () => {
+        switchQuestion(newIndex);
+    });
+}
+
+$(document).ready(function () {
+    let firstQuestion = document.querySelector(`#question-0`);
+    if (firstQuestion) {
+        getUserAnswer(firstQuestion.getAttribute("data-question-id"), 0);
+    }
+
+    $(".btn-next").on("click", function () {
+        showQuestion(1);
+    });
+
+    $(".btn-prev").on("click", function () {
+        showQuestion(-1);
+    });
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

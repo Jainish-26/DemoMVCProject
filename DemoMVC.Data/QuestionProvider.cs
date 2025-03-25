@@ -25,7 +25,7 @@ namespace DemoMVC.Data
         public IQueryable<QuestionGridModel> GetAllQuestionsGridModel()
         {
             return (from q in _db.Questions
-                    //where q.IsActive == true
+                        //where q.IsActive == true
                     select new QuestionGridModel
                     {
                         QuestionId = q.QuestionId,

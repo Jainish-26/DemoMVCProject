@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Data
 {
@@ -25,7 +23,8 @@ namespace DemoMVC.Data
                 _db.UserExams.Add(userExam);
                 _db.SaveChanges();
                 return userExam.UserExamId;
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 throw e;
             }
@@ -46,7 +45,7 @@ namespace DemoMVC.Data
         }
 
         public IQueryable<UserExamGrid> GetUserExamGrids()
-        { 
+        {
             return (from e in _db.UserExams
                     select new UserExamGrid
                     {
@@ -59,7 +58,7 @@ namespace DemoMVC.Data
                         Result = e.Result,
                         ResultStatus = e.ResultStatus,
                         ResultBadgeCode = (from code in _db.CommonLookup where e.ResultStatus == code.Code select code.BadgeCode).FirstOrDefault()
-                    }).AsQueryable(); 
+                    }).AsQueryable();
         }
 
         public UserExams GetByUserExamId(int UserExamId)
@@ -67,7 +66,7 @@ namespace DemoMVC.Data
             return (from i in _db.UserExams where i.UserExamId == UserExamId select i).FirstOrDefault();
         }
 
-        public UserExams GetByUserIdAndExamId(int ExamId,int UserId)
+        public UserExams GetByUserIdAndExamId(int ExamId, int UserId)
         {
             return (from i in _db.UserExams where ExamId == i.ExamId && UserId == i.UserId select i).FirstOrDefault();
         }

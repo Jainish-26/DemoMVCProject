@@ -93,6 +93,7 @@
     <Compile Include="QuestionType.cs" />
     <Compile Include="SessionHelper.cs" />
     <Compile Include="Subject.cs" />
+    <Compile Include="UserAnswers.cs" />
     <Compile Include="UserExams.cs" />
     <Compile Include="UserProfile.cs" />
     <Compile Include="webpages_Membership.cs" />

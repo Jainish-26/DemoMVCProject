@@ -107,6 +107,7 @@
     <Compile Include="RolesProvider.cs" />
     <Compile Include="QuestionTypeProvider.cs" />
     <Compile Include="SubjectProvider.cs" />
+    <Compile Include="UserAnswerProvider.cs" />
     <Compile Include="UserExamProvider.cs" />
     <Compile Include="UserProfileProvider.cs" />
   </ItemGroup>

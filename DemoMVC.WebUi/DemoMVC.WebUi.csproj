@@ -181,6 +181,7 @@
     <Compile Include="Controllers\QuestionTypeController.cs" />
     <Compile Include="Controllers\SendMailController.cs" />
     <Compile Include="Controllers\SubjectController.cs" />
+    <Compile Include="Controllers\UserAnswerController.cs" />
     <Compile Include="Controllers\UserExamController.cs" />
     <Compile Include="Controllers\UserProfileController.cs" />
     <Compile Include="Filters\ActivityLogFilter.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="Models\RolesModel.cs" />
     <Compile Include="Models\StartTestModel.cs" />
     <Compile Include="Models\SubjectModel.cs" />
+    <Compile Include="Models\UserAnswerModel.cs" />
     <Compile Include="Models\UserExamModel.cs" />
     <Compile Include="Models\UserProfileModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -2508,6 +2510,7 @@
     <Folder Include="App_Data\" />
     <Folder Include="content\QuestionImage\" />
     <Folder Include="Views\SendMail\" />
+    <Folder Include="Views\UserAnswer\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
