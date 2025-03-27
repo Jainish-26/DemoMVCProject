@@ -10,6 +10,7 @@ namespace DemoMVC.WebUi.Models
 		public int UserAnswerId { get; set; }
         public int UserExamId { get; set; }
         public int QuestionId { get; set; }
-        public List<string> Answer { get; set; }
+        public string Answer { get; set; }
+        public bool IsVisited { get; set; }
     }
 }

@@ -25,9 +25,21 @@ namespace DemoMVC.Service
         {
             return _userAnswerProvider.DeleteUserAnswers(userExamId, questionId , answerText);
         }
-        public List<UserAnswers> GetAnswers(int userExamId, int questionId)
+        public UserAnswers GetExistingAnswer(int userExamId, int questionId)
         {
-            return _userAnswerProvider.GetAnswers(userExamId, questionId);
+            return _userAnswerProvider.GetExistingAnswer(userExamId, questionId);
+        }
+        public List<UserAnswers> GetAllAnswerByUser(int userExamId)
+        {
+            return _userAnswerProvider.GetAllAnswerByUser(userExamId);
+        }
+        public int UpdateAnswer(UserAnswers ans)
+        {
+            return _userAnswerProvider.UpdateAnswer(ans);
+        }
+        public void SaveOrUpdateUserAnswer(UserAnswers model)
+        {
+            _userAnswerProvider.SaveOrUpdateUserAnswer(model);
         }
     }
 }

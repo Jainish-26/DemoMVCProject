@@ -39,85 +39,133 @@ namespace DemoMVC.WebUi.Controllers
             return View();
         }
 
+        //UserLogIn Page When Open Links
         [AllowAnonymous]
         public ActionResult UserExamLogIn(string userToken)
         {
             var userExamDetails = _userExamService.GetByUserToken(userToken);
             var userDetails = _userProfileService.GetUserById(userExamDetails.UserId);
+            var examDetails = _examService.GetById(userExamDetails.ExamId);
             if (userToken == null || userExamDetails == null || userExamDetails.UserToken == null)
             {
-                return HttpNotFound();
+                ViewBag.ErrorMessage = "User Not found for this Link Verify it with Your Administartor.";
+                return View("ErrorPage");
             }
-
+            if (userExamDetails.ExamStatus == Constants.UserExamStatus.COMPLETED && userExamDetails.ExpiryDate < DateTime.UtcNow)
+            {
+                return View("ExamSummary");
+            }
             if (userExamDetails.ExpiryDate < DateTime.UtcNow)
             {
                 return View("ExamLinkExpired");
             }
-
-            if (userDetails == null)
+            
+            if(userExamDetails.ExamStatus == Constants.UserExamStatus.ONGOING)
             {
-                return HttpNotFound();
+                var model = new StartTestModel
+                {
+                    Email = userDetails.Email,
+                    UserName = userDetails.UserName,
+                    Name = userDetails.Name,
+                    ExamName = examDetails.ExamName,
+                    ExamId = userExamDetails.ExamId,
+                    Duration = examDetails.DurationMin,
+                    PassingMarks = examDetails.PassingMarks,
+                    TotalMarks = examDetails.TotalMarks,
+                    UserExamStatus = userExamDetails.ExamStatus
+                };
+                ViewBag.UserToken = userToken;
+
+                return View(model);
             }
-
-            var model = new StartTestModel
+            else
             {
-                Email = userDetails.Email,
-                ExamId = userExamDetails.ExamId
-            };
-            ViewBag.UserToken = userToken;
+                if (userDetails == null)
+                {
+                    ViewBag.ErrorMessage = "User not found. Plzz contact Support team.";
+                    return View("ErrorPage");
+                }
 
-            return View(model);
+                var model = new StartTestModel
+                {
+                    Email = userDetails.Email,
+                    ExamName = examDetails.ExamName,
+                    ExamId = userExamDetails.ExamId,
+                    Duration = examDetails.DurationMin,
+                    PassingMarks = examDetails.PassingMarks,
+                    TotalMarks = examDetails.TotalMarks,
+                    UserExamStatus = userExamDetails.ExamStatus
+                };
+                ViewBag.UserToken = userToken;
+
+                return View(model);
+            }
         }
 
+        //Save Details Enters From LogIn Page
         [HttpPost]
-        public JsonResult SaveUserAndExamDetails(string userToken, string userName, string userEmail, string name)
+        public ActionResult UserExamLogIn(string userToken,string userName,string name)
         {
             try
             {
                 var userExamDetails = _userExamService.GetByUserToken(userToken);
-                var userDetails = _userProfileService.GetUserByEmailId(userEmail);
+
+                var decryptedToken = AESCrypto.Decrypt(userExamDetails.UserToken);
+                int userId = decryptedToken.userId;
+                int examId = decryptedToken.examId;
+                var userDetails = _userProfileService.GetUserById(userId);
+
                 if (userDetails == null)
                 {
-                    return Json(new { success = false, message = "user not found." });
+                    ViewBag.ErrorMessage = "User not found. Please check your email.";
+                    return View("ErrorPage");
                 }
                 if (userExamDetails == null)
                 {
-                    return Json(new { success = false, message = "Invalid token" });
+                    ViewBag.ErrorMessage = "Invalid token. Please try again.";
+                    return View("ErrorPage");
                 }
 
-                userDetails.UserName = userName;
-                userDetails.Name = name;
-                int userId = _userProfileService.UpdateUserProfile(userDetails);
-
-                if (userId > 0)
+                if(userExamDetails.ExamStatus == Constants.UserExamStatus.ONGOING)
                 {
-                    userExamDetails.StartTime = DateTime.UtcNow;
-                    userExamDetails.ExamStatus = "ONGOING";
-
-                    int userExamId = _userExamService.UpdateUserExam(userExamDetails);
-                    if (userExamId > 0)
-                    {
-                        var redirectUrl = Url.Action("UserExamView", "UserExam", new { userToken });
-
-                        return Json(new { success = true, redirectUrl });
-                    }
+                    return RedirectToAction("UserExamView", "UserExam", new { userToken });
                 }
                 else
                 {
-                    return Json(new { success = false, message = "user not found." });
+                    // Update user details
+                    userDetails.UserName = userName;
+                    userDetails.Name = name;
+                    int updatedUserId = _userProfileService.UpdateUserProfile(userDetails);
+
+                    if (updatedUserId <= 0)
+                    {
+                        ViewBag.ErrorMessage = "Failed to update user profile.";
+                        return View("ErrorPage");
+                    }
+
+                    // Update exam details
+                    userExamDetails.StartTime = DateTime.UtcNow;
+                    userExamDetails.ExamStatus = Constants.UserExamStatus.ONGOING;
+
+                    int userExamId = _userExamService.UpdateUserExam(userExamDetails);
+                    if (userExamId <= 0)
+                    {
+                        ViewBag.ErrorMessage = "Failed to update exam status.";
+                        return View("ErrorPage");
+                    }
+
+                    // Redirect to the User Exam View
+                    return RedirectToAction("UserExamView", "UserExam", new { userToken });
                 }
-
-
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                ViewBag.ErrorMessage = $"An error occurred: {ex.Message}";
+                return View("ErrorPage");
             }
-
-            return Json(new { success = false });
         }
 
-
+        //Exam View
         public ActionResult UserExamView(string userToken)
         {
             var userExamDetails = _userExamService.GetByUserToken(userToken);
@@ -156,6 +204,8 @@ namespace DemoMVC.WebUi.Controllers
             ViewBag.UserExamId = userExamDetails.UserExamId;
             return View(model);
         }
+        
+        //Generate Token For User
         [HttpPost]
         public JsonResult GenerateExamLink(UserExamModel model)
         {
@@ -184,9 +234,9 @@ namespace DemoMVC.WebUi.Controllers
                     {
                         userExams.UserId = userDetails.UserId;
                         userExams.ExamId = model.ExamId;
-                        userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId.ToString());
+                        userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId, model.ExamId);
                         userExams.ExpiryDate = DateTime.UtcNow.AddDays(2);
-                        userExams.ExamStatus = "PENDING";
+                        userExams.ExamStatus = Constants.UserExamStatus.PENDING;
                         userExams.CreatedBy = userId;
                         userExams.CreatedOn = DateTime.UtcNow;
 
@@ -205,7 +255,7 @@ namespace DemoMVC.WebUi.Controllers
                     {
                         if (userExamDetails.ExpiryDate < DateTime.UtcNow)
                         {
-                            userExams.UserToken = AESCrypto.Encrypt(userExamDetails.UserId.ToString());
+                            userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId, model.ExamId);
                             userExams.ExpiryDate = DateTime.UtcNow.AddDays(2);
                             userExams.UpdatedBy = userId;
                             userExams.UpdatedOn = DateTime.UtcNow;
@@ -244,9 +294,9 @@ namespace DemoMVC.WebUi.Controllers
 
                     userExams.UserId = userDetails.UserId;
                     userExams.ExamId = model.ExamId;
-                    userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId.ToString());
+                    userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId,model.ExamId);
                     userExams.ExpiryDate = DateTime.UtcNow.AddDays(2);
-                    userExams.ExamStatus = "PENDING";
+                    userExams.ExamStatus = Constants.UserExamStatus.PENDING;
                     userExams.CreatedBy = userId;
                     userExams.CreatedOn = DateTime.UtcNow;
 
@@ -265,6 +315,7 @@ namespace DemoMVC.WebUi.Controllers
             return Json(new { success = true }, JsonRequestBehavior.AllowGet);
         }
 
+        
         [HttpPost]
         public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
         {
@@ -272,36 +323,56 @@ namespace DemoMVC.WebUi.Controllers
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
+        //Create A Link For User
         public JsonResult UserExamLink(int userExamId)
         {
             try
             {
                 var userExamDetails = _userExamService.GetByUserExamId(userExamId);
-                if(userExamDetails.ExpiryDate < DateTime.UtcNow)
+
+                if (userExamDetails.ExamStatus != Constants.UserExamStatus.COMPLETED)
                 {
-                    int userId = int.Parse(AESCrypto.Decrypt(userExamDetails.UserToken));
-                    userExamDetails.UserToken = AESCrypto.Encrypt(userId.ToString());
-                    userExamDetails.ExpiryDate = DateTime.UtcNow.AddDays(2);
+                   if(userExamDetails.ExamStatus != Constants.UserExamStatus.ONGOING)
+                    {
+                        if (userExamDetails.ExpiryDate < DateTime.UtcNow)
+                        {
+                            var decryptedToken = AESCrypto.Decrypt(userExamDetails.UserToken);
+                            int userId = decryptedToken.userId;
+                            int examId = decryptedToken.examId;
 
-                    _userExamService.UpdateUserExam(userExamDetails);
+                            userExamDetails.UserToken = AESCrypto.Encrypt(userId,examId);
+                            userExamDetails.ExpiryDate = DateTime.UtcNow.AddDays(2);
 
-                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-                    string updatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam", 
-                        new { 
-                            userToken = userExamDetails.UserToken
-                        });
-                    return Json(new { success = true, link = updatedLink });
+                            _userExamService.UpdateUserExam(userExamDetails);
+
+                            string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+                            string updatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam",
+                                new
+                                {
+                                    userToken = userExamDetails.UserToken
+                                });
+                            return Json(new { success = true, link = updatedLink });
+                        }
+                        else
+                        {
+                            string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
+                            string generatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam",
+                                new
+                                {
+                                    userToken = userExamDetails.UserToken
+                                });
+
+                            return Json(new { success = true, link = generatedLink });
+                        }
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "User Started Exam Already" });
+                    }
                 }
                 else
                 {
-                    string baseUrl = Request.Url.GetLeftPart(UriPartial.Authority);
-                    string generatedLink = baseUrl + Url.Action("UserExamLogIn", "UserExam",
-                        new
-                        {
-                            userToken = userExamDetails.UserToken
-                        });
-
-                    return Json(new { success = true, link = generatedLink });
+                    return Json(new { success = false, message = "User Completed Exam Already" });
                 }
             }
             catch (Exception)
@@ -310,28 +381,7 @@ namespace DemoMVC.WebUi.Controllers
             }
         }
 
-        public ActionResult LoadStartTest(UserExamViewModel userExamModel)
-        {
-            var userToken = Request.Headers["UserToken"];
-
-            var examDetails = _examService.GetById(userExamModel.ExamId);
-
-            var model = new StartTestModel
-            {
-                ExamId = userExamModel.ExamId,
-                UserName = userExamModel.UserName,
-                UserToken = userToken,
-                Name = userExamModel.Name,
-                Email = userExamModel.Email,
-                ExamName = examDetails.ExamName,
-                Duration = examDetails.DurationMin,
-                TotalMarks = examDetails.TotalMarks,
-                PassingMarks = examDetails.PassingMarks
-            };
-
-            return PartialView("_StartTestPartial", model);
-        }
-
+        //Check Duplicate UserName
         public JsonResult CheckDuplicateUserName(string UserName)
         {
             var checkduplicate = _userProfileService.CheckDuplicateUserName(UserName).ToList();
@@ -345,6 +395,43 @@ namespace DemoMVC.WebUi.Controllers
             {
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        //Submit Exam
+        [HttpPost]
+        public JsonResult SubmitExam(int UserExamId)
+        {
+            var userExamDetails = _userExamService.GetByUserExamId(UserExamId);
+
+            if (userExamDetails != null)
+            {
+                userExamDetails.ExamStatus = Constants.UserExamStatus.COMPLETED;
+                userExamDetails.ResultStatus = Constants.ResultStatus.PENDING;
+                userExamDetails.EndTime = DateTime.UtcNow;
+                userExamDetails.ExpiryDate = DateTime.UtcNow;
+
+                int updatedUserExamId = _userExamService.UpdateUserExam(userExamDetails);
+                if (updatedUserExamId > 0)
+                {
+                    return Json(new { success = true, redirectUrl = Url.Action("ExamSummary", "UserExam", new { UserExamId }) });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Exam submission failed." });
+                }
+            }
+            else
+            {
+                return Json(new { success = false, message = "Exam Not Available." });
+            }
+        }
+
+
+        [AllowAnonymous]
+        //Exam Summary View
+        public ActionResult ExamSummary()
+        {
+            return View();
         }
     }
 }

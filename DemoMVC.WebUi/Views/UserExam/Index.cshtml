@@ -16,7 +16,7 @@
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
-<h2 class="text-center">UserExamList</h2>
+<h2 class="text-center m-2">Participant List</h2>
 <div class="common_white_box listingpage m-5" style="margin-left: 50px; margin-right: 50px">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.UserExamGrid>()
@@ -33,7 +33,7 @@
                 columns.Bound(c => c.UserToken).Width("7%").Title("Token");
                 columns.Bound(c => c.ExamStatus).Width("7%").Title("Status").ClientTemplate("#if(ExamBadgeCode!=null && ExamBadgeCode!=''){#" + "<span class='status' style='background:#=ExamBadgeCode#'>#=ExamStatus#</span>#} else {# #=ExamStatus# #}#");
                 columns.Bound(c => c.Result).Width("7%").Title("Result");
-                columns.Bound(c => c.ResultStatus).Width("7%").Title("Result Status").ClientTemplate("#if(ResultBadgeCode!=null && ResultBadgeCode!=''){#" + "<span class='status' style='background:#=ResultBadgeCode#'>#=ResultStatus#</span>#} else {# #=ExamStatus# #}#");
+                columns.Bound(c => c.ResultStatus).Width("7%").Title("Result Status").ClientTemplate("#if(ResultBadgeCode!=null && ResultBadgeCode!=''){#" + "<span class='status' style='background:#=ResultBadgeCode#'>#=ResultStatus#</span>#}#");
                 if (role == "sadmin")
                 {
                     columns.Bound(c => c.UserExamId)
@@ -94,7 +94,7 @@
                         }
                     });
                 } else {
-                    Swal.fire("Error!", "Failed to generate link.", "error");
+                    Swal.fire("Error!", response.message, "error");
                 }
             },
             error: function () {

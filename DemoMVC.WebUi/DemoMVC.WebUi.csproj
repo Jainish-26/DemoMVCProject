@@ -2504,7 +2504,8 @@
     <Content Include="Views\Exam\_EmailInputPartial.cshtml" />
     <Content Include="Views\UserExam\Index.cshtml" />
     <Content Include="Views\UserExam\UserExamLogIn.cshtml" />
-    <Content Include="Views\UserExam\_StartTestPartial.cshtml" />
+    <Content Include="Views\UserExam\ExamSummary.cshtml" />
+    <Content Include="Views\Shared\ErrorPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -32,6 +32,108 @@
         flex-wrap: wrap;
     }
 
+    .exam-container {
+        display: flex;
+        width: 100%;
+        gap: 15px;
+    }
+
+    /* Left Section: Question Container (80%) */
+    .question-section {
+        width: 80%;
+    }
+
+    /* Right Section: Question Palette (20%) */
+    .question-palette {
+        width: 20%;
+        padding: 15px;
+        margin-top: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+        min-height: 570px;
+    }
+
+        /* Palette Heading */
+        .question-palette h4 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+    /* Palette Buttons */
+    #palette-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .palette-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        font-weight: bold;
+        margin: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Status Colors */
+    .not-visited {
+        background-color: gray;
+        color: white;
+    }
+
+    .current {
+        background-color: blue;
+        color: white;
+    }
+
+    .visited {
+        background-color: yellow;
+    }
+
+    .answered {
+        background-color: green;
+        color: white;
+    }
+    ..color-legend {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Align to the left */
+        font-size: 14px;
+        margin-left: 10px; /* Optional: Adjust for better spacing */
+    }
+
+    .legend-box {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 10px;
+        border-radius: 3px;
+    }
+
+    .yellow {
+        background-color: yellow;
+    }
+
+    .blue {
+        background-color: blue;
+    }
+
+    .green {
+        background-color: green;
+    }
+
+    .gray {
+        background-color: gray;
+    }
+
+
+    /* Existing Styles - Keeping Your Question Container UI */
     .question-container {
         margin-top: 20px;
         padding: 25px;
@@ -92,6 +194,7 @@
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
     }
 
+    /* Navigation Buttons */
     .navigation-buttons {
         position: absolute;
         bottom: 15px;
@@ -122,6 +225,10 @@
         background-color: #007bff;
     }
 
+    .btn-save {
+        background-color: seagreen;
+    }
+
     .btn-prev:hover {
         background-color: #5a6268;
     }
@@ -130,10 +237,53 @@
         background-color: #0056b3;
     }
 
+    .btn-save:hover {
+        background-color: forestgreen;
+    }
+
     .btn-prev:disabled, .btn-next:disabled {
         background-color: #ccc;
         cursor: not-allowed;
     }
+
+    /*Pop Up*/
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        width: 350px;
+    }
+
+    .confirm-btn {
+        background-color: green;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .cancel-btn {
+        background-color: red;
+        color: white;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+    }
+
 </style>
 
 
@@ -146,198 +296,362 @@
 </div>
 
 
-<div class="question-container">
-    @for (int i = 0; i < totalQuestions; i++)
-    {
-        var question = Model.Questions[i];
+<div class="exam-container">
+    <!-- Left: Questions (80%) -->
+    <div class="question-section">
+        <div class="question-container">
+            @for (int i = 0; i < totalQuestions; i++)
+            {
+                var question = Model.Questions[i];
 
-        <div class="question-page @(i == 0 ? "active" : "")" id="question-@i" data-question-id="@question.QuestionId">
-            <div class="question-header">
-                <h3>Q@(i + 1): @question.QuestionText</h3>
-                <span class="question-marks">Marks: @question.Marks</span>
+                <div class="question-page @(i == 0 ? "active" : "")" id="question-@i" data-question-id="@question.QuestionId">
+                    <div class="question-header">
+                        <h3>Q@(i + 1): @question.QuestionText</h3>
+                        <span class="question-marks">Marks: @question.Marks</span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(question.QuestionImage))
+                    {
+                        <div class="mb-2">
+                            <img src="~/content/QuestionImage/@question.QuestionImage" alt="Question Image">
+                        </div>
+                    }
+
+                    @if (question.QuestionType == "Single Choice MCQ")
+                    {
+                        foreach (var answer in question.Answers)
+                        {
+                            <div class="answer-item">
+                                <div class="d-flex align-items-center">
+                                    <input type="radio" name="selectedAnswer_@i" value="@answer.AnswerText" class="form-check-input">
+                                    <span class="answer-text">@answer.AnswerText</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else if (question.QuestionType == "Multiple Choice MCQ")
+                    {
+                        foreach (var answer in question.Answers)
+                        {
+                            <div class="answer-item">
+                                <div class="d-flex align-items-center">
+                                    <input type="checkbox" name="selectedAnswers_@i" value="@answer.AnswerText" class="form-check-input">
+                                    <span class="answer-text">@answer.AnswerText</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
+                    {
+                        <div class="text-answer-box">
+                            <textarea class="form-control" name="textAnswer_@i" rows="4" placeholder="Type your answer here..."></textarea>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Invalid Question Type</p>
+                    }
+                </div>
+            }
+
+            <div class="navigation-buttons">
+                <button class="btn-custom btn-prev"  disabled>Previous</button>
+                <button class="btn-custom btn-save" id="btn-save" onclick="showSavePopup()">Save</button>
+                <button class="btn-custom btn-next" >Next</button>
             </div>
+        </div>
+    </div>
 
-            @if (!string.IsNullOrEmpty(question.QuestionImage))
+    <!-- Right: Question Palette (20%) -->
+    <div class="question-palette">
+        <div class="color-legend">
+            <p><span class="legend-box yellow"></span> Visited Question</p>
+            <p><span class="legend-box blue"></span> Current Question</p>
+            <p><span class="legend-box green"></span> Answered Question</p>
+            <p><span class="legend-box gray"></span> Not Visited Question</p>
+        </div>
+        <div class="palette-buttons">
+            @for (int i = 0; i < totalQuestions; i++)
             {
-                <div class="mb-2">
-                    <img src="~/content/QuestionImage/@question.QuestionImage" alt="Question Image">
-                </div>
-            }
-
-            @if (question.QuestionType == "Single Choice MCQ")
-            {
-                foreach (var answer in question.Answers)
-                {
-                    <div class="answer-item">
-                        <div class="d-flex align-items-center">
-                            <input type="radio" name="selectedAnswer_@i" value="@answer.AnswerText" class="form-check-input">
-                            <span class="answer-text">@answer.AnswerText</span>
-                        </div>
-                    </div>
-                }
-            }
-            else if (question.QuestionType == "Multiple Choice MCQ")
-            {
-                foreach (var answer in question.Answers)
-                {
-                    <div class="answer-item">
-                        <div class="d-flex align-items-center">
-                            <input type="checkbox" name="selectedAnswers_@i" value="@answer.AnswerText" class="form-check-input">
-                            <span class="answer-text">@answer.AnswerText</span>
-                        </div>
-                    </div>
-                }
-            }
-            else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
-            {
-                <div class="text-answer-box">
-                    <textarea class="form-control" name="textAnswer_@i" rows="4" placeholder="Type your answer here..."></textarea>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted">Invalid Question Type</p>
+                <button class="palette-btn not-visited" data-index="@i" id="palette-@i">@(@i + 1)</button>
             }
         </div>
-    }
+    </div>
+</div>
+<div id="saveExamModal" class="modal">
+    <div class="modal-content">
+        <h2>Confirm Exam Submission</h2>
+        <p>You are about to submit your exam.</p>
+        <p><strong>Total Questions:</strong> <span id="total-questions"></span></p>
+        <p><strong>Answered Questions:</strong> <span id="answered-questions"></span></p>
+        <p><strong>Unanswered Questions:</strong> <span id="unanswered-questions"></span></p>
 
-
-    <div class="navigation-buttons">
-        <button class="btn-custom btn-prev" onclick="showQuestion(-1)" disabled>Previous</button>
-        <button class="btn-custom btn-next" onclick="showQuestion(1)">Next</button>
+        <button onclick="confirmExamSubmission()" class="confirm-btn">Submit Exam</button>
+        <button onclick="closeSavePopup()" class="cancel-btn">Cancel</button>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-let currentIndex = 0;
-let totalQuestions = @totalQuestions;
 let userExamId = @viewBagUserExamId;
-let isNavigating = false; // Prevents double-click issue
+let totalQuestions = @totalQuestions;
+let currentQuestionIndex = 0;
+let answersData = {};
+let visitedCount = 0;
 
-    function getSelectedAnswer(questionIndex) {
-        let selectedAnswers = [];
-        let questionContainer = document.querySelector(`#question-${questionIndex}`);
-        if (!questionContainer) return selectedAnswers;
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".question-page")[0].style.display = "block";
 
-        questionContainer.querySelectorAll(`input[name="selectedAnswers_${questionIndex}"]:checked,
-                                            input[name="selectedAnswer_${questionIndex}"]:checked`)
-                         .forEach(el => selectedAnswers.push(el.value));
+    loadAnswersFromDatabase();
 
-        let textArea = questionContainer.querySelector(`textarea[name="textAnswer_${questionIndex}"]`);
-        if (textArea && textArea.value.trim()) selectedAnswers.push(textArea.value.trim());
+    document.querySelectorAll(".palette-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+            let questionIndex = parseInt(this.getAttribute("data-index"));
+            saveAndChangeQuestion(questionIndex);
+        });
+    });
 
-        return selectedAnswers;
-    }
+    document.querySelector(".btn-next").addEventListener("click", function () {
+        saveAndChangeQuestion(currentQuestionIndex + 1);
+    });
 
-function storeUserAnswer(questionId, questionIndex, callback) {
-    let selectedAnswers = getSelectedAnswer(questionIndex);
+    document.querySelector(".btn-prev").addEventListener("click", function () {
+        saveAndChangeQuestion(currentQuestionIndex - 1);
+    });
 
-    if (selectedAnswers.length === 0) {
-        return callback && callback(false);
-    }
+    document.querySelectorAll(".question-page").forEach((page) => {
+        page.addEventListener("input", function () {
+            let questionId = page.getAttribute("data-question-id");
+            let answer = getCurrentAnswer(page);
 
+            answersData[questionId] = { AnswerText: answer, IsVisited: true };
+            updateQuestionPalette();
+        });
+    });
+});
+
+
+function loadAnswersFromDatabase() {
     $.ajax({
-        url: '@Url.Action("StoreUserAnswer", "UserAnswer")',
-        type: 'POST',
-        contentType: "application/json",
-        data: JSON.stringify({ UserExamId: userExamId, QuestionId: parseInt(questionId), Answer: selectedAnswers }),
-        success: function () {
-            if (callback) callback(true);
+        url: '/UserAnswer/GetAllAnswers',
+        type: 'GET',
+        data: { userExamId: userExamId },
+        success: function (response) {
+            if (response.success && response.data) {
+                answersData = {};
+                response.data.forEach(ans => {
+                    answersData[ans.QuestionId] = {
+                        AnswerText: ans.AnswerText || "",
+                        IsVisited: ans.IsVisited || false
+                    };
+                });
+            } 
+            applyPrefilledAnswers();
+            updateQuestionPalette();
         },
-        error: function () {
-            if (callback) callback(false);
+        error: function (xhr) {
+            console.error("❌ Error loading answers:", xhr.responseText);
         }
     });
 }
 
-function prefillUserAnswer(questionIndex, storedAnswers) {
-    let questionContainer = document.querySelector(`#question-${questionIndex}`);
-    if (!questionContainer) return;
 
-    questionContainer.querySelectorAll(`input[name="selectedAnswers_${questionIndex}"],
-                                        input[name="selectedAnswer_${questionIndex}"]`)
-                     .forEach(el => el.checked = storedAnswers.includes(el.value));
+function applyPrefilledAnswers() {
+    document.querySelectorAll(".question-page").forEach((page) => {
+        let questionId = page.getAttribute("data-question-id");
+        let answerData = answersData[questionId];
+        if (answerData && answerData.IsVisited) {
+            visitedCount++;
+        }
+        if (answerData) {
+            let answer = answerData.AnswerText || "";
 
-    let textArea = questionContainer.querySelector(`textarea[name="textAnswer_${questionIndex}"]`);
-    if (textArea) textArea.value = storedAnswers.length > 0 ? storedAnswers[0] : "";
-}
-
-function getUserAnswer(questionId, questionIndex, callback) {
-    // Show loader on both buttons
-    $(".btn-next").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
-    $(".btn-prev").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
-
-    $.ajax({
-        url: '@Url.Action("GetUserAnswer", "UserAnswer")',
-        type: 'GET',
-        data: { UserExamId: userExamId, QuestionId: questionId },
-        success: function (response) {
-            if (response.success && Array.isArray(response.answer)) {
-                prefillUserAnswer(questionIndex, response.answer);
+            if (page.querySelector("input[type='radio']")) {
+                let radio = page.querySelector(`input[type='radio'][value='${answer}']`);
+                if (radio) radio.checked = true;
             }
 
-            // Reset buttons after loading
-            $(".btn-next").prop("disabled", false).html("Next");
-            $(".btn-prev").prop("disabled", false).html("Previous");
+            else if (page.querySelector("input[type='checkbox']")) {
+                answer.split(",").forEach(val => {
+                    let trimmedValue = val.trim();
+                    page.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+                        if (checkbox.value === trimmedValue) {
+                            checkbox.checked = true;
+                        }
+                    });
+                });
+            }
 
-            if (callback) callback(response.success);
-        },
-        error: function () {
-            $(".btn-next").prop("disabled", false).html("Next");
-            $(".btn-prev").prop("disabled", false).html("Previous");
-            if (callback) callback(false);
+            else if (page.querySelector("textarea")) {
+                page.querySelector("textarea").value = answer;
+            }
+        }
+    });
+    checkAllQuestionsVisited();
+}
+
+function updateQuestionPalette() {
+
+    document.querySelectorAll(".palette-btn").forEach((btn, index) => {
+        let questionPage = document.querySelectorAll(".question-page")[index];
+        let questionId = questionPage.getAttribute("data-question-id");
+        let answerData = answersData[questionId] || {};
+        let status = "not-visited"; 
+
+        if (answerData.AnswerText) {
+            status = "answered";
+        } else if (answerData.IsVisited) {
+            status = "visited";
+        }
+
+        btn.classList.remove("not-visited", "visited", "answered", "current");
+
+        if (index === currentQuestionIndex) {
+            btn.classList.add("current");
+            btn.style.background = "blue";
+        } else if (status === "answered") {
+            btn.classList.add("answered");
+            btn.style.background = "green";
+        } else if (status === "visited") {
+            btn.classList.add("visited");
+            btn.style.background = "yellow";
+        } else {
+            btn.classList.add("not-visited");
+            btn.style.background = "gray";
         }
     });
 }
 
-function switchQuestion(newIndex) {
-    isNavigating = true;
+    function saveAndChangeQuestion(newIndex, callback = null) {
+        if (newIndex < 0 || newIndex >= totalQuestions) return;
 
-    document.querySelectorAll('.question-page').forEach((el, i) => el.classList.toggle('active', i === newIndex));
-    currentIndex = newIndex;
+        let currentPage = document.querySelectorAll(".question-page")[currentQuestionIndex];
+        let questionId = currentPage.getAttribute("data-question-id");
+        let answer = getCurrentAnswer(currentPage);
 
-    let questionElement = document.querySelector(`#question-${currentIndex}`);
-    if (questionElement) {
-        getUserAnswer(questionElement.getAttribute("data-question-id"), currentIndex, () => {
-            isNavigating = false;
+        let userAnswerModel = {
+            UserExamId: userExamId,
+            QuestionId: questionId,
+            AnswerText: answer,
+            IsVisited: true
+        };
+
+        $.ajax({
+            url: '/UserAnswer/SaveUserAnswer',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(userAnswerModel),
+            success: function () {
+                
+                    visitedCount++;
+                    console.log(`🔄 Visited count updated: ${visitedCount}/${totalQuestions}`);
+                
+                answersData[questionId] = { AnswerText: answer, IsVisited: true };
+                checkAllQuestionsVisited();
+
+                // ✅ If a callback is provided (e.g., submitExam), call it instead of changing the question
+                if (typeof callback === "function") {
+                    callback();
+                } else {
+                    changeQuestion(newIndex);
+                }
+            },
+            error: function (xhr) {
+                console.error("❌ Error saving answer:", xhr.responseJSON?.error || xhr.responseText);
+            }
         });
     }
 
-    $(".btn-prev").prop("disabled", currentIndex === 0);
-    $(".btn-next").prop("disabled", currentIndex === totalQuestions - 1);
-}
 
-function showQuestion(change) {
-    if (isNavigating) return;
+function getCurrentAnswer(page) {
+    let answer = "";
 
-    let newIndex = currentIndex + change;
-    if (newIndex < 0 || newIndex >= totalQuestions) return;
-
-    let questionElement = document.querySelector(`#question-${currentIndex}`);
-
-    // Show loader and disable both buttons
-    $(".btn-next").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
-    $(".btn-prev").prop("disabled", true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
-
-    storeUserAnswer(questionElement.getAttribute("data-question-id"), currentIndex, () => {
-        switchQuestion(newIndex);
-    });
-}
-
-$(document).ready(function () {
-    let firstQuestion = document.querySelector(`#question-0`);
-    if (firstQuestion) {
-        getUserAnswer(firstQuestion.getAttribute("data-question-id"), 0);
+    if (page.querySelector("input[type='radio']:checked")) {
+        answer = page.querySelector("input[type='radio']:checked").value;
+    } else if (page.querySelectorAll("input[type='checkbox']:checked").length > 0) {
+        let selectedCheckboxes = page.querySelectorAll("input[type='checkbox']:checked");
+        answer = Array.from(selectedCheckboxes).map(cb => cb.value).join(",");
+    } else if (page.querySelector("textarea")) {
+        answer = page.querySelector("textarea").value;
     }
 
-    $(".btn-next").on("click", function () {
-        showQuestion(1);
-    });
+    return answer;
+}
 
-    $(".btn-prev").on("click", function () {
-        showQuestion(-1);
-    });
-});
+// ✅ Change question
+function changeQuestion(index) {
+    if (index < 0 || index >= totalQuestions) return;
+
+    document.querySelectorAll(".question-page")[currentQuestionIndex].style.display = "none";
+    document.querySelectorAll(".question-page")[index].style.display = "block";
+    currentQuestionIndex = index;
+
+    document.querySelector(".btn-prev").disabled = currentQuestionIndex === 0;
+    document.querySelector(".btn-next").disabled = currentQuestionIndex === totalQuestions - 1;
+
+    updateQuestionPalette();
+}
+
+    function checkAllQuestionsVisited() {
+        let saveButton = document.querySelector(".btn-save");
+
+        if (visitedCount >= totalQuestions - 1) {
+            saveButton.style.display = "block"; // ✅ Show button
+            console.log("✅ All questions visited. Showing Save button.");
+        } else {
+            saveButton.style.display = "none"; // ❌ Hide button
+            console.log(`❌ ${totalQuestions - visitedCount} questions left. Hiding Save button.`);
+        }
+    }
+    function showSavePopup() {
+        let answeredCount = document.querySelectorAll(".answered").length + 1;
+
+        Swal.fire({
+            title: "Confirm Exam Submission",
+            html: `
+            <p><strong>Total Questions:</strong> ${totalQuestions}</p>
+            <p><strong>Attempted Questions:</strong> ${answeredCount}</p>
+            <p>Are you sure you want to submit your exam?</p>
+        `,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Submit Exam",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                saveCurrentAnswerAndSubmit();
+            }
+        });
+    }
+    function saveCurrentAnswerAndSubmit() {
+        console.log("💾 Saving last answer before submitting exam...");
+
+        // ✅ Save the current question answer and call submitExam after success
+        saveAndChangeQuestion(currentQuestionIndex, function () {
+            console.log("✅ Last answer saved. Now submitting exam...");
+            submitExam();
+        });
+    }
+    function submitExam() {
+        $.ajax({
+            url: '/UserExam/SubmitExam',
+            type: 'POST',
+            data: { userExamId: userExamId },
+            success: function (response) {
+                window.location.href = response.redirectUrl;
+            },
+            error: function (xhr) {
+                console.error("❌ Error submitting exam:", xhr.responseText);
+                Swal.fire("Error", "Failed to submit exam. Please try again.", "error");
+            }
+        });
+    }
+
+</script>
+<script>
+    history.pushState(null, "", location.href);
+    window.onpopstate = function () {
+        history.pushState(null, "", location.href);
+    };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

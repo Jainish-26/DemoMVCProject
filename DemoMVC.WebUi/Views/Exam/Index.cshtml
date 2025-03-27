@@ -140,21 +140,34 @@
         });
     }
     function openEmailPopup(examId) {
-        $.ajax({
-            url: '/Exam/GetEmailPartial',
-            type: 'GET',
-            data: { ExamId: examId },
-            success: function (response) {
-                $("#emailModalBody").html(response);
-                $("#emailModal").modal("show"); 
-            },
-            error: function () {
-                Swal.fire("Error", "Failed to load email input form.", "error");
+        var grid = $("#gridExam").data("kendoGrid");  
+        var dataSource = grid.dataSource.data();
+
+        var dataItem = dataSource.find(item => item.ExamId == examId);
+
+        if (dataItem) {
+            var examStatus = dataItem.ExamStatus; 
+
+            if (examStatus === "PUBLISHED") {
+                $.ajax({
+                    url: '/Exam/GetEmailPartial',
+                    type: 'GET',
+                    data: { ExamId: examId },
+                    success: function (response) {
+                        $("#emailModalBody").html(response);
+                        $("#emailModal").modal("show");
+                    },
+                    error: function () {
+                        Swal.fire("Error", "Failed to load email input form.", "error");
+                    }
+                });
+            } else {
+                Swal.fire("Warning!", "You can only add emails for published exams.", "warning");
             }
-        });
+        } else {
+            Swal.fire("Error!", "Exam not found in grid.", "error");
+        }
     }
-
-
     function generateExamLink(examId) {
         $.ajax({
             url: '/UserExam/GenerateExamLink',
@@ -163,7 +176,6 @@
             success: function (response) {
                 console.log(response);
                 if (response.success) {
-                    // Show link in a popup
                     Swal.fire({
                         title: 'Exam Link Generated',
                         html: `<a href="${response.link}" target="_blank">${response.link}</a>`,

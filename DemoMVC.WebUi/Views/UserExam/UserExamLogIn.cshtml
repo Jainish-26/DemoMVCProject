@@ -57,8 +57,7 @@
     <div class="form-container">
         <div class="card shadow-lg p-4">
             <h2 class="text-center mb-4 text-primary">Start Your Exam</h2>
-
-            @using (Html.BeginForm("LoadStartTest", "UserExam", FormMethod.Post, new { id = "examForm" }))
+            @using (Html.BeginForm("UserExamLogIn", "UserExam", FormMethod.Post, new { id = "examForm", enctype = "multipart/form-data", @action = Url.Action("UserExamLogIn", "UserExam", new { userToken = ViewBag.userToken }) }))
             {
                 @Html.AntiForgeryToken();
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -81,22 +80,54 @@
                 <div class="text-center">
                     <button type="button" class="btn btn-primary px-4 py-2 rounded-pill" onclick="validateAndSubmit()">Start Test</button>
                 </div>
+                <!-- Modal for Start Test -->
+                <div id="startTestModal" class="modal fade" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content shadow">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">Start Test</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4" id="modalBodyContent">
+                                <div class="container">
+                                    <h4 class="mb-3">Exam Details</h4>
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <th>Exam Name:</th>
+                                                <td>@Model.ExamName</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Total Marks:</th>
+                                                <td>@Model.TotalMarks</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Passing Marks:</th>
+                                                <td>@Model.PassingMarks</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Duration:</th>
+                                                <td>@Model.Duration minutes</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p class="alert alert-warning text-center">
+                                        Please ensure you are ready before starting the exam. Once you begin, the timer will start, and you cannot pause or restart the exam.
+                                    </p>
+                                    <div class="text-end">
+                                        <button class="btn btn-success" type="submit" id="startExamBtn">Ok</button>
+                                        <button class="btn btn-danger" data-bs-dismiss="modal" id="cancelBtn">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             }
         </div>
     </div>
 
-    <!-- Modal for Start Test -->
-    <div id="startTestModal" class="modal fade" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">Start Test</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4" id="modalBodyContent"></div>
-            </div>
-        </div>
-    </div>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -104,26 +135,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
     <script>
-        function validateAndSubmit() {
-            var form = $("#examForm");
-            if (form.valid()) { 
-                var requestData = form.serialize();
+    $(document).ready(function () {
+        var examStatus = "@Model.UserExamStatus";
 
-                $.ajax({
-                    url: '@Url.Action("LoadStartTest", "UserExam")',
-                    type: 'POST',
-                    headers: { "UserToken": '@Html.Raw(Json.Encode(ViewBag.UserToken))' },
-                    data: requestData,
-                    success: function (data) {
-                        $("#modalBodyContent").html(data);
-                        $("#startTestModal").modal("show");
-                    },
-                    error: function () {
-                        alert("Error loading exam details.");
-                    }
-                });
-            }
+        if (examStatus.trim() === "ONGOING") {
+            $("#startTestModal").modal("show");
+
+            $("#examForm input").prop("readonly", true);
+            $("#startExamBtn").text("Continue Test");
+            $("#cancelBtn").hide(); 
+            $("#UserName").rules("remove", "remote");
         }
+    });
+
+    function validateAndSubmit() {
+        var form = $("#examForm");
+        if (form.valid()) {
+            $("#startTestModal").modal("show");
+        }
+    }
     </script>
+
 </body>
 </html>

@@ -15,10 +15,12 @@ namespace DemoMVC.WebUi.Controllers
     public class UserAnswerController : BaseController
     {
         private readonly UserAnswerService _userAnswerService;
+        private readonly UserExamService _userExamService;
 
         public UserAnswerController()
         {
             _userAnswerService = new UserAnswerService();
+            _userExamService = new UserExamService();
         }
         public ActionResult Index()
         {
@@ -26,94 +28,37 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public JsonResult StoreUserAnswer(UserAnswerModel userAnswerModel)
+        public JsonResult SaveUserAnswer(UserAnswers answerData)
         {
             try
             {
-                if (userAnswerModel == null)
-                {
-                    return Json(new { success = false, message = "Invalid data received." });
-                }
+                _userAnswerService.SaveOrUpdateUserAnswer(answerData);
 
-                var existingAnswers = _userAnswerService.GetAnswers(userAnswerModel.UserExamId, userAnswerModel.QuestionId)
-                                                        .Select(a => a.AnswerText)
-                                                        .ToList();
-
-                var newAnswers = userAnswerModel.Answer.ToList(); 
-
-                var answersToDelete = new List<string>();
-                foreach (var answer in existingAnswers)
-                {
-                    if (!newAnswers.Contains(answer))
-                    {
-                        answersToDelete.Add(answer);
-                    }
-                }
-
-                // Find answers to insert (present in new but not in existing)
-                var answersToInsert = new List<string>();
-                foreach (var answer in newAnswers)
-                {
-                    if (!existingAnswers.Contains(answer))
-                    {
-                        answersToInsert.Add(answer);
-                    }
-                }
-
-                foreach (var answer in answersToDelete)
-                {
-                    bool ans = _userAnswerService.DeleteUserAnswers(userAnswerModel.UserExamId, userAnswerModel.QuestionId, answer);
-                    if (ans)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        return Json(new { success = false, message = "Answer Not Deleted"}, JsonRequestBehavior.AllowGet);
-                    }
-                }
-
-                // Insert new answers that are different from existing ones
-                foreach (var answer in answersToInsert)
-                {
-                    var newAnswer = new UserAnswers
-                    {
-                        UserExamId = userAnswerModel.UserExamId,
-                        QuestionId = userAnswerModel.QuestionId,
-                        AnswerText = answer
-                    };
-                    _userAnswerService.CreateUserAnswer(newAnswer);
-                }
-
-                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true } , JsonRequestBehavior.AllowGet);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false , message =e.Message} , JsonRequestBehavior.AllowGet);
             }
-
-        }
+        }   
 
         [HttpGet]
-        public JsonResult GetUserAnswer(int userExamId, int questionId)
+        public JsonResult GetAllAnswers(int userExamId)
         {
             try
             {
-                var answers = _userAnswerService.GetAnswers(userExamId, questionId).Select(x => x.AnswerText).ToList();
-               
-                if (answers == null)
-                {
-                    return Json(new { success = true, answer = "", message = "No answer found." }, JsonRequestBehavior.AllowGet);
-                }
+                var answers = _userAnswerService.GetAllAnswerByUser(userExamId);
 
-                return Json(new { success = true, answer = answers, message = "Answer retrieved." }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, data = answers }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
-            
-            
         }
+
+
+
+
     }
 }

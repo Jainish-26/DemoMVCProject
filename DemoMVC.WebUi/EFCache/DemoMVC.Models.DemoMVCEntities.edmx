@@ -226,6 +226,7 @@
           <Property Name="QuestionId" Type="Int32" Nullable="false" />
           <Property Name="AnswerText" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="ObtainedMarks" Type="Int32" Nullable="false" />
+          <Property Name="IsVisited" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="Question" Relationship="Self.UserAnswers_Question" FromRole="UserAnswers_Question_Source" ToRole="UserAnswers_Question_Target" />
           <NavigationProperty Name="UserExam" Relationship="Self.UserAnswers_UserExam" FromRole="UserAnswers_UserExam_Source" ToRole="UserAnswers_UserExam_Target" />
         </EntityType>
@@ -728,6 +729,7 @@
                 <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
                 <ScalarProperty Name="AnswerText" ColumnName="AnswerText" />
                 <ScalarProperty Name="ObtainedMarks" ColumnName="ObtainedMarks" />
+                <ScalarProperty Name="IsVisited" ColumnName="IsVisited" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1022,6 +1024,7 @@
           <Property Name="QuestionId" Type="int" customannotation:Index="{ Name: IX_QuestionId, Order: 0 }" Nullable="false" />
           <Property Name="AnswerText" Type="nvarchar(max)" Nullable="true" />
           <Property Name="ObtainedMarks" Type="int" Nullable="false" />
+          <Property Name="IsVisited" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="UserExams">
           <Key>

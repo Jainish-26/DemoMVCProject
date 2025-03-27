@@ -7,52 +7,49 @@ namespace DemoMVC.WebUi.Helper
 {
     static public class AESCrypto
     {
-        private static readonly string key = "JainishPatel2603";
+        private static readonly string Key = "jhja2537AhjsDa84"; // 16 chars for AES-128
+        private static readonly string IV = "ghdts5FkG6S3dghG"; // 16 chars for AES
 
-        public static string Encrypt(string plainText)
+        public static string Encrypt(int userId, int testId)
         {
-            byte[] iv = new byte[16];
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            string plainText = $"{userId}:{testId}"; // Store both UserId and TestId
 
-            using (Aes aes = Aes.Create())
+            using (Aes aesAlg = Aes.Create())
             {
-                aes.Key = keyBytes;
-                aes.IV = iv;
+                aesAlg.KeySize = 128; // AES-128 (valid for 16-char key)
+                aesAlg.Key = Encoding.UTF8.GetBytes(Key);
+                aesAlg.IV = Encoding.UTF8.GetBytes(IV);
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = PaddingMode.PKCS7;
 
                 using (MemoryStream ms = new MemoryStream())
+                using (CryptoStream cs = new CryptoStream(ms, aesAlg.CreateEncryptor(), CryptoStreamMode.Write))
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter sw = new StreamWriter(cs))
-                        {
-                            sw.Write(plainText);
-                        }
-                    }
+                    byte[] inputBytes = Encoding.UTF8.GetBytes(plainText);
+                    cs.Write(inputBytes, 0, inputBytes.Length);
+                    cs.FlushFinalBlock();
                     return Convert.ToBase64String(ms.ToArray());
                 }
             }
         }
 
-        public static string Decrypt(string cipherText)
+        public static (int userId, int examId) Decrypt(string encryptedToken)
         {
-            byte[] iv = new byte[16];
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-            byte[] buffer = Convert.FromBase64String(cipherText);
-
-            using (Aes aes = Aes.Create())
+            using (Aes aesAlg = Aes.Create())
             {
-                aes.Key = keyBytes;
-                aes.IV = iv;
+                aesAlg.KeySize = 128; // AES-128 (valid for 16-char key)
+                aesAlg.Key = Encoding.UTF8.GetBytes(Key);
+                aesAlg.IV = Encoding.UTF8.GetBytes(IV);
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = PaddingMode.PKCS7;
 
-                using (MemoryStream ms = new MemoryStream(buffer))
+                using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(encryptedToken)))
+                using (CryptoStream cs = new CryptoStream(ms, aesAlg.CreateDecryptor(), CryptoStreamMode.Read))
+                using (StreamReader sr = new StreamReader(cs))
                 {
-                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
-                    {
-                        using (StreamReader sr = new StreamReader(cs))
-                        {
-                            return sr.ReadToEnd();
-                        }
-                    }
+                    string decryptedText = sr.ReadToEnd();
+                    var parts = decryptedText.Split(':');
+                    return (int.Parse(parts[0]), int.Parse(parts[1]));
                 }
             }
         }

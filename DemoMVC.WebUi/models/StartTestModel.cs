@@ -12,6 +12,7 @@ namespace DemoMVC.WebUi.Models
         [Required]
         public string Name { get; set; }
         public string Email { get; set; }
+        public string UserExamStatus { get; set; }
         public string ExamName { get; set; }
         public string UserToken { get; set; }
         public int TotalMarks { get; set; }

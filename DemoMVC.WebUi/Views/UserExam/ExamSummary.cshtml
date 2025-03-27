@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "Exam Summary";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Submitted</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd, #90caf9);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card-custom {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #28a745;
+            animation: bounce 1s infinite;
+        }
+
+        h2 {
+            font-size: 26px;
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .text-muted {
+            font-size: 16px;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .btn-home {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+            .btn-home:hover {
+                background-color: #0056b3;
+            }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-custom">
+        <i class="fas fa-check-circle success-icon"></i>
+        <h2>Exam Submitted Successfully!</h2>
+        <p class="text-muted">Thank you for completing the exam. Your responses have been recorded.</p>
+        <p class="text-muted">The results will be declared soon. Stay tuned!</p>
+    </div>
+
+</body>
+</html>
+<script>
+    history.replaceState(null, "", location.href);
+    window.addEventListener("popstate", function (event) {
+        history.replaceState(null, "", location.href);
+    });
+</script>

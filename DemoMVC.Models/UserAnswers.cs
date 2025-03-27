@@ -21,5 +21,7 @@ namespace DemoMVC.Models
 
         [ForeignKey("QuestionId")]
         public virtual Questions Question { get; set; }
+
+        public bool IsVisited { get; set; }
     }
 }
