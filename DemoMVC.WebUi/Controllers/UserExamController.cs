@@ -43,6 +43,7 @@ namespace DemoMVC.WebUi.Controllers
         [AllowAnonymous]
         public ActionResult UserExamLogIn(string userToken)
         {
+            _userExamService.UpdateExamStatusOnEndTime();
             var userExamDetails = _userExamService.GetByUserToken(userToken);
             var userDetails = _userProfileService.GetUserById(userExamDetails.UserId);
             var examDetails = _examService.GetById(userExamDetails.ExamId);
@@ -114,6 +115,7 @@ namespace DemoMVC.WebUi.Controllers
                 int userId = decryptedToken.userId;
                 int examId = decryptedToken.examId;
                 var userDetails = _userProfileService.GetUserById(userId);
+                var examDetails = _examService.GetById(userExamDetails.ExamId);
 
                 if (userDetails == null)
                 {
@@ -145,6 +147,7 @@ namespace DemoMVC.WebUi.Controllers
 
                     // Update exam details
                     userExamDetails.StartTime = DateTime.UtcNow;
+                    userExamDetails.EndTime = DateTime.UtcNow.AddMinutes(examDetails.DurationMin);
                     userExamDetails.ExamStatus = Constants.UserExamStatus.ONGOING;
 
                     int userExamId = _userExamService.UpdateUserExam(userExamDetails);
@@ -433,5 +436,40 @@ namespace DemoMVC.WebUi.Controllers
         {
             return View();
         }
+
+        // Get Remaining Time From Database
+        [HttpGet]
+        public JsonResult GetRemainingTime(int userExamId)
+        {
+            var userExamDetails = _userExamService.GetByUserExamId(userExamId);
+
+            if (userExamDetails == null)
+            {
+                return Json(new { minutes = 0, seconds = 0 }, JsonRequestBehavior.AllowGet);
+            }
+
+            // Get the exam end time from the database
+            DateTime? endTime = userExamDetails.EndTime;
+
+            if (endTime == null)
+            {
+                return Json(new { minutes = 0, seconds = 0 }, JsonRequestBehavior.AllowGet);
+            }
+
+            // Calculate remaining time
+            TimeSpan remainingTime = endTime.Value - DateTime.UtcNow;
+
+            if (remainingTime.TotalSeconds <= 0)
+            {
+                return Json(new { minutes = 0, seconds = 0 }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                minutes = remainingTime.Minutes,
+                seconds = remainingTime.Seconds
+            }, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

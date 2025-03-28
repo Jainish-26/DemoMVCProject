@@ -33,13 +33,10 @@ namespace DemoMVC.Service
         {
             return _commonlookupProvider.UpdateCommonLookup(commonlookup);
         }
-
-
         public CommonLookup GetCommonLookupById(int id)
         {
             return _commonlookupProvider.GetCommonLookupById(id);
         }
-
         public CommonLookup GetCommonLookupByCode(string code)
         {
             return _commonlookupProvider.GetCommonLookupByCode(code);
@@ -48,9 +45,5 @@ namespace DemoMVC.Service
         {
             return _commonlookupProvider.CheckDuplicateLookupCode(Code);
         }
-
-
     }
-
-
 }

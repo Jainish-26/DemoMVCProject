@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Configuration;
+using System.Runtime.Remoting.Contexts;
 
 namespace DemoMVC.Data
 {
@@ -110,8 +111,6 @@ namespace DemoMVC.Data
                     }
                     else
                     {
-                        
-
                         _db.UserAnswers.Add(model);
                     }
 
@@ -130,6 +129,5 @@ namespace DemoMVC.Data
                 }
             }
         }
-
     }
 }

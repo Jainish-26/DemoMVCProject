@@ -398,9 +398,14 @@ let totalQuestions = @totalQuestions;
 let currentQuestionIndex = 0;
 let answersData = {};
 let visitedCount = 0;
+    let remainingMinutes = 0;
+    let remainingSeconds = 0;
+    let timerInterval;
 
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".question-page")[0].style.display = "block";
+
+    getRemainingTimeFromServer();
 
     loadAnswersFromDatabase();
 
@@ -548,8 +553,6 @@ function updateQuestionPalette() {
                 
                 answersData[questionId] = { AnswerText: answer, IsVisited: true };
                 checkAllQuestionsVisited();
-
-                // ✅ If a callback is provided (e.g., submitExam), call it instead of changing the question
                 if (typeof callback === "function") {
                     callback();
                 } else {
@@ -624,11 +627,7 @@ function changeQuestion(index) {
         });
     }
     function saveCurrentAnswerAndSubmit() {
-        console.log("💾 Saving last answer before submitting exam...");
-
-        // ✅ Save the current question answer and call submitExam after success
         saveAndChangeQuestion(currentQuestionIndex, function () {
-            console.log("✅ Last answer saved. Now submitting exam...");
             submitExam();
         });
     }
@@ -646,7 +645,67 @@ function changeQuestion(index) {
             }
         });
     }
+    function getRemainingTimeFromServer() {
+        $.ajax({
+            url: '/UserExam/GetRemainingTime',
+            type: 'GET',
+            data: { userExamId: userExamId },
+            success: function (response) {
+                startTimer(response.minutes, response.seconds);
+            },
+            error: function (xhr) {
+                console.error("❌ Error fetching remaining time:", xhr.responseText);
+            }
+        });
+    }
 
+    // Start Timer Countdown
+    function startTimer(minutes, seconds) {
+        remainingMinutes = minutes;
+        remainingSeconds = seconds;
+        updateTimerDisplay();
+
+        // Start countdown
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    // Update Timer Every Second
+    function updateTimer() {
+        if (remainingSeconds === 0) {
+            if (remainingMinutes === 0) {
+                showTimeUpPopup();
+                clearInterval(timerInterval);
+                return;
+            }
+            remainingMinutes--;
+            remainingSeconds = 59;
+        } else {
+            remainingSeconds--;
+        }
+
+        updateTimerDisplay();
+    }
+
+    // Update Timer Display in UI
+    function updateTimerDisplay() {
+        $("#time").text(remainingMinutes + " min " + remainingSeconds + " sec");
+    }
+    function showTimeUpPopup() {
+        Swal.fire({
+            title: "⏳ Time is Up!",
+            html: `
+                <p>Your exam time is over.</p>
+                <p><strong>Only your attempted answers will be submitted.</strong></p>
+            `,
+            icon: "warning",
+            allowOutsideClick: false,  // Prevent closing on outside click
+            allowEscapeKey: false,     // Prevent closing with ESC
+            showConfirmButton: true,   // Show only OK button
+            confirmButtonText: "OK"
+        }).then(() => {
+            saveCurrentAnswerAndSubmit(); // Call function to submit attempted answers
+        });
+    }
 </script>
 <script>
     history.pushState(null, "", location.href);

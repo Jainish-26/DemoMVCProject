@@ -1,4 +1,5 @@
-﻿using DemoMVC.Models;
+﻿using DemoMVC.Helper;
+using DemoMVC.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,5 +76,25 @@ namespace DemoMVC.Data
         {
             return (from i in _db.UserExams where i.UserToken == userToken select i).FirstOrDefault();
         }
+        public void UpdateExamStatusOnEndTime()
+        {
+            try
+            {
+                var expiredDate = _db.UserExams.Where(e => e.EndTime <= DateTime.Now && e.ExamStatus != Constants.UserExamStatus.COMPLETED)
+                                    .ToList();
+                foreach (var exam in expiredDate)
+                {
+                    exam.ExamStatus = Constants.UserExamStatus.COMPLETED;
+                    exam.ExpiryDate = DateTime.UtcNow;
+                    exam.ResultStatus = Constants.ResultStatus.PENDING;
+                }
+                _db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
     }
 }

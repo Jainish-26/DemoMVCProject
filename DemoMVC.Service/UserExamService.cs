@@ -40,5 +40,9 @@ namespace DemoMVC.Service
         {
             return _userExamProvider.GetByUserToken(userToken);
         }
+        public void UpdateExamStatusOnEndTime()
+        {
+            _userExamProvider.UpdateExamStatusOnEndTime();
+        }
     }
 }
