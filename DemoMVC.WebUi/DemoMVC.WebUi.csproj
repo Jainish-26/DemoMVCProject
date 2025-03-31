@@ -205,7 +205,7 @@
     <Compile Include="Models\StartTestModel.cs" />
     <Compile Include="Models\SubjectModel.cs" />
     <Compile Include="Models\UserAnswerModel.cs" />
-    <Compile Include="Models\UserExamChekingModel.cs" />
+    <Compile Include="Models\UserExamCheckingModel.cs" />
     <Compile Include="Models\UserExamModel.cs" />
     <Compile Include="Models\UserProfileModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

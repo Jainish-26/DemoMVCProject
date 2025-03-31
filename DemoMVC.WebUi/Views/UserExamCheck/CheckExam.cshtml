@@ -1,5 +1,9 @@
-﻿@model DemoMVC.WebUi.Models.UserExamChekingModel
+﻿@model DemoMVC.WebUi.Models.UserExamCheckingModel
 @using Newtonsoft.Json
+@{ 
+    var userExamId = Model.UserExamId;
+}
+
 
 
 <style>
@@ -394,7 +398,7 @@
             }
             <div class="navigation-buttons">
                 <button class="btn-custom btn-prev" disabled>Previous</button>
-                <button class="btn-custom btn-save" id="btn-save" onclick="showSavePopup()">Save</button>
+                <button class="btn-custom btn-save" id="submit-exam-btn" onclick="checkEvaluationAndSubmit()">Save</button>
                 <button class="btn-custom btn-next">Next</button>
             </div>
         </div>
@@ -411,34 +415,40 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-    setTimeout(updatePaletteStatus, 100); // Delay to ensure elements are loaded
+$(document).ready(function () {
+    updatePaletteStatus();
 });
 
 // Store User Answer IDs and Marks in JavaScript Variables
-let userAnswers = @Html.Raw(JsonConvert.SerializeObject(Model.UserAnswers)) || [];
+let userAnswers = @Html.Raw(JsonConvert.SerializeObject(Model.UserAnswers));
 let questionMarks = @Html.Raw(JsonConvert.SerializeObject(Model.Questions.Select(q => q.Marks)));
 let questions = @Html.Raw(JsonConvert.SerializeObject(Model.Questions));
-let currentIndex = 0; // Keep track of the currently displayed question
+    let currentIndex = 0;
 
-function updatePaletteStatus() {
-    $(".palette-btn").each(function (index) {
-        let userAnswer = userAnswers[index] || {}; // Ensure default object
-        let isEvaluate = userAnswer.IsEvaluate || false;
-        let obtainedMarks = userAnswer.ObtainedMarks || 0;
-        let hasAnswer = userAnswer.Answer !== undefined && userAnswer.Answer !== null;
+    function updatePaletteStatus() {
+        $(".palette-btn").each(function (index) {
+            let userAnswer = userAnswers[index];
+            let isEvaluate = userAnswer?.IsEvaluate || false;
+            let obtainedMarks = userAnswer?.ObtainedMarks || 0;
 
-        $(this).removeClass("not-visited for-review evaluated");
+            // Remove all previous classes
+            $(this).removeClass("not-visited for-review evaluated current");
 
-        if (!hasAnswer) {
-            $(this).addClass("not-visited"); // Gray - Not Attempted
-        } else if (isEvaluate) {
-            $(this).addClass("evaluated"); // Green - Evaluated
-        } else if (obtainedMarks === 0 && !isEvaluate) {
-            $(this).addClass("for-review"); // Orange - For Review
-        }
-    });
-}
+            // ✅ Highlight Current Question
+            if (index === currentIndex) {
+                $(this).addClass("current");  // 🔵 Current question
+            }
+            // ✅ Set Colors Based on Evaluation
+            else if (!userAnswer) {
+                $(this).addClass("not-visited"); // Gray - Not Attempted
+            } else if (isEvaluate) {
+                $(this).addClass("evaluated"); // Green - Evaluated
+            } else if (obtainedMarks === 0 && !isEvaluate) {
+                $(this).addClass("for-review"); // Orange - For Review
+            }
+        });
+    }
+
 
 // Function to save marks for Text Answer or SQL Query
 function saveManualMarks(index, callback) {
@@ -459,8 +469,8 @@ function saveManualMarks(index, callback) {
             success: function (response) {
                 if (response.success) {
                     userAnswers[index].ObtainedMarks = obtainedMarks;
-                    userAnswers[index].IsEvaluated = true; // Mark as evaluated
-                    updatePaletteStatus(); // Ensure the color updates after saving
+                    userAnswers[index].IsEvaluate = true; // Mark as evaluated
+                    updatePaletteStatus();
                 } else {
                     alert("Error: " + response.message);
                 }
@@ -477,52 +487,98 @@ function saveManualMarks(index, callback) {
 }
 
 // Function to navigate between questions
-function navigateQuestion(direction) {
-    let newIndex = currentIndex + direction;
+    // Function to navigate between questions
+    function navigateQuestion(direction) {
+        let newIndex = currentIndex + direction;
 
-    if (newIndex >= 0 && newIndex < questions.length) {
+        if (newIndex >= 0 && newIndex < questions.length) {
+            saveManualMarks(currentIndex, function () {
+                $(".question-page").hide();
+                $("#question-" + newIndex).show();
+                currentIndex = newIndex;
+
+                // Enable/Disable buttons accordingly
+                $(".btn-prev").prop("disabled", currentIndex === 0);
+                $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
+
+                updatePaletteStatus(); // ✅ Update the palette color
+            });
+        }
+    }
+
+    // Handle Previous and Next button clicks
+    $(".btn-prev").on("click", function () {
+        navigateQuestion(-1);
+    });
+
+    $(".btn-next").on("click", function () {
+        navigateQuestion(1);
+    });
+
+    // Handle question navigation using the palette
+    $(".palette-btn").on("click", function () {
+        let targetIndex = parseInt($(this).data("target").split("-")[1]);
+
         saveManualMarks(currentIndex, function () {
             $(".question-page").hide();
-            $("#question-" + newIndex).show();
-            currentIndex = newIndex;
-
-            // Update palette colors
-            updatePaletteStatus();
+            $("#question-" + targetIndex).show();
+            currentIndex = targetIndex;
 
             // Enable/Disable buttons accordingly
             $(".btn-prev").prop("disabled", currentIndex === 0);
             $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
+
+            updatePaletteStatus(); // ✅ Update the palette color
+        });
+    });
+
+    function checkEvaluationAndSubmit() {
+        let totalQuestions = userAnswers.length; // Total questions
+        let evaluatedCount = userAnswers.filter(ans => ans.IsEvaluate).length; // Count evaluated questions
+
+        if (evaluatedCount === totalQuestions) {
+            submitExam(); // ✅ All questions evaluated → Submit exam
+        } else {
+            let notEvaluatedIndexes = [];
+
+            userAnswers.forEach((ans, index) => {
+                if (!ans.IsEvaluate) {
+                    notEvaluatedIndexes.push(index + 1); // Store 1-based index
+                }
+            });
+
+            alert("❌ The following questions are not evaluated: " + notEvaluatedIndexes.join(", "));
+        }
+    }
+
+    // ✅ Function to Submit Exam via AJAX
+    function submitExam() {
+        // Calculate total obtained marks and convert to integer
+        let totalObtainedMarks = Math.round(userAnswers.reduce((sum, ans) => sum + (parseFloat(ans.ObtainedMarks) || 0), 0));
+
+        $.ajax({
+            url: '/UserExamCheck/SaveUserResult',
+            type: 'POST',
+            data: {
+                userExamId: @userExamId,
+                totalObtainedMarks: totalObtainedMarks // ✅ Send integer value
+            },
+            success: function (response) {
+                if (response.success) {
+                    window.location.href = "/UserExam/Index"
+                } else {
+                    alert("❌ Error submitting exam: " + response.message);
+                }
+            },
+            error: function () {
+                alert("❌ Error submitting the exam.");
+            }
         });
     }
-}
 
-// Handle Previous and Next button clicks
-$(document).on("click", ".btn-prev", function () {
-    navigateQuestion(-1);
+    $("#submit-exam-btn").click(function () {
+    checkEvaluationAndSubmit();
 });
-
-$(document).on("click", ".btn-next", function () {
-    navigateQuestion(1);
-});
-
-// Handle question navigation using the palette
-$(document).on("click", ".palette-btn", function () {
-    let targetIndex = parseInt($(this).data("target").split("-")[1]);
-
-    saveManualMarks(currentIndex, function () {
-        $(".question-page").hide();
-        $("#question-" + targetIndex).show();
-        currentIndex = targetIndex;
-
-        // Update palette colors
-        updatePaletteStatus();
-
-        // Enable/Disable buttons accordingly
-        $(".btn-prev").prop("disabled", currentIndex === 0);
-        $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
-    });
-});
-
 </script>
 
 

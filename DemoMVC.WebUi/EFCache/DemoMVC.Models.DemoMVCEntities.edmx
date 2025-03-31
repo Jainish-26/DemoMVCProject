@@ -241,7 +241,7 @@
           <Property Name="UserToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="ExpiryDate" Type="DateTime" Nullable="false" />
           <Property Name="ExamStatus" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Result" Type="Int32" />
+          <Property Name="Result" Type="Double" />
           <Property Name="ResultStatus" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="StartTime" Type="DateTime" />
           <Property Name="EndTime" Type="DateTime" />
@@ -1039,7 +1039,7 @@
           <Property Name="UserToken" Type="nvarchar(max)" Nullable="true" />
           <Property Name="ExpiryDate" Type="datetime" Nullable="false" />
           <Property Name="ExamStatus" Type="nvarchar(max)" Nullable="true" />
-          <Property Name="Result" Type="int" Nullable="true" />
+          <Property Name="Result" Type="float" Nullable="true" />
           <Property Name="ResultStatus" Type="nvarchar(max)" Nullable="true" />
           <Property Name="StartTime" Type="datetime" Nullable="true" />
           <Property Name="EndTime" Type="datetime" Nullable="true" />

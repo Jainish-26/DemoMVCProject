@@ -19,7 +19,7 @@ namespace DemoMVC.Models
 
         public string ExamStatus { get; set; }
 
-        public int? Result { get; set; }
+        public double? Result { get; set; }
 
         public string ResultStatus { get; set; }
 
@@ -58,7 +58,7 @@ namespace DemoMVC.Models
         public string ExamStatus { get; set; }
         public string ExamBadgeCode { get; set; }
 
-        public int? Result { get; set; }
+        public double? Result { get; set; }
 
         public string ResultStatus { get; set; }
         public string ResultBadgeCode { get; set; }

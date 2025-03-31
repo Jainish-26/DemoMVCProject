@@ -1,4 +1,5 @@
-﻿using DemoMVC.Service;
+﻿using DemoMVC.Helper;
+using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,7 @@ namespace DemoMVC.WebUi.Controllers
                         IsCorrect = ans.IsCorrect,
                         AnswerText = ans.AnswerText
                     }).ToList()
-            }).ToList();
+            }).OrderBy(q=>q.QuestionId).ToList();
 
             var userAnswers = _userAnswerService.GetAllAnswerByUser(userExamId).Select(a => new UserAnswerModel
             {
@@ -68,7 +69,7 @@ namespace DemoMVC.WebUi.Controllers
                 UserExamId = a.UserExamId,
                 ObtainedMarks = a.ObtainedMarks,
                 IsEvaluate = a.IsEvaluate
-            }).ToList();
+            }).OrderBy(q => q.QuestionId).ToList();
 
             _userExamService.UpdateResultStatus(userExamId);
             // ✅ Automatic Checking for MCQs
@@ -81,13 +82,13 @@ namespace DemoMVC.WebUi.Controllers
                 }
             }
 
-            var model = new UserExamChekingModel
+            var model = new UserExamCheckingModel
             {
+                UserExamId = userExamId,
                 Exam = examModel,
                 Questions = questions,
                 UserAnswers = userAnswers
             };
-
             return View(model);
         }
 
@@ -105,17 +106,11 @@ namespace DemoMVC.WebUi.Controllers
             else if (question.QuestionType == "Multiple Choice MCQ")
             {
                 var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.AnswerText).ToList();
-                var userAnswers = userAnswer.Answer.Split(',').Select(a => a.Trim()).ToList();
+                var userAnswers = userAnswer.Answer?.Split(',').Select(a => a.Trim()).ToList() ?? new List<string>();
 
-                if (!userAnswers.All(ua => question.Answers.Any(q => q.AnswerText == ua)))
-                {
-                    return 0;
-                }
+                bool isCorrect = userAnswers.Count == correctAnswers.Count && userAnswers.All(correctAnswers.Contains);
 
-                int correctCount = userAnswers.Count(answer => correctAnswers.Contains(answer));
-                int incorrectCount = userAnswers.Count(answer => !correctAnswers.Contains(answer));
-
-                if (correctCount == correctAnswers.Count && incorrectCount == 0)
+                if (isCorrect)
                 {
                     _userAnswerService.UpdateManualMarks(userAnswer.UserAnswerId, question.Marks);
                     return question.Marks;
@@ -155,5 +150,40 @@ namespace DemoMVC.WebUi.Controllers
 
             return Json(new { success = true});
         }
+
+        public JsonResult SaveUserResult(int userExamId, int totalObtainedMarks)
+        {
+            var userExamDetails = _userExamService.GetByUserExamId(userExamId);
+
+            if (userExamDetails == null)
+            {
+                return Json(new { success = false, message = "Failed to store result." });
+            }
+
+            var examDetails = _examService.GetById(userExamDetails.ExamId);
+            if (examDetails == null)
+            {
+                return Json(new { success = false, message = "Exam details not found." });
+            }
+
+            // Fix: Correct percentage calculation
+            double percentage = (totalObtainedMarks / (double)examDetails.TotalMarks) * 100;
+
+            if (totalObtainedMarks >= examDetails.PassingMarks)
+            {
+                userExamDetails.ResultStatus = Constants.ResultStatus.PASS;
+            }
+            else
+            {
+                userExamDetails.ResultStatus = Constants.ResultStatus.FAIL;
+            }
+
+            userExamDetails.Result = percentage;
+
+            _userExamService.UpdateUserExam(userExamDetails);
+
+            return Json(new { success = true, message = "Exam result saved successfully!", resultStatus = userExamDetails.ResultStatus, percentage });
+        }
+
     }
 }
