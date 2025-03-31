@@ -622,13 +622,10 @@ function changeQuestion(index) {
             cancelButtonText: "Cancel",
         }).then((result) => {
             if (result.isConfirmed) {
-                saveCurrentAnswerAndSubmit();
+                saveAndChangeQuestion(currentQuestionIndex, function () {
+                    submitExam();
+                });
             }
-        });
-    }
-    function saveCurrentAnswerAndSubmit() {
-        saveAndChangeQuestion(currentQuestionIndex, function () {
-            submitExam();
         });
     }
     function submitExam() {

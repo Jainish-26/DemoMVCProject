@@ -1,0 +1,530 @@
+﻿@model DemoMVC.WebUi.Models.UserExamChekingModel
+@using Newtonsoft.Json
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+    }
+
+    .exam-header {
+        position: sticky;
+        margin-top: 10px;
+        background: #fff;
+        min-height: 70px;
+        border-bottom: 3px solid #ddd;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .exam-container {
+        display: flex;
+        width: 100%;
+        gap: 15px;
+    }
+
+    /* Left Section: Question Container (80%) */
+    .question-section {
+        width: 80%;
+    }
+
+    /* Right Section: Question Palette (20%) */
+    .question-palette {
+        width: 20%;
+        padding: 15px;
+        margin-top: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+        min-height: 530px;
+    }
+
+        /* Palette Heading */
+        .question-palette h4 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+    /* Palette Buttons */
+    /* Palette Buttons */
+    #palette-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .palette-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        font-weight: bold;
+        margin: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Status Colors */
+    .not-visited {
+        background-color: gray; /* Question not yet visited */
+        color: white;
+    }
+
+    .evaluated {
+        background-color: green; /* Question evaluated */
+        color: white;
+    }
+
+    .for-review {
+        background-color: orange; /* Marks = 0 and not evaluated */
+        color: white;
+    }
+
+    .saved {
+        background-color: blue; /* All questions evaluated */
+        color: white;
+    }
+
+    .current {
+        background-color: darkblue;
+        color: white;
+    }
+
+
+    .color-legend {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Align to the left */
+        font-size: 14px;
+        margin-left: 10px; /* Optional: Adjust for better spacing */
+    }
+
+    .legend-box {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-right: 10px;
+        border-radius: 3px;
+    }
+
+    .yellow {
+        background-color: yellow;
+    }
+
+    .blue {
+        background-color: blue;
+    }
+
+    .green {
+        background-color: green;
+    }
+
+    .gray {
+        background-color: gray;
+    }
+
+
+    /* Existing Styles - Keeping Your Question Container UI */
+    .question-container {
+        margin-top: 20px;
+        padding: 25px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        min-height: 530px;
+    }
+
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 20px;
+        font-weight: bold;
+        padding-bottom: 10px;
+    }
+
+    .question-marks {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    h3 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .text-answer-box textarea {
+        width: 100%;
+        margin: 10px;
+        min-height: 120px;
+        resize: vertical;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .question-page {
+        display: none;
+    }
+
+        .question-page.active {
+            display: block;
+        }
+
+    .answer-item {
+        padding: 10px;
+        font-size: 18px;
+    }
+
+    img {
+        max-width: 400px;
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .true-btn, .false-btn {
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    /* True Button (Green) */
+    .true-btn {
+        background-color: #28a745;
+        margin: 10px;
+        color: white;
+    }
+
+        .true-btn:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+    /* False Button (Red) */
+    .false-btn {
+        background-color: #dc3545;
+        margin: 10px;
+        color: white;
+    }
+
+        .false-btn:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+    /*Save Button*/
+    .navigation-buttons {
+        position: absolute;
+        bottom: 15px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 25px;
+        background: #fff;
+    }
+
+    .btn-custom {
+        padding: 10px 20px;
+        font-size: 18px;
+        font-weight: bold;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-prev {
+        background-color: #6c757d;
+    }
+
+    .btn-next {
+        background-color: #007bff;
+    }
+
+    .btn-save {
+        background-color: seagreen;
+    }
+
+    .btn-prev:hover {
+        background-color: #5a6268;
+    }
+
+    .btn-next:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-save:hover {
+        background-color: forestgreen;
+    }
+
+    .btn-prev:disabled, .btn-next:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+</style>
+<div class="exam-header">
+    <div><h2>@Model.Exam.ExamName</h2></div>
+    <div><p><strong>Exam Code:</strong> @Model.Exam.ExamCode</p></div>
+    <div><p><strong>Total Marks:</strong> @Model.Exam.TotalMarks</p></div>
+    <div><p><strong>Passing Marks:</strong> @Model.Exam.PassingMarks</p></div>
+</div>
+
+<div class="exam-container">
+
+
+    <div class="question-section">
+        <div class="question-container">
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                var question = Model.Questions[i];
+                var userAnswer = Model.UserAnswers.FirstOrDefault(a => a.QuestionId == question.QuestionId);
+                var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.AnswerText).ToList(); // ✅ Fetch correct answers
+
+                <div class="question-page" id="question-@i" style="display: @(i == 0 ? "block" : "none")">
+                    <div class="question-header">
+                        <h3>Q@(i + 1): @question.QuestionText</h3>
+                    </div>
+
+                    @if (question.QuestionType == "Single Choice MCQ")
+                    {
+                        bool isCorrect = userAnswer != null && correctAnswers.Contains(userAnswer.Answer);
+                        <div class="marks-display">
+                            <strong>Obtained Marks:</strong>
+                            <span style="font-weight: bold; color: blue;">@userAnswer.ObtainedMarks</span>
+                        </div>
+
+                        foreach (var answer in question.Answers)
+                        {
+                            bool isUserAnswer = userAnswer?.Answer == answer.AnswerText;
+                            bool isCorrectAnswer = correctAnswers.Contains(answer.AnswerText);
+
+                            <div class="answer-item">
+                                <input type="radio" disabled @(isUserAnswer ? "checked" : "")>
+                                <span>@answer.AnswerText</span>
+
+                                @if (isCorrectAnswer && isUserAnswer)
+                                {
+                                    <span style="color: green; font-weight: bold;">✅</span>
+                                }
+                                else if (isUserAnswer && !isCorrectAnswer)
+                                {
+                                    <span style="color: red; font-weight: bold;">❌</span>
+                                }
+                                else if (isCorrectAnswer)
+                                {
+                                    <span style="color: green; font-weight: bold;">✔</span>
+                                }
+                            </div>
+                        }
+
+
+                    }
+
+                    else if (question.QuestionType == "Multiple Choice MCQ")
+                    {
+                        var userAnswers = userAnswer?.Answer?.Split(',') ?? new string[] { };
+                        <div class="marks-display" style="margin-top: 10px;">
+                            <strong>Obtained Marks:</strong>
+                            <span style="font-weight: bold; color: blue;">@userAnswer.ObtainedMarks</span>
+                        </div>
+                        foreach (var answer in question.Answers)
+                        {
+                            bool isUserAnswer = userAnswers.Contains(answer.AnswerText);
+                            bool isCorrectAnswer = correctAnswers.Contains(answer.AnswerText);
+
+                            <div class="answer-item">
+                                <input type="checkbox" disabled @(isUserAnswer ? "checked" : "")>
+                                <span>@answer.AnswerText</span>
+
+                                @if (isCorrectAnswer && isUserAnswer)
+                                {
+                                    <span style="color: green; font-weight: bold;">✅</span>
+                                }
+                                else if (isUserAnswer && !isCorrectAnswer)
+                                {
+                                    <span style="color: red; font-weight: bold;">❌</span>
+                                }
+                                else if (isCorrectAnswer)
+                                {
+                                    <span style="color: green; font-weight: bold;">✔</span>
+                                }
+                            </div>
+                        }
+                    }
+                    else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
+                    {
+                        <div class="marks-field">
+                            <label><strong>Obtained Marks:</strong></label>
+                            <input type="number" class="marks-input" id="marks-@i"
+                                   value="@userAnswer.ObtainedMarks"
+                                   style="font-weight: bold; color: blue; width: 80px;"
+                                   min="0" max="@question.Marks">
+                        </div>
+                        <div class="text-answer-box" style="padding-left:20px; padding-top:20px">
+                            <label><strong>User Answer:</strong></label>
+                            <textarea class="form-control" readonly>@Model.UserAnswers[i].Answer</textarea>
+                        </div>
+                        <div class="text-answer-box" style="padding-left: 20px; padding-top: 20px">
+                            <label><strong>Correct Answer(s):</strong></label>
+                            <textarea class="form-control" readonly>@string.Join(", ", correctAnswers)</textarea> <!-- ✅ Fix applied -->
+                        </div>
+                    }
+                </div>
+            }
+            <div class="navigation-buttons">
+                <button class="btn-custom btn-prev" disabled>Previous</button>
+                <button class="btn-custom btn-save" id="btn-save" onclick="showSavePopup()">Save</button>
+                <button class="btn-custom btn-next">Next</button>
+            </div>
+        </div>
+    </div>
+    <div class="question-palette">
+        <h4>Question Palette</h4>
+        <div class="palette-buttons">
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                <button class="palette-btn" data-target="question-@i">@(i + 1)</button>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+    setTimeout(updatePaletteStatus, 100); // Delay to ensure elements are loaded
+});
+
+// Store User Answer IDs and Marks in JavaScript Variables
+let userAnswers = @Html.Raw(JsonConvert.SerializeObject(Model.UserAnswers)) || [];
+let questionMarks = @Html.Raw(JsonConvert.SerializeObject(Model.Questions.Select(q => q.Marks)));
+let questions = @Html.Raw(JsonConvert.SerializeObject(Model.Questions));
+let currentIndex = 0; // Keep track of the currently displayed question
+
+function updatePaletteStatus() {
+    $(".palette-btn").each(function (index) {
+        let userAnswer = userAnswers[index] || {}; // Ensure default object
+        let isEvaluate = userAnswer.IsEvaluate || false;
+        let obtainedMarks = userAnswer.ObtainedMarks || 0;
+        let hasAnswer = userAnswer.Answer !== undefined && userAnswer.Answer !== null;
+
+        $(this).removeClass("not-visited for-review evaluated");
+
+        if (!hasAnswer) {
+            $(this).addClass("not-visited"); // Gray - Not Attempted
+        } else if (isEvaluate) {
+            $(this).addClass("evaluated"); // Green - Evaluated
+        } else if (obtainedMarks === 0 && !isEvaluate) {
+            $(this).addClass("for-review"); // Orange - For Review
+        }
+    });
+}
+
+// Function to save marks for Text Answer or SQL Query
+function saveManualMarks(index, callback) {
+    let question = questions[index];
+    if (question.QuestionType === "Text Answer" || question.QuestionType === "SQL Query") {
+        let obtainedMarks = $("#marks-" + index).val();
+        let userAnswerId = userAnswers[index]?.UserAnswerId;
+
+        if (!userAnswerId) {
+            alert("Error: User Answer ID not found.");
+            return;
+        }
+
+        $.ajax({
+            url: '/UserExamCheck/SaveManualMarks',
+            type: 'POST',
+            data: { userAnswerId: userAnswerId, obtainedMarks: obtainedMarks },
+            success: function (response) {
+                if (response.success) {
+                    userAnswers[index].ObtainedMarks = obtainedMarks;
+                    userAnswers[index].IsEvaluated = true; // Mark as evaluated
+                    updatePaletteStatus(); // Ensure the color updates after saving
+                } else {
+                    alert("Error: " + response.message);
+                }
+                if (callback) callback(); // Proceed after saving
+            },
+            error: function () {
+                alert("Error saving marks.");
+                if (callback) callback(); // Proceed even if error occurs
+            }
+        });
+    } else {
+        if (callback) callback(); // No save required, proceed
+    }
+}
+
+// Function to navigate between questions
+function navigateQuestion(direction) {
+    let newIndex = currentIndex + direction;
+
+    if (newIndex >= 0 && newIndex < questions.length) {
+        saveManualMarks(currentIndex, function () {
+            $(".question-page").hide();
+            $("#question-" + newIndex).show();
+            currentIndex = newIndex;
+
+            // Update palette colors
+            updatePaletteStatus();
+
+            // Enable/Disable buttons accordingly
+            $(".btn-prev").prop("disabled", currentIndex === 0);
+            $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
+        });
+    }
+}
+
+// Handle Previous and Next button clicks
+$(document).on("click", ".btn-prev", function () {
+    navigateQuestion(-1);
+});
+
+$(document).on("click", ".btn-next", function () {
+    navigateQuestion(1);
+});
+
+// Handle question navigation using the palette
+$(document).on("click", ".palette-btn", function () {
+    let targetIndex = parseInt($(this).data("target").split("-")[1]);
+
+    saveManualMarks(currentIndex, function () {
+        $(".question-page").hide();
+        $("#question-" + targetIndex).show();
+        currentIndex = targetIndex;
+
+        // Update palette colors
+        updatePaletteStatus();
+
+        // Enable/Disable buttons accordingly
+        $(".btn-prev").prop("disabled", currentIndex === 0);
+        $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
+    });
+});
+
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+

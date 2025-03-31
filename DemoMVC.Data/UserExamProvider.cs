@@ -80,7 +80,7 @@ namespace DemoMVC.Data
         {
             try
             {
-                var expiredDate = _db.UserExams.Where(e => e.EndTime <= DateTime.Now && e.ExamStatus != Constants.UserExamStatus.COMPLETED)
+                var expiredDate = _db.UserExams.Where(e => e.EndTime <= DateTime.UtcNow && e.ExamStatus != Constants.UserExamStatus.COMPLETED)
                                     .ToList();
                 foreach (var exam in expiredDate)
                 {
@@ -96,5 +96,18 @@ namespace DemoMVC.Data
             }
         }
 
+        public void UpdateResultStatus(int userExamId)
+        {
+            try
+            {
+                var userExam = GetByUserExamId(userExamId);
+                userExam.ResultStatus = Constants.ResultStatus.INREVIEW;
+                _db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }

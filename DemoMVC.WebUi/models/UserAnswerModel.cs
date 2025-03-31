@@ -13,5 +13,6 @@ namespace DemoMVC.WebUi.Models
         public string Answer { get; set; }
         public bool IsVisited { get; set; }
         public int ObtainedMarks { get; set; } = 0;
+        public bool IsEvaluate { get; set; }
     }
 }

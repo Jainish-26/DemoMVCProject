@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using System.Runtime.Remoting.Contexts;
+using System.Web.UI.WebControls;
 
 namespace DemoMVC.Data
 {
@@ -127,6 +128,16 @@ namespace DemoMVC.Data
                     transaction.Rollback();
                     throw new Exception("Error saving answer: " + ex.Message);
                 }
+            }
+        }
+        public void UpdateManualMarks(int userAnswerId, int obtainedMarks)
+        {
+            var userAnswer = _db.UserAnswers.FirstOrDefault(x => x.UserAnswerId == userAnswerId);
+            if (userAnswer != null)
+            {
+                userAnswer.ObtainedMarks = obtainedMarks;
+                userAnswer.IsEvaluate = true;
+                _db.SaveChanges();
             }
         }
     }

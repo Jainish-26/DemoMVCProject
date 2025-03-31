@@ -41,6 +41,7 @@ namespace DemoMVC.WebUi.Controllers
 
         //UserLogIn Page When Open Links
         [AllowAnonymous]
+        [HttpGet]
         public ActionResult UserExamLogIn(string userToken)
         {
             _userExamService.UpdateExamStatusOnEndTime();

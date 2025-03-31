@@ -44,5 +44,9 @@ namespace DemoMVC.Service
         {
             _userExamProvider.UpdateExamStatusOnEndTime();
         }
+        public void UpdateResultStatus(int userExamId)
+        {
+            _userExamProvider.UpdateResultStatus(userExamId);
+        }
     }
 }

@@ -23,5 +23,6 @@ namespace DemoMVC.Models
         public virtual Questions Question { get; set; }
 
         public bool IsVisited { get; set; }
+        public bool IsEvaluate { get; set; }
     }
 }
