@@ -150,10 +150,15 @@
 
     function validateAndSubmit() {
         var form = $("#examForm");
-        if (form.valid()) {
-            $("#startTestModal").modal("show");
+            if (form.valid()) {
+                $("#startTestModal").modal("show");
+            }
         }
-    }
+        $("#startExamBtn").click(function (e) {
+            setTimeout(function () {
+                location.reload();
+            }, 500); 
+        });
     </script>
 
 </body>

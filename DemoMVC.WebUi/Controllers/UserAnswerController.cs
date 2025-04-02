@@ -1,4 +1,5 @@
-﻿using DemoMVC.Models;
+﻿using DemoMVC.Helper;
+using DemoMVC.Models;
 using DemoMVC.Service;
 using System;
 using System.Web.Mvc;
@@ -27,6 +28,11 @@ namespace DemoMVC.WebUi.Controllers
             try
             {
                 var existingAnswer = _userAnswerService.GetExistingAnswer(answerData.UserExamId, answerData.QuestionId);
+                var userExamDetails = _userExamService.GetByUserExamId(answerData.UserExamId);
+                if(userExamDetails.ExamStatus == Constants.UserExamStatus.COMPLETED)
+                {
+                    return Json(new { success = false, message = "Your Response Already Saved Plzz Close Exam Otherwise You Will Be Disqualified" }, JsonRequestBehavior.AllowGet);
+                }
 
                 if (existingAnswer != null)
                 {

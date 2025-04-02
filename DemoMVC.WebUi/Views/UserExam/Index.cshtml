@@ -78,13 +78,17 @@
         var grid = $("#gridUserExam").data("kendoGrid");
         var dataSource = grid.dataSource.data();
 
-        var dataItem = dataSource.find(item => item.UserExamId == userExamId);
-        var userToken = dataItem.userToken;
+        var dataItem = dataSource.find(item => item.UserExamId == UserExamId);
+        var userToken = dataItem.UserToken;
         if (userToken != null) {
             var baseUrl = window.location.origin;
-            var generatedLink = baseUrl + "/UserExam/UserExamLogIn?userToken=" + userToken;
+            var generatedLink = baseUrl + "/UserExam/UserExamLogIn?userToken=" + encodeURIComponent(userToken);
 
-            alert(generatedLink);
+            navigator.clipboard.writeText(generatedLink).then(() => {
+                toastr.success("The link has been copied to your clipboard.");
+            }).catch(err => {
+                toastr.error("Failed to copy the link.");
+            });
         } else {
             Swal.fire("Error!", "User Token Not Found", "error");
         }
@@ -121,7 +125,7 @@
 
     function sendEmail(userExamId, generatedLink) {
         $.ajax({
-            url: '/SendMail/SendExamEmail', 
+            url: '/SendMail/SendExamEmail',
             type: 'POST',
             data: { userExamId: userExamId, generatedLink: generatedLink },
             success: function (response) {
@@ -156,3 +160,7 @@
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Toastr CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>

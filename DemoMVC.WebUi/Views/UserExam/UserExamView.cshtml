@@ -100,7 +100,7 @@
         background-color: green;
         color: white;
     }
-    ..color-legend {
+    .color-legend {
         display: flex;
         flex-direction: column;
         align-items: flex-start; /* Align to the left */
@@ -358,11 +358,11 @@
                 </div>
             }
 
-            <div class="navigation-buttons">
-                <button class="btn-custom btn-prev"  disabled>Previous</button>
-                <button class="btn-custom btn-save" id="btn-save" onclick="showSavePopup()">Save</button>
-                <button class="btn-custom btn-next" >Next</button>
-            </div>
+        <div class="navigation-buttons">
+            <button class="btn-custom btn-prev" disabled>Previous</button>
+            <button class="btn-custom btn-save" id="btn-save">Save</button>
+            <button class="btn-custom btn-next">Next</button>
+        </div>
         </div>
     </div>
 
@@ -397,46 +397,37 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+    $(document).ready(function () {
     let userExamId = @viewBagUserExamId;
     let totalQuestions = @totalQuestions;
     let currentQuestionIndex = 0;
     let answersData = {};
-    let visitedCount = 0;
-    let remainingMinutes = 0;
-    let remainingSeconds = 0;
     let timerInterval;
+    let remainingMinutes = 0, remainingSeconds = 0;
 
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".question-page")[0].style.display = "block";
+    //$(".question-page").first().show(); // Show first question
+    getRemainingTimeFromServer();
+    loadAnswersFromDatabase();
 
-        getRemainingTimeFromServer();
+    $(".palette-btn").on("click", function () {
+        let questionIndex = parseInt($(this).attr("data-index"));
+        saveAndChangeQuestion(questionIndex);
+    });
 
-        loadAnswersFromDatabase();
+    $(".btn-next").on("click", function () {
+        saveAndChangeQuestion(currentQuestionIndex + 1);
+    });
 
-        document.querySelectorAll(".palette-btn").forEach((btn) => {
-            btn.addEventListener("click", function () {
-                let questionIndex = parseInt(this.getAttribute("data-index"));
-                saveAndChangeQuestion(questionIndex);
-            });
-        });
+    $(".btn-prev").on("click", function () {
+        saveAndChangeQuestion(currentQuestionIndex - 1);
+    });
 
-        document.querySelector(".btn-next").addEventListener("click", function () {
-            saveAndChangeQuestion(currentQuestionIndex + 1);
-        });
+    $(".question-page").on("input", function () {
+        let questionId = $(this).attr("data-question-id");
+        let answer = getCurrentAnswer($(this));
 
-        document.querySelector(".btn-prev").addEventListener("click", function () {
-            saveAndChangeQuestion(currentQuestionIndex - 1);
-        });
-
-        document.querySelectorAll(".question-page").forEach((page) => {
-            page.addEventListener("input", function () {
-                let questionId = page.getAttribute("data-question-id");
-                let answer = getCurrentAnswer(page);
-
-                answersData[questionId] = { AnswerText: answer, IsVisited: true };
-                updateQuestionPalette();
-            });
-        });
+        answersData[questionId] = { AnswerText: answer, IsVisited: true };
+        updateQuestionPalette();
     });
 
     function loadAnswersFromDatabase() {
@@ -447,13 +438,13 @@
             success: function (response) {
                 if (response.success && response.data) {
                     answersData = {};
-                    response.data.forEach(ans => {
+                    $.each(response.data, function (_, ans) {
                         answersData[ans.QuestionId] = {
                             AnswerText: ans.AnswerText || "",
                             IsVisited: ans.IsVisited || false
                         };
                     });
-                } 
+                }
                 applyPrefilledAnswers();
                 updateQuestionPalette();
             },
@@ -463,48 +454,35 @@
         });
     }
 
-
     function applyPrefilledAnswers() {
-        document.querySelectorAll(".question-page").forEach((page) => {
-            let questionId = page.getAttribute("data-question-id");
+        $(".question-page").each(function () {
+            let questionId = $(this).attr("data-question-id");
             let answerData = answersData[questionId];
-            if (answerData && answerData.IsVisited) {
-                visitedCount++;
-            }
+
             if (answerData) {
                 let answer = answerData.AnswerText || "";
 
-                if (page.querySelector("input[type='radio']")) {
-                    let radio = page.querySelector(`input[type='radio'][value='${answer}']`);
-                    if (radio) radio.checked = true;
-                }
+                $(this).find("input[type='radio']").each(function () {
+                    if ($(this).val() === answer) $(this).prop("checked", true);
+                });
 
-                else if (page.querySelector("input[type='checkbox']")) {
-                    answer.split(",").forEach(val => {
-                        let trimmedValue = val.trim();
-                        page.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
-                            if (checkbox.value === trimmedValue) {
-                                checkbox.checked = true;
-                            }
-                        });
-                    });
-                }
+                $(this).find("input[type='checkbox']").each(function () {
+                    let values = answer.split(",");
+                    if (values.includes($(this).val())) $(this).prop("checked", true);
+                });
 
-                else if (page.querySelector("textarea")) {
-                    page.querySelector("textarea").value = answer;
-                }
+                $(this).find("textarea").val(answer);
             }
         });
         checkAllQuestionsVisited();
     }
 
     function updateQuestionPalette() {
-
-        document.querySelectorAll(".palette-btn").forEach((btn, index) => {
-            let questionPage = document.querySelectorAll(".question-page")[index];
-            let questionId = questionPage.getAttribute("data-question-id");
+        $(".palette-btn").each(function (index) {
+            let questionPage = $(".question-page").eq(index);
+            let questionId = questionPage.attr("data-question-id");
             let answerData = answersData[questionId] || {};
-            let status = "not-visited"; 
+            let status = "not-visited";
 
             if (answerData.AnswerText) {
                 status = "answered";
@@ -512,20 +490,14 @@
                 status = "visited";
             }
 
-            btn.classList.remove("not-visited", "visited", "answered", "current");
+            $(this).removeClass("not-visited visited answered current").css("background", "gray");
 
             if (index === currentQuestionIndex) {
-                btn.classList.add("current");
-                btn.style.background = "blue";
+                $(this).addClass("current").css("background", "blue");
             } else if (status === "answered") {
-                btn.classList.add("answered");
-                btn.style.background = "green";
+                $(this).addClass("answered").css("background", "green");
             } else if (status === "visited") {
-                btn.classList.add("visited");
-                btn.style.background = "yellow";
-            } else {
-                btn.classList.add("not-visited");
-                btn.style.background = "gray";
+                $(this).addClass("visited").css("background", "yellow");
             }
         });
     }
@@ -533,8 +505,8 @@
     function saveAndChangeQuestion(newIndex, callback = null) {
         if (newIndex < 0 || newIndex >= totalQuestions) return;
 
-        let currentPage = document.querySelectorAll(".question-page")[currentQuestionIndex];
-        let questionId = currentPage.getAttribute("data-question-id");
+        let currentPage = $(".question-page").eq(currentQuestionIndex);
+        let questionId = currentPage.attr("data-question-id");
         let answer = getCurrentAnswer(currentPage);
 
         let userAnswerModel = {
@@ -550,10 +522,6 @@
             contentType: 'application/json',
             data: JSON.stringify(userAnswerModel),
             success: function () {
-                
-                    visitedCount++;
-                    console.log(`🔄 Visited count updated: ${visitedCount}/${totalQuestions}`);
-                
                 answersData[questionId] = { AnswerText: answer, IsVisited: true };
                 checkAllQuestionsVisited();
                 if (typeof callback === "function") {
@@ -562,8 +530,9 @@
                     changeQuestion(newIndex);
                 }
             },
-            error: function (xhr) {
-                console.error("❌ Error saving answer:", xhr.responseJSON?.error || xhr.responseText);
+            error: function (error) {
+                Swal.fire("Warning", error.message, "warning");
+                
             }
         });
     }
@@ -571,81 +540,40 @@
     function getCurrentAnswer(page) {
         let answer = "";
 
-        if (page.querySelector("input[type='radio']:checked")) {
-            answer = page.querySelector("input[type='radio']:checked").value;
-        } else if (page.querySelectorAll("input[type='checkbox']:checked").length > 0) {
-            let selectedCheckboxes = page.querySelectorAll("input[type='checkbox']:checked");
-            answer = Array.from(selectedCheckboxes).map(cb => cb.value).join(",");
-        } else if (page.querySelector("textarea")) {
-            answer = page.querySelector("textarea").value;
+        if (page.find("input[type='radio']:checked").length > 0) {
+            answer = page.find("input[type='radio']:checked").val();
+        } else if (page.find("input[type='checkbox']:checked").length > 0) {
+            answer = page.find("input[type='checkbox']:checked").map(function () {
+                return $(this).val();
+            }).get().join(",");
+        } else if (page.find("textarea").length > 0) {
+            answer = page.find("textarea").val();
         }
 
         return answer;
     }
 
-// ✅ Change question
     function changeQuestion(index) {
         if (index < 0 || index >= totalQuestions) return;
 
-        document.querySelectorAll(".question-page")[currentQuestionIndex].style.display = "none";
-        document.querySelectorAll(".question-page")[index].style.display = "block";
+        $(".question-page").eq(currentQuestionIndex).hide();
+        $(".question-page").eq(index).show();
         currentQuestionIndex = index;
 
-        document.querySelector(".btn-prev").disabled = currentQuestionIndex === 0;
-        document.querySelector(".btn-next").disabled = currentQuestionIndex === totalQuestions - 1;
+        $(".btn-prev").prop("disabled", currentQuestionIndex === 0);
+        $(".btn-next").prop("disabled", currentQuestionIndex === totalQuestions - 1);
 
         updateQuestionPalette();
     }
 
     function checkAllQuestionsVisited() {
-        let saveButton = document.querySelector(".btn-save");
-
-        if (visitedCount >= totalQuestions - 1) {
-            saveButton.disabled = false; // ✅ Enable button
-            console.log("✅ All questions visited. Enabling Save button.");
+        let saveButton = $(".btn-save");
+        let visitedCount = $(".visited").length;
+        if (visitedCount >= totalQuestions) {
+            saveButton.prop("disabled", false);
         } else {
-            saveButton.disabled = true; // ❌ Disable button
-            console.log(`❌ ${totalQuestions - visitedCount} questions left. Disabling Save button.`);
+            saveButton.prop("disabled", true);
         }
-    }
-
-
-    function showSavePopup() {
-        let answeredCount = document.querySelectorAll(".answered").length + 1;
-
-        Swal.fire({
-            title: "Confirm Exam Submission",
-            html: `
-            <p><strong>Total Questions:</strong> ${totalQuestions}</p>
-            <p><strong>Attempted Questions:</strong> ${answeredCount}</p>
-            <p>Are you sure you want to submit your exam?</p>
-        `,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, Submit Exam",
-            cancelButtonText: "Cancel",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                saveAndChangeQuestion(currentQuestionIndex, function () {
-                    submitExam();
-                });
-            }
-        });
-    }
-
-    function submitExam() {
-        $.ajax({
-            url: '/UserExam/SubmitExam',
-            type: 'POST',
-            data: { userExamId: userExamId },
-            success: function (response) {
-                window.location.href = response.redirectUrl;
-            },
-            error: function (xhr) {
-                console.error("❌ Error submitting exam:", xhr.responseText);
-                Swal.fire("Error", "Failed to submit exam. Please try again.", "error");
-            }
-        });
     }
 
     function getRemainingTimeFromServer() {
@@ -662,17 +590,13 @@
         });
     }
 
-    // Start Timer Countdown
     function startTimer(minutes, seconds) {
         remainingMinutes = minutes;
         remainingSeconds = seconds;
         updateTimerDisplay();
-
-        // Start countdown
         timerInterval = setInterval(updateTimer, 1000);
     }
 
-    // Update Timer Every Second
     function updateTimer() {
         if (remainingSeconds === 0) {
             if (remainingMinutes === 0) {
@@ -685,11 +609,38 @@
         } else {
             remainingSeconds--;
         }
-
         updateTimerDisplay();
     }
+        $(document).ready(function () {
+            $("#btn-save").click(function () {
+                showSavePopup();
+            });
+        });
 
-    // Update Timer Display in UI
+        function showSavePopup() {
+            let answeredCount = $(".answered").length + 1;
+
+            Swal.fire({
+                title: "Confirm Exam Submission",
+                html: `
+            <p><strong>Total Questions:</strong> ${totalQuestions}</p>
+            <p><strong>Attempted Questions:</strong> ${answeredCount}</p>
+            <p>Are you sure you want to submit your exam?</p>
+        `,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Submit Exam",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    saveAndChangeQuestion(currentQuestionIndex, function () {
+                        submitExam();
+                    });
+                }
+            });
+        }
+
+
     function updateTimerDisplay() {
         $("#time").text(remainingMinutes + " min " + remainingSeconds + " sec");
     }
@@ -697,26 +648,35 @@
     function showTimeUpPopup() {
         Swal.fire({
             title: "⏳ Time is Up!",
-            html: `
-                <p>Your exam time is over.</p>
-                <p><strong>Only your attempted answers will be submitted.</strong></p>
-            `,
+            html: `<p>Your exam time is over.</p>`,
             icon: "warning",
-            allowOutsideClick: false,  // Prevent closing on outside click
-            allowEscapeKey: false,     // Prevent closing with ESC
-            showConfirmButton: true,   // Show only OK button
+            allowOutsideClick: false,
+            showConfirmButton: true,
             confirmButtonText: "OK"
         }).then(() => {
-            saveAndChangeQuestion(currentQuestionIndex, function () {
-                submitExam();
-            }); // Call function to submit attempted answers
+            saveAndChangeQuestion(currentQuestionIndex, submitExam);
         });
     }
-</script>
-<script>
-    history.pushState(null, "", location.href);
-    window.onpopstate = function () {
-        history.pushState(null, "", location.href);
-    };
+
+    function submitExam() {
+        $.ajax({
+            url: '/UserExam/SubmitExam',
+            type: 'POST',
+            data: { userExamId: userExamId },
+            success: function (response) {
+                location.reload();
+                setTimeout(function () {
+                    window.location.href = response.redirectUrl;
+                }, 500); 
+            },
+            error: function (xhr) {
+                console.error("❌ Error submitting exam:", xhr.responseText);
+                Swal.fire("Error", "Failed to submit exam. Please try again.", "error");
+            }
+        });
+    }
+});
+
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

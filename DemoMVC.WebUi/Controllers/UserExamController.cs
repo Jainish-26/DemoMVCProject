@@ -190,6 +190,7 @@ namespace DemoMVC.WebUi.Controllers
         {
             var userExamDetails = _userExamService.GetByUserToken(userToken);
             var exam = _examService.GetById(userExamDetails.ExamId);
+
             var examModel = new ExamModel
             {
                 ExamId = exam.ExamId,
@@ -451,6 +452,7 @@ namespace DemoMVC.WebUi.Controllers
         //Exam Summary View
         public ActionResult ExamSummary()
         {
+            ViewBag.DisableBackButton = true;
             return View();
         }
 

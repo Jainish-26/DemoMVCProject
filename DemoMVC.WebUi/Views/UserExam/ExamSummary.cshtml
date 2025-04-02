@@ -101,8 +101,8 @@
 </body>
 </html>
 <script>
-    history.replaceState(null, "", location.href);
-    window.addEventListener("popstate", function (event) {
-        history.replaceState(null, "", location.href);
-    });
+    window.onpopstate = function () {
+        window.location.href = "/UserExam/ExamSummary"; // Redirects back to the same page
+    };
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
