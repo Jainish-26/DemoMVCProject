@@ -45,7 +45,6 @@ namespace DemoMVC.WebUi.Controllers
         [HttpGet]
         public ActionResult UserExamLogIn(string userToken)
         {
-            _userExamService.UpdateExamStatusOnEndTime();
             var userExamDetails = _userExamService.GetByUserToken(userToken);
             var userDetails = _userProfileService.GetUserById(userExamDetails.UserId);
             var examDetails = _examService.GetById(userExamDetails.ExamId);

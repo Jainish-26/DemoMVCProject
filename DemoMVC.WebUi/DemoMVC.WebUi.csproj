@@ -201,6 +201,7 @@
     <Compile Include="Helper\AESCrypto.cs" />
     <Compile Include="Helper\CommonUtility.cs" />
     <Compile Include="Helper\FormUtility.cs" />
+    <Compile Include="Helper\QuartzSchedular.cs" />
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\ExamModel.cs" />
     <Compile Include="Models\ExamQuestionModel.cs" />

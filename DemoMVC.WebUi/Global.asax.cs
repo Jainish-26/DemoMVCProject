@@ -13,6 +13,7 @@ namespace DemoMVC.WebUi
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             BundleTable.EnableOptimizations = true;
+            QuartzScheduler.StartScheduler().GetAwaiter().GetResult();
         }
     }
 }

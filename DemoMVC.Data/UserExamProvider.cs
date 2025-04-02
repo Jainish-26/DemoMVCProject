@@ -76,11 +76,12 @@ namespace DemoMVC.Data
         {
             return (from i in _db.UserExams where i.UserToken == userToken select i).FirstOrDefault();
         }
+
         public void UpdateExamStatusOnEndTime()
         {
             try
             {
-                var expiredDate = _db.UserExams.Where(e => e.EndTime <= DateTime.UtcNow && e.ExamStatus != Constants.UserExamStatus.COMPLETED)
+                var expiredDate = _db.UserExams.Where(e => e.EndTime <= DateTime.UtcNow && e.ExamStatus == Constants.UserExamStatus.ONGOING)
                                     .ToList();
                 foreach (var exam in expiredDate)
                 {
