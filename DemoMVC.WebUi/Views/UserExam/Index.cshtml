@@ -40,8 +40,8 @@
                     .HeaderHtmlAttributes(new { @class = "center_text" })
                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
                     .ClientTemplate("<div class='k_action_table'>" +
-                    (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=UserExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
-                    "<a href='javascript:void(0);' title='Generate Link' onclick=\"showUrl(#=UserExamId#)\"><i class='fa fa-link'></i></a> " +
+                    (AllowedEdit ? "<a href='javascript:void(0);' title='Copy Link' onclick=\"copyLink(#=UserExamId#)\"><i class='fa fa-copy'></i></a>" : "") +
+                    "<a href='javascript:void(0);' title='Generate Link' onclick=\"generateLink(#=UserExamId#)\"><i class='fa fa-link'></i></a> " +
                     "<a href='javascript:void(0);' title='Check Exam' onclick=\"checkExam(#=UserExamId#)\"><i class='fa fa-check-circle'></i></a>" +
                     "</div>")
                     .Filterable(false)
@@ -73,7 +73,23 @@
         )
 </div>
 <script>
-    function showUrl(UserExamId) {
+
+    function copyLink(UserExamId) {
+        var grid = $("#gridUserExam").data("kendoGrid");
+        var dataSource = grid.dataSource.data();
+
+        var dataItem = dataSource.find(item => item.UserExamId == userExamId);
+        var userToken = dataItem.userToken;
+        if (userToken != null) {
+            var baseUrl = window.location.origin;
+            var generatedLink = baseUrl + "/UserExam/UserExamLogIn?userToken=" + userToken;
+
+            alert(generatedLink);
+        } else {
+            Swal.fire("Error!", "User Token Not Found", "error");
+        }
+    }
+    function generateLink(UserExamId) {
         $.ajax({
             url: '/UserExam/UserExamLink', // Your endpoint
             type: 'POST',
@@ -122,8 +138,20 @@
     }
 
     function checkExam(userExamId) {
-        // Redirect to the exam checking page
-        window.location.href = '/UserExamCheck/CheckExam?userExamId=' + userExamId;
+        var grid = $("#gridUserExam").data("kendoGrid");
+        var dataSource = grid.dataSource.data();
+
+        var dataItem = dataSource.find(item => item.UserExamId == userExamId);
+        if (dataItem) {
+            var examStatus = dataItem.ExamStatus;
+
+            if (examStatus === "COMPLETED") {
+
+                window.location.href = '/UserExamCheck/CheckExam?userExamId=' + userExamId;
+            } else {
+                Swal.fire("Warning!", "Wait For Candidate To Give Exam", "warning");
+            }
+        }
     }
 
 </script>

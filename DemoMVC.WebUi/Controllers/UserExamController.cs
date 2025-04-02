@@ -159,7 +159,6 @@ namespace DemoMVC.WebUi.Controllers
                         ViewBag.ErrorMessage = "Failed to update exam status.";
                         return View("ErrorPage");
                     }
-                    ;
 
                     var questions = _questionService.GetQuestionsByExamId(userExamDetails.ExamId)
                     .Select(q => new QuestionAndAnswerModel

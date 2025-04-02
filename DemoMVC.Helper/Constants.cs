@@ -73,6 +73,7 @@
             public const string PENDING = "PENDING";
             public const string ONGOING = "ONGOING";
             public const string COMPLETED = "COMPLETED";
+            public const string DISQUALIFIED = "DISQUALIFIED";
         }
         public static class ResultStatus
         {
