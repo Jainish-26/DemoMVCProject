@@ -1,14 +1,9 @@
 ﻿using DemoMVC.Models;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Configuration;
-using System.Runtime.Remoting.Contexts;
-using System.Web.UI.WebControls;
 
 namespace DemoMVC.Data
 {
@@ -27,7 +22,7 @@ namespace DemoMVC.Data
                 throw e;
             }
         }
-        public bool DeleteUserAnswers(int userExamId, int questionId , string answerText)
+        public bool DeleteUserAnswers(int userExamId, int questionId, string answerText)
         {
             try
             {
@@ -39,8 +34,8 @@ namespace DemoMVC.Data
 
                 if (userAnswer != null)
                 {
-                    _db.UserAnswers.Remove(userAnswer); 
-                    _db.SaveChanges(); 
+                    _db.UserAnswers.Remove(userAnswer);
+                    _db.SaveChanges();
                     return true;
                 }
 
@@ -71,7 +66,7 @@ namespace DemoMVC.Data
                 var allAnswer = (from i in _db.UserAnswers where userExamId == i.UserExamId select i).ToList();
                 return allAnswer;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }

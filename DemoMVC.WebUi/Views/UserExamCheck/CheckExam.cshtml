@@ -1,6 +1,6 @@
 ﻿@model DemoMVC.WebUi.Models.UserExamCheckingModel
 @using Newtonsoft.Json
-@{ 
+@{
     var userExamId = Model.UserExamId;
 }
 
@@ -80,23 +80,20 @@
     }
 
     /* Status Colors */
-    .not-visited {
-        background-color: gray; /* Question not yet visited */
+
+
+    .correct {
+        background-color: green; /* Question evaluated */
         color: white;
     }
 
-    .evaluated {
-        background-color: green; /* Question evaluated */
+    .inCorrect {
+        background-color: red; /* Question evaluated */
         color: white;
     }
 
     .for-review {
         background-color: orange; /* Marks = 0 and not evaluated */
-        color: white;
-    }
-
-    .saved {
-        background-color: blue; /* All questions evaluated */
         color: white;
     }
 
@@ -123,7 +120,7 @@
     }
 
     .yellow {
-        background-color: yellow;
+        background-color: orange;
     }
 
     .blue {
@@ -134,21 +131,43 @@
         background-color: green;
     }
 
-    .gray {
-        background-color: gray;
+    .red{
+        background-color :red ;
     }
 
 
     /* Existing Styles - Keeping Your Question Container UI */
     .question-container {
-        margin-top: 20px;
         padding: 25px;
+        margin-top :20px;
         background: #fff;
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        position: relative;
         min-height: 530px;
+        max-height: 600px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Prevents the whole container from scrolling */
     }
+
+    .question-page {
+        flex-grow: 1;
+        overflow-y: auto; /* Enables scrolling for question content */
+        max-height: 480px; /* Adjust height as needed */
+        padding-right: 10px; /* Avoids cutting off scrollbar */
+        scrollbar-width: thin; /* Makes the scrollbar smaller */
+        scrollbar-color: #aaa transparent; /* Custom scrollbar color */
+    }
+
+        /* Custom Scrollbar for WebKit Browsers */
+        .question-page::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .question-page::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
 
     .question-header {
         display: flex;
@@ -180,14 +199,6 @@
         border: 1px solid #ccc;
     }
 
-    .question-page {
-        display: none;
-    }
-
-        .question-page.active {
-            display: block;
-        }
-
     .answer-item {
         padding: 10px;
         font-size: 18px;
@@ -201,50 +212,18 @@
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
     }
 
-    .true-btn, .false-btn {
-        font-size: 16px;
-        font-weight: bold;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-    }
 
-    /* True Button (Green) */
-    .true-btn {
-        background-color: #28a745;
-        margin: 10px;
-        color: white;
-    }
-
-        .true-btn:hover {
-            background-color: #218838;
-            transform: scale(1.05);
-        }
-
-    /* False Button (Red) */
-    .false-btn {
-        background-color: #dc3545;
-        margin: 10px;
-        color: white;
-    }
-
-        .false-btn:hover {
-            background-color: #c82333;
-            transform: scale(1.05);
-        }
-
+    
     /*Save Button*/
     .navigation-buttons {
         position: absolute;
         bottom: 15px;
         left: 0;
         right: 0;
+        width:80%;
         display: flex;
-        justify-content: space-between;
-        padding: 10px 25px;
-        background: #fff;
+        justify-content: space-between; /* Ensures buttons are spaced evenly */
+        padding: 10px 20px; /* Adds padding for better spacing */
     }
 
     .btn-custom {
@@ -307,7 +286,7 @@
 
                 <div class="question-page" id="question-@i" style="display: @(i == 0 ? "block" : "none")">
                     <div class="question-header">
-                        <h3>Q@(i + 1): @question.QuestionText</h3>
+                        <h3>Q@(i + 1): @question.QuestionText (Marks : @question.Marks)</h3>
                     </div>
 
                     @if (question.QuestionType == "Single Choice MCQ")
@@ -385,6 +364,13 @@
                                    style="font-weight: bold; color: blue; width: 80px;"
                                    min="0" max="@question.Marks">
                         </div>
+                        <div class="evaluate-checkbox">
+                            <label>
+                                <input type="checkbox" class="evaluate-toggle" id="evaluate-@i"
+                                       @(userAnswer.IsEvaluate ? "checked" : "")>
+                                <strong>Mark as Evaluated</strong>
+                            </label>
+                        </div>
                         <div class="text-answer-box" style="padding-left:20px; padding-top:20px">
                             <label><strong>User Answer:</strong></label>
                             <textarea class="form-control" readonly>@Model.UserAnswers[i].Answer</textarea>
@@ -398,13 +384,18 @@
             }
             <div class="navigation-buttons">
                 <button class="btn-custom btn-prev" disabled>Previous</button>
-                <button class="btn-custom btn-save" id="submit-exam-btn" onclick="checkEvaluationAndSubmit()">Save</button>
+                <button class="btn-custom btn-save" id="submit-exam-btn">Save</button>
                 <button class="btn-custom btn-next">Next</button>
             </div>
         </div>
     </div>
     <div class="question-palette">
-        <h4>Question Palette</h4>
+        <div class="color-legend">
+            <p><span class="legend-box yellow"></span> Not Evalueated Question</p>
+            <p><span class="legend-box blue"></span> Current Question</p>
+            <p><span class="legend-box green"></span> Correct Question</p>
+            <p><span class="legend-box red"></span> InCorrect Question</p>
+        </div>
         <div class="palette-buttons">
             @for (int i = 0; i < Model.Questions.Count; i++)
             {
@@ -415,78 +406,123 @@
 </div>
 
 <script>
-$(document).ready(function () {
-    updatePaletteStatus();
-});
+    $(document).ready(function () {
+        debugger
+        updatePaletteStatus();
+        $("input.evaluate-toggle").each(function () {
+            let index = $(this).attr('id').split('-')[1];
+            let marksInput = $("#marks-" + index);
+            let isChecked = $(this).prop('checked');
 
-// Store User Answer IDs and Marks in JavaScript Variables
-let userAnswers = @Html.Raw(JsonConvert.SerializeObject(Model.UserAnswers));
-let questionMarks = @Html.Raw(JsonConvert.SerializeObject(Model.Questions.Select(q => q.Marks)));
-let questions = @Html.Raw(JsonConvert.SerializeObject(Model.Questions));
+            // Enable or disable the input based on the checkbox state
+            if (isChecked) {
+                marksInput.prop("disabled", false); // Enable the input if checked
+            } else {
+                marksInput.prop("disabled", true); // Disable the input if unchecked
+                marksInput.val(0); // Clear the value if unchecked
+            }
+        });
+    });
+
+    // Store User Answer IDs and Marks in JavaScript Variables
+    let userAnswers = @Html.Raw(JsonConvert.SerializeObject(Model.UserAnswers));
+    let questionMarks = @Html.Raw(JsonConvert.SerializeObject(Model.Questions.Select(q => q.Marks)));
+    let questions = @Html.Raw(JsonConvert.SerializeObject(Model.Questions));
     let currentIndex = 0;
 
     function updatePaletteStatus() {
+        debugger
         $(".palette-btn").each(function (index) {
             let userAnswer = userAnswers[index];
             let isEvaluate = userAnswer?.IsEvaluate || false;
             let obtainedMarks = userAnswer?.ObtainedMarks || 0;
 
             // Remove all previous classes
-            $(this).removeClass("not-visited for-review evaluated current");
+            $(this).removeClass("not-visited for-review correct current inCorrect");
 
-            // ✅ Highlight Current Question
+            // Highlight Current Question
             if (index === currentIndex) {
-                $(this).addClass("current");  // 🔵 Current question
+                $(this).addClass("current");  // Current question (Blue)
             }
-            // ✅ Set Colors Based on Evaluation
-            else if (!userAnswer) {
-                $(this).addClass("not-visited"); // Gray - Not Attempted
-            } else if (isEvaluate) {
-                $(this).addClass("evaluated"); // Green - Evaluated
+            // Set Colors Based on Evaluation
+            else if (isEvaluate && obtainedMarks > 0) {
+                $(this).addClass("correct"); // Evaluated (Green)
+            } else if (isEvaluate && obtainedMarks <= 0) {
+                $(this).addClass("inCorrect"); // Evaluated (Green)
             } else if (obtainedMarks === 0 && !isEvaluate) {
-                $(this).addClass("for-review"); // Orange - For Review
-            }
+                $(this).addClass("for-review"); // For Review (Orange)
+            } else if (!userAnswer) {
+                $(this).addClass("not-visited"); // Not Attempted (Gray)
+            } 
         });
     }
 
+    // Function to save marks for Text Answer or SQL Query
+    function saveManualMarks(index, callback) {
+        let question = questions[index];
 
-// Function to save marks for Text Answer or SQL Query
-function saveManualMarks(index, callback) {
-    let question = questions[index];
-    if (question.QuestionType === "Text Answer" || question.QuestionType === "SQL Query") {
-        let obtainedMarks = $("#marks-" + index).val();
-        let userAnswerId = userAnswers[index]?.UserAnswerId;
+        // Check if the question is of type "Text Answer" or "SQL Query"
+        if (question.QuestionType === "Text Answer" || question.QuestionType === "SQL Query") {
+            // Check if the 'Mark as Evaluated' checkbox is checked
+            let isChecked = $("#evaluate-" + index).prop("checked");
 
-        if (!userAnswerId) {
-            alert("Error: User Answer ID not found.");
-            return;
-        }
+            // Only proceed if the checkbox is checked
+            if (isChecked) {
+                let obtainedMarks = $("#marks-" + index).val();
+                let userAnswerId = userAnswers[index]?.UserAnswerId;
 
-        $.ajax({
-            url: '/UserExamCheck/SaveManualMarks',
-            type: 'POST',
-            data: { userAnswerId: userAnswerId, obtainedMarks: obtainedMarks },
-            success: function (response) {
-                if (response.success) {
-                    userAnswers[index].ObtainedMarks = obtainedMarks;
-                    userAnswers[index].IsEvaluate = true; // Mark as evaluated
-                    updatePaletteStatus();
-                } else {
-                    alert("Error: " + response.message);
+                if (!userAnswerId) {
+                    alert("Error: User Answer ID not found.");
+                    return;
                 }
-                if (callback) callback(); // Proceed after saving
-            },
-            error: function () {
-                alert("Error saving marks.");
-                if (callback) callback(); // Proceed even if error occurs
-            }
-        });
-    } else {
-        if (callback) callback(); // No save required, proceed
-    }
-}
 
-// Function to navigate between questions
+                $.ajax({
+                    url: '/UserExamCheck/SaveManualMarks',
+                    type: 'POST',
+                    data: { userAnswerId: userAnswerId, obtainedMarks: obtainedMarks },
+                    success: function (response) {
+                        if (response.success) {
+                            // Update the userAnswers array with the saved marks and evaluate status
+                            userAnswers[index].ObtainedMarks = obtainedMarks;
+                            userAnswers[index].IsEvaluate = true; // Mark as evaluated
+                            updatePaletteStatus(); // Update the question palette
+
+                            // Call the callback function if provided
+                            if (callback) callback();
+                        } else {
+                            alert("Error: " + response.message);
+                            if (callback) callback(); // Proceed even if there is an error
+                        }
+                    },
+                    error: function () {
+                        alert("Error saving marks.");
+                        if (callback) callback(); // Proceed even if there is an error
+                    }
+                });
+            } else {    
+                if (callback) callback(); // Proceed even if the checkbox is not checked
+            }
+        } else {
+            // If not a text or SQL query, proceed without saving marks
+            if (callback) callback();
+        }
+    }
+
+
+    // Handle 'Mark as Evaluated' checkbox change
+    $("input.evaluate-toggle").on("change", function () {
+        let index = $(this).attr('id').split('-')[1];
+        let marksInput = $("#marks-" + index);
+        let isChecked = $(this).prop('checked');
+
+        if (isChecked) {
+            marksInput.prop("disabled", false); // Enable marks input
+        } else {
+            marksInput.prop("disabled", true); // Disable marks input
+            marksInput.val(0); // Optionally clear value when unchecked
+        }
+    });
+
     // Function to navigate between questions
     function navigateQuestion(direction) {
         let newIndex = currentIndex + direction;
@@ -501,11 +537,22 @@ function saveManualMarks(index, callback) {
                 $(".btn-prev").prop("disabled", currentIndex === 0);
                 $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
 
-                updatePaletteStatus(); // ✅ Update the palette color
+                updatePaletteStatus(); // Update the palette color
             });
         }
     }
+    $(document).on("input", ".marks-input", function () {
+        let maxMarks = parseInt($(this).attr("max"), 10); // Get max marks from attribute
+        let minMarks = parseInt($(this).attr("min"), 10);
+        let enteredMarks = parseInt($(this).val(), 10) || 0; // Default to 0 if NaN
 
+        // Enforce min/max limits
+        if (enteredMarks < minMarks) {
+            $(this).val(minMarks); // Set to min if less than 0
+        } else if (enteredMarks > maxMarks) {
+            $(this).val(maxMarks); // Set to max if greater than question marks
+        }
+    });
     // Handle Previous and Next button clicks
     $(".btn-prev").on("click", function () {
         navigateQuestion(-1);
@@ -514,6 +561,7 @@ function saveManualMarks(index, callback) {
     $(".btn-next").on("click", function () {
         navigateQuestion(1);
     });
+
 
     // Handle question navigation using the palette
     $(".palette-btn").on("click", function () {
@@ -528,16 +576,17 @@ function saveManualMarks(index, callback) {
             $(".btn-prev").prop("disabled", currentIndex === 0);
             $(".btn-next").prop("disabled", currentIndex === questions.length - 1);
 
-            updatePaletteStatus(); // ✅ Update the palette color
+            updatePaletteStatus(); // Update the palette color
         });
     });
 
+    // Function to check if all questions are evaluated before submitting
     function checkEvaluationAndSubmit() {
         let totalQuestions = userAnswers.length; // Total questions
         let evaluatedCount = userAnswers.filter(ans => ans.IsEvaluate).length; // Count evaluated questions
 
         if (evaluatedCount === totalQuestions) {
-            submitExam(); // ✅ All questions evaluated → Submit exam
+            submitExam(); // All questions evaluated → Submit exam
         } else {
             let notEvaluatedIndexes = [];
 
@@ -546,14 +595,11 @@ function saveManualMarks(index, callback) {
                     notEvaluatedIndexes.push(index + 1); // Store 1-based index
                 }
             });
-
-            alert("❌ The following questions are not evaluated: " + notEvaluatedIndexes.join(", "));
+            Swal.fire("Warning", ` Please First Check Question No :- ${notEvaluatedIndexes}`, "warning");
         }
     }
 
-    // ✅ Function to Submit Exam via AJAX
     function submitExam() {
-        // Calculate total obtained marks and convert to integer
         let totalObtainedMarks = Math.round(userAnswers.reduce((sum, ans) => sum + (parseFloat(ans.ObtainedMarks) || 0), 0));
 
         $.ajax({
@@ -561,11 +607,11 @@ function saveManualMarks(index, callback) {
             type: 'POST',
             data: {
                 userExamId: @userExamId,
-                totalObtainedMarks: totalObtainedMarks // ✅ Send integer value
+                totalObtainedMarks: totalObtainedMarks // Send integer value
             },
             success: function (response) {
                 if (response.success) {
-                    window.location.href = "/UserExam/Index"
+                    window.location.href = "/UserExam/Index"; // Redirect to the final view
                 } else {
                     alert("❌ Error submitting exam: " + response.message);
                 }
@@ -577,10 +623,12 @@ function saveManualMarks(index, callback) {
     }
 
     $("#submit-exam-btn").click(function () {
-    checkEvaluationAndSubmit();
-});
+        saveManualMarks(currentIndex, function () {
+            checkEvaluationAndSubmit();
+        });
+    });
+
 </script>
-
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

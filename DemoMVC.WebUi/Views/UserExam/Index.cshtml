@@ -7,7 +7,7 @@
 @{
     ViewBag.Title = "Index";
     string role = SessionHelper.RoleName;
-    string formCode = AuthorizeFormAccess.FormAccessCode.EXAM.ToString();
+    string formCode = AuthorizeFormAccess.FormAccessCode.USEREXAM.ToString();
     var formName = FormUtility.GetFormName(formCode);
     string parentFormname = FormUtility.GetParentFormName(formCode);
     ViewBag.Title = formName;
@@ -37,15 +37,13 @@
                 if (role == "sadmin")
                 {
                     columns.Bound(c => c.UserExamId)
-    .HeaderHtmlAttributes(new { @class = "center_text" })
-    .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
-    .ClientTemplate("<div class='k_action_table'>" +
-        (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=UserExamId#)'><i class='fa fa-trash'></i></a> " : "") +
-        (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=UserExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
-        "<a href='javascript:void(0);' title='Generate Link' onclick=\"showUrl(#=UserExamId#)\"><i class='fa fa-link'></i></a> " +
-        "<a href='javascript:void(0);' title='Check Exam' onclick=\"checkExam(#=UserExamId#)\"><i class='fa fa-check-circle'></i></a>" +
-    "</div>")
-
+                    .HeaderHtmlAttributes(new { @class = "center_text" })
+                    .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+                    .ClientTemplate("<div class='k_action_table'>" +
+                    (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=UserExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
+                    "<a href='javascript:void(0);' title='Generate Link' onclick=\"showUrl(#=UserExamId#)\"><i class='fa fa-link'></i></a> " +
+                    "<a href='javascript:void(0);' title='Check Exam' onclick=\"checkExam(#=UserExamId#)\"><i class='fa fa-check-circle'></i></a>" +
+                    "</div>")
                     .Filterable(false)
                     .Title("Action")
                     .Width("7%")

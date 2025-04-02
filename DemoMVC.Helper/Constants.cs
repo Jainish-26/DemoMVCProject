@@ -80,6 +80,7 @@
             public const string PASS = "PASS";
             public const string FAIL = "FAIL";
             public const string INREVIEW = "INREVIEW";
+            public const string EVALUATED = "EVALUATED";
         }
     }
 }

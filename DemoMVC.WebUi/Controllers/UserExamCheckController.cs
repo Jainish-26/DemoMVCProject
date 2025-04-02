@@ -4,7 +4,6 @@ using DemoMVC.WebUi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -49,6 +48,7 @@ namespace DemoMVC.WebUi.Controllers
             .Select(q => new QuestionAndAnswerModel
             {
                 QuestionId = q.QuestionId,
+                QuestionTypeId = q.QuestionTypeId,
                 QuestionText = q.QuestionText,
                 QuestionImage = q.QuestionImage,
                 QuestionType = q.QuestionType.QuestionTypeName,
@@ -59,7 +59,7 @@ namespace DemoMVC.WebUi.Controllers
                         IsCorrect = ans.IsCorrect,
                         AnswerText = ans.AnswerText
                     }).ToList()
-            }).OrderBy(q=>q.QuestionId).ToList();
+            }).OrderBy(q => q.QuestionId).ToList();
 
             var userAnswers = _userAnswerService.GetAllAnswerByUser(userExamId).Select(a => new UserAnswerModel
             {
@@ -67,8 +67,7 @@ namespace DemoMVC.WebUi.Controllers
                 QuestionId = a.QuestionId,
                 UserAnswerId = a.UserAnswerId,
                 UserExamId = a.UserExamId,
-                ObtainedMarks = a.ObtainedMarks,
-                IsEvaluate = a.IsEvaluate
+                ObtainedMarks = a.ObtainedMarks
             }).OrderBy(q => q.QuestionId).ToList();
 
             _userExamService.UpdateResultStatus(userExamId);
@@ -79,6 +78,22 @@ namespace DemoMVC.WebUi.Controllers
                 if (userAnswer != null)
                 {
                     userAnswer.ObtainedMarks = CheckAutomatic(question, userAnswer);
+                    if (question.QuestionTypeId == 1 || question.QuestionTypeId == 2)
+                    {
+                        userAnswer.IsEvaluate = true;
+                        
+                    }
+                    else
+                    {
+                        if(userAnswer.ObtainedMarks > 0)
+                        {
+                            userAnswer.IsEvaluate = true;
+                        }
+                        else
+                        {
+                            userAnswer.IsEvaluate = false;
+                        }
+                    }
                 }
             }
 
@@ -101,7 +116,7 @@ namespace DemoMVC.WebUi.Controllers
                 int obtainedMarks = userAnswer.Answer == correctAnswer ? question.Marks : 0;
                 _userAnswerService.UpdateManualMarks(userAnswer.UserAnswerId, obtainedMarks);
                 return obtainedMarks;
-                
+
             }
             else if (question.QuestionType == "Multiple Choice MCQ")
             {
@@ -123,14 +138,14 @@ namespace DemoMVC.WebUi.Controllers
             }
             else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
             {
-                if(userAnswer.ObtainedMarks > 0)
+                if (userAnswer.ObtainedMarks > 0)
                 {
                     return userAnswer.ObtainedMarks;
                 }
                 else
                 {
                     var correctAnswer = question.Answers.FirstOrDefault(a => a.IsCorrect)?.AnswerText;
-                    int obtainedMarks =  string.Equals(userAnswer.Answer?.Trim(), correctAnswer?.Trim(), StringComparison.OrdinalIgnoreCase)
+                    int obtainedMarks = string.Equals(userAnswer.Answer?.Trim(), correctAnswer?.Trim(), StringComparison.OrdinalIgnoreCase)
                         ? question.Marks
                         : 0;
                     if (obtainedMarks > 0)
@@ -146,9 +161,9 @@ namespace DemoMVC.WebUi.Controllers
         [HttpPost]
         public JsonResult SaveManualMarks(int userAnswerId, int obtainedMarks)
         {
-            _userAnswerService.UpdateManualMarks(userAnswerId , obtainedMarks);
+            _userAnswerService.UpdateManualMarks(userAnswerId, obtainedMarks);
 
-            return Json(new { success = true});
+            return Json(new { success = true });
         }
 
         public JsonResult SaveUserResult(int userExamId, int totalObtainedMarks)
@@ -166,23 +181,12 @@ namespace DemoMVC.WebUi.Controllers
                 return Json(new { success = false, message = "Exam details not found." });
             }
 
-            // Fix: Correct percentage calculation
-            double percentage = (totalObtainedMarks / (double)examDetails.TotalMarks) * 100;
-
-            if (totalObtainedMarks >= examDetails.PassingMarks)
-            {
-                userExamDetails.ResultStatus = Constants.ResultStatus.PASS;
-            }
-            else
-            {
-                userExamDetails.ResultStatus = Constants.ResultStatus.FAIL;
-            }
-
-            userExamDetails.Result = percentage;
+            userExamDetails.ResultStatus = Constants.ResultStatus.EVALUATED;
+            userExamDetails.Result = totalObtainedMarks;
 
             _userExamService.UpdateUserExam(userExamDetails);
 
-            return Json(new { success = true, message = "Exam result saved successfully!", resultStatus = userExamDetails.ResultStatus, percentage });
+            return Json(new { success = true, message = "Exam result saved successfully!" });
         }
 
     }

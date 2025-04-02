@@ -19,14 +19,18 @@
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
 
-<h2 class="text-center fw-bold mt-4">Roles List</h2>
 
-<div class="d-flex justify-content-end m-2">
-    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
-    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+
+<div class="d-flex justify-content-between align-items-center m-2">
+    <h2 class="fw-bold mx-3 ">Roles List</h2>
+    <div>
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+        <button class="btn btn-outline-success btn rounded-pill shadow-sm" onclick="exportToExcel()" style="height:38px;">Export to Excel</button>
+    </div>
 </div>
 
-<div class="common_white_box listingpage m-4">
+
+<div class="common_white_box listingpage mx-3">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.RolesGridModel>()
           .Name("gridRoles")
@@ -78,16 +82,10 @@
           ))
 </div>
 
-<!-- 📊 Kendo Chart Container -->
-<h3 class="text-center mt-5">Roles Distribution</h3>
-<div id="roleChart"></div>
-
-
 <script>
     $(document).ready(function () {
         $('#gridRoles').data('kendoGrid').dataSource.read();
         $('#gridRoles').data('kendoGrid').refresh();
-        loadRoleChart(); // Load chart when page loads
     });
 
     function confirmDelete(roleId) {
@@ -136,40 +134,6 @@
         grid.saveAsExcel();
     }
 
-    function loadRoleChart() {
-        $.ajax({
-            url: '@Url.Action("GetRoleChartData", "Roles")', // Ensure you have this endpoint
-            type: 'GET',
-            success: function (data) {
-                $("#roleChart").kendoChart({
-                    title: {
-                        text: "Active vs Inactive Roles"
-                    },
-                    legend: {
-                        position: "bottom"
-                    },
-                    seriesDefaults: {
-                        type: "pie",
-                        labels: {
-                            visible: true,
-                            format: "{0}%",
-                            background: "transparent"
-                        }
-                    },
-                    series: [{
-                        data: data // Ensure your API returns correct format
-                    }],
-                    tooltip: {
-                        visible: true,
-                        format: "{0}%"
-                    }
-                });
-            },
-            error: function () {
-                console.error("Error loading role chart data.");
-            }
-        });
-    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -108,6 +108,11 @@
             font-size: 12px;
             margin-top: 4px;
         }
+
+        .invalid-input {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+        }
     </style>
 </head>
 <body>
@@ -278,6 +283,12 @@
         $(document).ready(function () {
             updateTotalMarks();
 
+            // Restrict negative or zero marks input
+            $(document).on("input", ".marks-input", function () {
+                validateMarksInput($(this));
+            });
+
+            // Handle change event for checkboxes and marks input
             $(document).on("change", "#gridUnassignedQuestion .toggle-edit, #gridUnassignedQuestion .marks-input", function () {
                 handleMarksChange("#gridUnassignedQuestion", this);
             });
@@ -286,6 +297,16 @@
                 handleMarksChange("#gridExamQuestion", this);
             });
         });
+
+        function validateMarksInput(inputElement) {
+            var value = parseFloat(inputElement.val());
+
+            if (isNaN(value) || value <= 0) {
+                inputElement.addClass("invalid-input"); // Add red border
+            } else {
+                inputElement.removeClass("invalid-input"); // Remove red border if valid
+            }
+        }
 
         function handleMarksChange(gridId, element) {
             var grid = $(gridId).data("kendoGrid");
@@ -296,15 +317,23 @@
             var marks = parseFloat(row.find(".marks-input").val()) || 0;
             var isChecked = row.find(".toggle-edit").is(":checked");
 
+            // Ensure valid marks (greater than 0)
+            if (marks <= 0) {
+                marks = 0;
+                row.find(".marks-input").val("").addClass("invalid-input"); // Reset invalid input
+            } else {
+                row.find(".marks-input").removeClass("invalid-input"); // Remove red border if valid
+            }
+
             if (gridId === "#gridUnassignedQuestion" || gridId === "#gridExamQuestion") {
                 if (isChecked) {
                     selectedRows[questionId] = marks;
                 } else {
-                    delete selectedRows[questionId]; 
+                    delete selectedRows[questionId];
                 }
             }
 
-            updateTotalMarks(); 
+            updateTotalMarks();
         }
 
         function fnKendoGridDataBoundEventForExam() {
@@ -366,178 +395,178 @@
     </script>
     @*Send Exam And Questions In Controller By AJAX*@
     <script>
-        var selectedQuestionsByGrid = {};
-        var unselectedQuestionsByGrid = {};
-        var preselectedQuestions = {};
+                        var selectedQuestionsByGrid = {};
+                        var unselectedQuestionsByGrid = {};
+                        var preselectedQuestions = {};
 
-        function storeSelection(gridId) {
-            var grid = $("#" + gridId).data("kendoGrid");
-            var rows = grid.tbody.find("tr");
+                        function storeSelection(gridId) {
+                            var grid = $("#" + gridId).data("kendoGrid");
+                            var rows = grid.tbody.find("tr");
 
-            rows.each(function () {
-                var row = $(this);
-                var dataItem = grid.dataItem(row);
-                var checkbox = row.find(".toggle-edit");
+                            rows.each(function () {
+                                var row = $(this);
+                                var dataItem = grid.dataItem(row);
+                                var checkbox = row.find(".toggle-edit");
 
-                var questionId = dataItem.QuestionId;
-                var marks = parseFloat(row.find(".marks-input").val()) || 0;
-                var isChecked = checkbox.is(":checked");
+                                var questionId = dataItem.QuestionId;
+                                var marks = parseFloat(row.find(".marks-input").val()) || 0;
+                                var isChecked = checkbox.is(":checked");
 
-                if (!selectedQuestionsByGrid[gridId]) {
-                    selectedQuestionsByGrid[gridId] = {};
-                }
+                                if (!selectedQuestionsByGrid[gridId]) {
+                                    selectedQuestionsByGrid[gridId] = {};
+                                }
 
-                if (isChecked) {
-                    selectedQuestionsByGrid[gridId][questionId] = {
-                        QuestionId: questionId,
-                        Marks: marks
-                    };
-                    delete unselectedQuestionsByGrid[questionId];
-                } else {
-                    delete selectedQuestionsByGrid[gridId][questionId];
-                    if (gridId === "gridExamQuestion" && preselectedQuestions[questionId]) {
-                        unselectedQuestionsByGrid[questionId] = true;
-                    }
-                }
-            });
-        }
-
-        function restoreSelections(gridId) {
-            var grid = $("#" + gridId).data("kendoGrid");
-
-            grid.tbody.find("tr").each(function () {
-                var row = $(this);
-                var dataItem = grid.dataItem(row);
-                var checkbox = row.find(".toggle-edit");
-
-                var questionId = dataItem.QuestionId;
-
-                if (selectedQuestionsByGrid[gridId] && selectedQuestionsByGrid[gridId][questionId]) {
-                    checkbox.prop("checked", true);
-                    row.find(".marks-input").val(selectedQuestionsByGrid[gridId][questionId].Marks);
-                }
-
-                if (preselectedQuestions[questionId] && !unselectedQuestionsByGrid[questionId]) {
-                    checkbox.prop("checked", true);
-                }
-
-                if (unselectedQuestionsByGrid[questionId]) {
-                    checkbox.prop("checked", false);
-                }
-            });
-        }
-
-        function onDataBound(e) {
-            var gridId = e.sender.element.attr("id");
-
-            if (gridId === "gridExamQuestion") {
-                var grid = $("#" + gridId).data("kendoGrid");
-                grid.dataSource.data().forEach(function (item) {
-                    if (!preselectedQuestions[item.QuestionId]) {
-                        preselectedQuestions[item.QuestionId] = true;
-                    }
-
-                    if (!unselectedQuestionsByGrid[item.QuestionId]) {
-                        if (!selectedQuestionsByGrid[gridId]) {
-                            selectedQuestionsByGrid[gridId] = {};
+                                if (isChecked) {
+                                    selectedQuestionsByGrid[gridId][questionId] = {
+                                        QuestionId: questionId,
+                                        Marks: marks
+                                    };
+                                    delete unselectedQuestionsByGrid[questionId];
+                                } else {
+                                    delete selectedQuestionsByGrid[gridId][questionId];
+                                    if (gridId === "gridExamQuestion" && preselectedQuestions[questionId]) {
+                                        unselectedQuestionsByGrid[questionId] = true;
+                                    }
+                                }
+                            });
                         }
 
-                        if (!selectedQuestionsByGrid[gridId][item.QuestionId]) {
-                            selectedQuestionsByGrid[gridId][item.QuestionId] = {
-                                QuestionId: item.QuestionId,
-                                Marks: parseFloat(item.Marks) || 0
-                            };
+                        function restoreSelections(gridId) {
+                            var grid = $("#" + gridId).data("kendoGrid");
+
+                            grid.tbody.find("tr").each(function () {
+                                var row = $(this);
+                                var dataItem = grid.dataItem(row);
+                                var checkbox = row.find(".toggle-edit");
+
+                                var questionId = dataItem.QuestionId;
+
+                                if (selectedQuestionsByGrid[gridId] && selectedQuestionsByGrid[gridId][questionId]) {
+                                    checkbox.prop("checked", true);
+                                    row.find(".marks-input").val(selectedQuestionsByGrid[gridId][questionId].Marks);
+                                }
+
+                                if (preselectedQuestions[questionId] && !unselectedQuestionsByGrid[questionId]) {
+                                    checkbox.prop("checked", true);
+                                }
+
+                                if (unselectedQuestionsByGrid[questionId]) {
+                                    checkbox.prop("checked", false);
+                                }
+                            });
                         }
-                    }
-                });
-            }
 
-            restoreSelections(gridId);
-        }
+                        function onDataBound(e) {
+                            var gridId = e.sender.element.attr("id");
 
-        $(document).on("change", ".toggle-edit", function () {
-            var checkbox = $(this);
-            var row = checkbox.closest("tr");
-            var grid = row.closest(".k-grid").data("kendoGrid");
-            var gridId = grid.element.attr("id");
+                            if (gridId === "gridExamQuestion") {
+                                var grid = $("#" + gridId).data("kendoGrid");
+                                grid.dataSource.data().forEach(function (item) {
+                                    if (!preselectedQuestions[item.QuestionId]) {
+                                        preselectedQuestions[item.QuestionId] = true;
+                                    }
 
-            storeSelection(gridId);
-        });
+                                    if (!unselectedQuestionsByGrid[item.QuestionId]) {
+                                        if (!selectedQuestionsByGrid[gridId]) {
+                                            selectedQuestionsByGrid[gridId] = {};
+                                        }
+
+                                        if (!selectedQuestionsByGrid[gridId][item.QuestionId]) {
+                                            selectedQuestionsByGrid[gridId][item.QuestionId] = {
+                                                QuestionId: item.QuestionId,
+                                                Marks: parseFloat(item.Marks) || 0
+                                            };
+                                        }
+                                    }
+                                });
+                            }
+
+                            restoreSelections(gridId);
+                        }
+
+                        $(document).on("change", ".toggle-edit", function () {
+                            var checkbox = $(this);
+                            var row = checkbox.closest("tr");
+                            var grid = row.closest(".k-grid").data("kendoGrid");
+                            var gridId = grid.element.attr("id");
+
+                            storeSelection(gridId);
+                        });
 
 // ✅ When marks are changed, update marks in `selectedQuestionsByGrid`
-        $(document).on("input", ".marks-input", function () {
-            var row = $(this).closest("tr");
-            var grid = row.closest(".k-grid").data("kendoGrid");
-            var gridId = grid.element.attr("id");
-            var dataItem = grid.dataItem(row);
+                        $(document).on("input", ".marks-input", function () {
+                            var row = $(this).closest("tr");
+                            var grid = row.closest(".k-grid").data("kendoGrid");
+                            var gridId = grid.element.attr("id");
+                            var dataItem = grid.dataItem(row);
 
-            var questionId = dataItem.QuestionId;
-            var marks = parseFloat($(this).val()) || 0;
+                            var questionId = dataItem.QuestionId;
+                            var marks = parseFloat($(this).val()) || 0;
 
-            // ✅ Only update marks if question is already selected
-            if (selectedQuestionsByGrid[gridId] && selectedQuestionsByGrid[gridId][questionId]) {
-                selectedQuestionsByGrid[gridId][questionId].Marks = marks;
-            }
-        });
+                            // ✅ Only update marks if question is already selected
+                            if (selectedQuestionsByGrid[gridId] && selectedQuestionsByGrid[gridId][questionId]) {
+                                selectedQuestionsByGrid[gridId][questionId].Marks = marks;
+                            }
+                        });
 
-        function saveExamAndQuestions() {
-            var formData = $("#form").serializeArray();
-            var formObject = {};
+                        function saveExamAndQuestions() {
+                            var formData = $("#form").serializeArray();
+                            var formObject = {};
 
-            $.each(formData, function (index, field) {
-                formObject[field.name] = field.value;
-            });
+                            $.each(formData, function (index, field) {
+                                formObject[field.name] = field.value;
+                            });
 
-            var selectedQuestions = [];
-            var totalSelectedMarks = 0;
+                            var selectedQuestions = [];
+                            var totalSelectedMarks = 0;
 
-            Object.values(selectedQuestionsByGrid).forEach(gridData => {
-                Object.values(gridData).forEach(question => {
-                    selectedQuestions.push(question);
-                    totalSelectedMarks += question.Marks;
-                });
-            });
+                            Object.values(selectedQuestionsByGrid).forEach(gridData => {
+                                Object.values(gridData).forEach(question => {
+                                    selectedQuestions.push(question);
+                                    totalSelectedMarks += question.Marks;
+                                });
+                            });
 
-        var examStatus = formObject["ExamStatus"];
-        var totalExamMarks = parseFloat(formObject["TotalMarks"]) || 0;
+                        var examStatus = formObject["ExamStatus"];
+                        var totalExamMarks = parseFloat(formObject["TotalMarks"]) || 0;
 
-        if (examStatus === "PUBLISHED" && selectedQuestions.length === 0) {
-            Swal.fire("Validation Error", "At least one question must be selected when exam is published!", "warning");
-            return;
-        }
+                        if (examStatus === "PUBLISHED" && selectedQuestions.length === 0) {
+                            Swal.fire("Validation Error", "At least one question must be selected when exam is published!", "warning");
+                            return;
+                        }
 
-        if (examStatus === "PUBLISHED" && totalSelectedMarks !== totalExamMarks) {
-            Swal.fire("Validation Error", `Total selected marks (${totalSelectedMarks}) must match the exam total marks (${totalExamMarks})!`, "warning");
-            return;
-        }
+                        if (examStatus === "PUBLISHED" && totalSelectedMarks !== totalExamMarks) {
+                            Swal.fire("Validation Error", `Total selected marks (${totalSelectedMarks}) must match the exam total marks (${totalExamMarks})!`, "warning");
+                            return;
+                        }
 
-        var requestData = {
-            Exam: formObject,
-            SelectedQuestions: selectedQuestions,
-        };
+                        var requestData = {
+                            Exam: formObject,
+                            SelectedQuestions: selectedQuestions,
+                        };
 
-        console.log("Final Request Data:", requestData);
+                        console.log("Final Request Data:", requestData);
 
-        $.ajax({
-            url: "/Exam/Create",
-            type: "POST",
-            data: JSON.stringify(requestData),
-            contentType: "application/json",
-            success: function (response) {
-                Swal.fire("Success!", "Exam and questions saved successfully.", "success").then(() => {
-                    location.reload();
-                });
-            },
-            error: function () {
-                Swal.fire("Error!", "Failed to save data. Please try again.", "error");
-            }
-        });
-    }
+                        $.ajax({
+                            url: "/Exam/Create",
+                            type: "POST",
+                            data: JSON.stringify(requestData),
+                            contentType: "application/json",
+                            success: function (response) {
+                                Swal.fire("Success!", "Exam and questions saved successfully.", "success").then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function () {
+                                Swal.fire("Error!", "Failed to save data. Please try again.", "error");
+                            }
+                        });
+                    }
 
-        $(document).ready(function () {
-            $("#gridExamQuestion").data("kendoGrid").bind("dataBound", onDataBound);
-            $("#gridUnassignedQuestion").data("kendoGrid").bind("dataBound", onDataBound);
-        });
+                        $(document).ready(function () {
+                            $("#gridExamQuestion").data("kendoGrid").bind("dataBound", onDataBound);
+                            $("#gridUnassignedQuestion").data("kendoGrid").bind("dataBound", onDataBound);
+                        });
 
 
     </script>

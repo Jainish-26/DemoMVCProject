@@ -13,7 +13,6 @@ using WebMatrix.WebData;
 
 namespace DemoMVC.WebUi.Controllers
 {
-    [AllowAnonymous]
     public class UserExamController : Controller
     {
         private readonly ExamService _examService;
@@ -23,6 +22,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly UserExamService _userExamService;
         private readonly ExamQuestionsService _examQuestionsService;
         private readonly MessageService _messageService;
+        private readonly UserAnswerService _userAnswerService;
 
         public UserExamController()
         {
@@ -33,6 +33,7 @@ namespace DemoMVC.WebUi.Controllers
             _userExamService = new UserExamService();
             _examQuestionsService = new ExamQuestionsService();
             _messageService = new MessageService();
+            _userAnswerService = new UserAnswerService();
         }
         public ActionResult Index()
         {
@@ -61,8 +62,8 @@ namespace DemoMVC.WebUi.Controllers
             {
                 return View("ExamLinkExpired");
             }
-            
-            if(userExamDetails.ExamStatus == Constants.UserExamStatus.ONGOING)
+
+            if (userExamDetails.ExamStatus == Constants.UserExamStatus.ONGOING)
             {
                 var model = new StartTestModel
                 {
@@ -106,7 +107,8 @@ namespace DemoMVC.WebUi.Controllers
 
         //Save Details Enters From LogIn Page
         [HttpPost]
-        public ActionResult UserExamLogIn(string userToken,string userName,string name)
+        [AllowAnonymous]
+        public ActionResult UserExamLogIn(string userToken, string userName, string name)
         {
             try
             {
@@ -129,7 +131,7 @@ namespace DemoMVC.WebUi.Controllers
                     return View("ErrorPage");
                 }
 
-                if(userExamDetails.ExamStatus == Constants.UserExamStatus.ONGOING)
+                if (userExamDetails.ExamStatus == Constants.UserExamStatus.ONGOING)
                 {
                     return RedirectToAction("UserExamView", "UserExam", new { userToken });
                 }
@@ -157,7 +159,21 @@ namespace DemoMVC.WebUi.Controllers
                         ViewBag.ErrorMessage = "Failed to update exam status.";
                         return View("ErrorPage");
                     }
+                    ;
 
+                    var questions = _questionService.GetQuestionsByExamId(userExamDetails.ExamId)
+                    .Select(q => new QuestionAndAnswerModel
+                    {
+                        QuestionId = q.QuestionId,
+                    }).ToList();
+
+                    UserAnswers answer = new UserAnswers();
+                    answer.UserExamId = userExamDetails.UserExamId;
+                    foreach (var q in questions)
+                    {
+                        answer.QuestionId = q.QuestionId;
+                        _userAnswerService.CreateUserAnswer(answer);
+                    }
                     // Redirect to the User Exam View
                     return RedirectToAction("UserExamView", "UserExam", new { userToken });
                 }
@@ -170,11 +186,11 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         //Exam View
+        [AllowAnonymous]
         public ActionResult UserExamView(string userToken)
         {
             var userExamDetails = _userExamService.GetByUserToken(userToken);
             var exam = _examService.GetById(userExamDetails.ExamId);
-
             var examModel = new ExamModel
             {
                 ExamId = exam.ExamId,
@@ -199,7 +215,6 @@ namespace DemoMVC.WebUi.Controllers
                         AnswerText = ans.AnswerText,
                     }).ToList()
             }).ToList();
-
             var model = new ExamQuestionViewModel
             {
                 Exam = examModel,
@@ -208,7 +223,7 @@ namespace DemoMVC.WebUi.Controllers
             ViewBag.UserExamId = userExamDetails.UserExamId;
             return View(model);
         }
-        
+
         //Generate Token For User
         [HttpPost]
         public JsonResult GenerateExamLink(UserExamModel model)
@@ -298,7 +313,7 @@ namespace DemoMVC.WebUi.Controllers
 
                     userExams.UserId = userDetails.UserId;
                     userExams.ExamId = model.ExamId;
-                    userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId,model.ExamId);
+                    userExams.UserToken = AESCrypto.Encrypt(userDetails.UserId, model.ExamId);
                     userExams.ExpiryDate = DateTime.UtcNow.AddDays(2);
                     userExams.ExamStatus = Constants.UserExamStatus.PENDING;
                     userExams.CreatedBy = userId;
@@ -319,7 +334,7 @@ namespace DemoMVC.WebUi.Controllers
             return Json(new { success = true }, JsonRequestBehavior.AllowGet);
         }
 
-        
+
         [HttpPost]
         public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
         {
@@ -336,7 +351,7 @@ namespace DemoMVC.WebUi.Controllers
 
                 if (userExamDetails.ExamStatus != Constants.UserExamStatus.COMPLETED)
                 {
-                   if(userExamDetails.ExamStatus != Constants.UserExamStatus.ONGOING)
+                    if (userExamDetails.ExamStatus != Constants.UserExamStatus.ONGOING)
                     {
                         if (userExamDetails.ExpiryDate < DateTime.UtcNow)
                         {
@@ -344,7 +359,7 @@ namespace DemoMVC.WebUi.Controllers
                             int userId = decryptedToken.userId;
                             int examId = decryptedToken.examId;
 
-                            userExamDetails.UserToken = AESCrypto.Encrypt(userId,examId);
+                            userExamDetails.UserToken = AESCrypto.Encrypt(userId, examId);
                             userExamDetails.ExpiryDate = DateTime.UtcNow.AddDays(2);
 
                             _userExamService.UpdateUserExam(userExamDetails);
@@ -386,6 +401,7 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         //Check Duplicate UserName
+        [AllowAnonymous]
         public JsonResult CheckDuplicateUserName(string UserName)
         {
             var checkduplicate = _userProfileService.CheckDuplicateUserName(UserName).ToList();
@@ -403,6 +419,7 @@ namespace DemoMVC.WebUi.Controllers
 
         //Submit Exam
         [HttpPost]
+        [AllowAnonymous]
         public JsonResult SubmitExam(int UserExamId)
         {
             var userExamDetails = _userExamService.GetByUserExamId(UserExamId);
@@ -440,6 +457,7 @@ namespace DemoMVC.WebUi.Controllers
 
         // Get Remaining Time From Database
         [HttpGet]
+        [AllowAnonymous]
         public JsonResult GetRemainingTime(int userExamId)
         {
             var userExamDetails = _userExamService.GetByUserExamId(userExamId);
@@ -471,6 +489,5 @@ namespace DemoMVC.WebUi.Controllers
                 seconds = remainingTime.Seconds
             }, JsonRequestBehavior.AllowGet);
         }
-
     }
 }

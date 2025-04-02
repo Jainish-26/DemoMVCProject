@@ -1,11 +1,6 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DemoMVC.Service
 {
@@ -20,6 +15,10 @@ namespace DemoMVC.Service
         {
             return _userAnswerProvider.GetAllAnswerByUser(userExamId);
         }
+        public int CreateUserAnswer(UserAnswers ans)
+        {
+            return _userAnswerProvider.CreateUserAnswer(ans);
+        }
         public void SaveOrUpdateUserAnswer(UserAnswers model)
         {
             _userAnswerProvider.SaveOrUpdateUserAnswer(model);
@@ -27,6 +26,14 @@ namespace DemoMVC.Service
         public void UpdateManualMarks(int userAnswerId, int obtainedMarks)
         {
             _userAnswerProvider.UpdateManualMarks(userAnswerId, obtainedMarks);
+        }
+        public UserAnswers GetExistingAnswer(int userExamId, int questionId)
+        {
+            return _userAnswerProvider.GetExistingAnswer(userExamId, questionId);
+        }
+        public int UpdateAnswer(UserAnswers ans)
+        {
+            return _userAnswerProvider.UpdateAnswer(ans);
         }
     }
 }

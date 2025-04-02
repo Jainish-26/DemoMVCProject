@@ -1,17 +1,10 @@
 ﻿using DemoMVC.Models;
 using DemoMVC.Service;
-using DemoMVC.WebUi.Models;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Script.Serialization;
 
 namespace DemoMVC.WebUi.Controllers
 {
-    [AllowAnonymous]
     public class UserAnswerController : BaseController
     {
         private readonly UserAnswerService _userAnswerService;
@@ -28,21 +21,33 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public JsonResult SaveUserAnswer(UserAnswers answerData)
         {
             try
             {
-                _userAnswerService.SaveOrUpdateUserAnswer(answerData);
+                var existingAnswer = _userAnswerService.GetExistingAnswer(answerData.UserExamId, answerData.QuestionId);
 
-                return Json(new { success = true } , JsonRequestBehavior.AllowGet);
+                if (existingAnswer != null)
+                {
+                    if (existingAnswer.AnswerText != answerData.AnswerText || !existingAnswer.IsVisited)
+                    {
+                        existingAnswer.AnswerText = answerData.AnswerText;
+                        existingAnswer.IsVisited = true;
+                        _userAnswerService.UpdateAnswer(existingAnswer);
+                    }
+                }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception e)
             {
-                return Json(new { success = false , message =e.Message} , JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = e.Message }, JsonRequestBehavior.AllowGet);
             }
-        }   
+        }
 
         [HttpGet]
+        [AllowAnonymous]
         public JsonResult GetAllAnswers(int userExamId)
         {
             try
@@ -56,9 +61,5 @@ namespace DemoMVC.WebUi.Controllers
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
-
-
-
-
     }
 }

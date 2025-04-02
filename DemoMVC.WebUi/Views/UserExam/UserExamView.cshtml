@@ -245,6 +245,10 @@
         background-color: #ccc;
         cursor: not-allowed;
     }
+    .btn-save:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
     /*Pop Up*/
     .modal {
@@ -393,139 +397,138 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-let userExamId = @viewBagUserExamId;
-let totalQuestions = @totalQuestions;
-let currentQuestionIndex = 0;
-let answersData = {};
-let visitedCount = 0;
+    let userExamId = @viewBagUserExamId;
+    let totalQuestions = @totalQuestions;
+    let currentQuestionIndex = 0;
+    let answersData = {};
+    let visitedCount = 0;
     let remainingMinutes = 0;
     let remainingSeconds = 0;
     let timerInterval;
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".question-page")[0].style.display = "block";
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".question-page")[0].style.display = "block";
 
-    getRemainingTimeFromServer();
+        getRemainingTimeFromServer();
 
-    loadAnswersFromDatabase();
+        loadAnswersFromDatabase();
 
-    document.querySelectorAll(".palette-btn").forEach((btn) => {
-        btn.addEventListener("click", function () {
-            let questionIndex = parseInt(this.getAttribute("data-index"));
-            saveAndChangeQuestion(questionIndex);
+        document.querySelectorAll(".palette-btn").forEach((btn) => {
+            btn.addEventListener("click", function () {
+                let questionIndex = parseInt(this.getAttribute("data-index"));
+                saveAndChangeQuestion(questionIndex);
+            });
+        });
+
+        document.querySelector(".btn-next").addEventListener("click", function () {
+            saveAndChangeQuestion(currentQuestionIndex + 1);
+        });
+
+        document.querySelector(".btn-prev").addEventListener("click", function () {
+            saveAndChangeQuestion(currentQuestionIndex - 1);
+        });
+
+        document.querySelectorAll(".question-page").forEach((page) => {
+            page.addEventListener("input", function () {
+                let questionId = page.getAttribute("data-question-id");
+                let answer = getCurrentAnswer(page);
+
+                answersData[questionId] = { AnswerText: answer, IsVisited: true };
+                updateQuestionPalette();
+            });
         });
     });
 
-    document.querySelector(".btn-next").addEventListener("click", function () {
-        saveAndChangeQuestion(currentQuestionIndex + 1);
-    });
-
-    document.querySelector(".btn-prev").addEventListener("click", function () {
-        saveAndChangeQuestion(currentQuestionIndex - 1);
-    });
-
-    document.querySelectorAll(".question-page").forEach((page) => {
-        page.addEventListener("input", function () {
-            let questionId = page.getAttribute("data-question-id");
-            let answer = getCurrentAnswer(page);
-
-            answersData[questionId] = { AnswerText: answer, IsVisited: true };
-            updateQuestionPalette();
-        });
-    });
-});
-
-
-function loadAnswersFromDatabase() {
-    $.ajax({
-        url: '/UserAnswer/GetAllAnswers',
-        type: 'GET',
-        data: { userExamId: userExamId },
-        success: function (response) {
-            if (response.success && response.data) {
-                answersData = {};
-                response.data.forEach(ans => {
-                    answersData[ans.QuestionId] = {
-                        AnswerText: ans.AnswerText || "",
-                        IsVisited: ans.IsVisited || false
-                    };
-                });
-            } 
-            applyPrefilledAnswers();
-            updateQuestionPalette();
-        },
-        error: function (xhr) {
-            console.error("❌ Error loading answers:", xhr.responseText);
-        }
-    });
-}
-
-
-function applyPrefilledAnswers() {
-    document.querySelectorAll(".question-page").forEach((page) => {
-        let questionId = page.getAttribute("data-question-id");
-        let answerData = answersData[questionId];
-        if (answerData && answerData.IsVisited) {
-            visitedCount++;
-        }
-        if (answerData) {
-            let answer = answerData.AnswerText || "";
-
-            if (page.querySelector("input[type='radio']")) {
-                let radio = page.querySelector(`input[type='radio'][value='${answer}']`);
-                if (radio) radio.checked = true;
-            }
-
-            else if (page.querySelector("input[type='checkbox']")) {
-                answer.split(",").forEach(val => {
-                    let trimmedValue = val.trim();
-                    page.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
-                        if (checkbox.value === trimmedValue) {
-                            checkbox.checked = true;
-                        }
+    function loadAnswersFromDatabase() {
+        $.ajax({
+            url: '/UserAnswer/GetAllAnswers',
+            type: 'GET',
+            data: { userExamId: userExamId },
+            success: function (response) {
+                if (response.success && response.data) {
+                    answersData = {};
+                    response.data.forEach(ans => {
+                        answersData[ans.QuestionId] = {
+                            AnswerText: ans.AnswerText || "",
+                            IsVisited: ans.IsVisited || false
+                        };
                     });
-                });
+                } 
+                applyPrefilledAnswers();
+                updateQuestionPalette();
+            },
+            error: function (xhr) {
+                console.error("❌ Error loading answers:", xhr.responseText);
+            }
+        });
+    }
+
+
+    function applyPrefilledAnswers() {
+        document.querySelectorAll(".question-page").forEach((page) => {
+            let questionId = page.getAttribute("data-question-id");
+            let answerData = answersData[questionId];
+            if (answerData && answerData.IsVisited) {
+                visitedCount++;
+            }
+            if (answerData) {
+                let answer = answerData.AnswerText || "";
+
+                if (page.querySelector("input[type='radio']")) {
+                    let radio = page.querySelector(`input[type='radio'][value='${answer}']`);
+                    if (radio) radio.checked = true;
+                }
+
+                else if (page.querySelector("input[type='checkbox']")) {
+                    answer.split(",").forEach(val => {
+                        let trimmedValue = val.trim();
+                        page.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+                            if (checkbox.value === trimmedValue) {
+                                checkbox.checked = true;
+                            }
+                        });
+                    });
+                }
+
+                else if (page.querySelector("textarea")) {
+                    page.querySelector("textarea").value = answer;
+                }
+            }
+        });
+        checkAllQuestionsVisited();
+    }
+
+    function updateQuestionPalette() {
+
+        document.querySelectorAll(".palette-btn").forEach((btn, index) => {
+            let questionPage = document.querySelectorAll(".question-page")[index];
+            let questionId = questionPage.getAttribute("data-question-id");
+            let answerData = answersData[questionId] || {};
+            let status = "not-visited"; 
+
+            if (answerData.AnswerText) {
+                status = "answered";
+            } else if (answerData.IsVisited) {
+                status = "visited";
             }
 
-            else if (page.querySelector("textarea")) {
-                page.querySelector("textarea").value = answer;
+            btn.classList.remove("not-visited", "visited", "answered", "current");
+
+            if (index === currentQuestionIndex) {
+                btn.classList.add("current");
+                btn.style.background = "blue";
+            } else if (status === "answered") {
+                btn.classList.add("answered");
+                btn.style.background = "green";
+            } else if (status === "visited") {
+                btn.classList.add("visited");
+                btn.style.background = "yellow";
+            } else {
+                btn.classList.add("not-visited");
+                btn.style.background = "gray";
             }
-        }
-    });
-    checkAllQuestionsVisited();
-}
-
-function updateQuestionPalette() {
-
-    document.querySelectorAll(".palette-btn").forEach((btn, index) => {
-        let questionPage = document.querySelectorAll(".question-page")[index];
-        let questionId = questionPage.getAttribute("data-question-id");
-        let answerData = answersData[questionId] || {};
-        let status = "not-visited"; 
-
-        if (answerData.AnswerText) {
-            status = "answered";
-        } else if (answerData.IsVisited) {
-            status = "visited";
-        }
-
-        btn.classList.remove("not-visited", "visited", "answered", "current");
-
-        if (index === currentQuestionIndex) {
-            btn.classList.add("current");
-            btn.style.background = "blue";
-        } else if (status === "answered") {
-            btn.classList.add("answered");
-            btn.style.background = "green";
-        } else if (status === "visited") {
-            btn.classList.add("visited");
-            btn.style.background = "yellow";
-        } else {
-            btn.classList.add("not-visited");
-            btn.style.background = "gray";
-        }
-    });
-}
+        });
+    }
 
     function saveAndChangeQuestion(newIndex, callback = null) {
         if (newIndex < 0 || newIndex >= totalQuestions) return;
@@ -565,47 +568,48 @@ function updateQuestionPalette() {
         });
     }
 
+    function getCurrentAnswer(page) {
+        let answer = "";
 
-function getCurrentAnswer(page) {
-    let answer = "";
+        if (page.querySelector("input[type='radio']:checked")) {
+            answer = page.querySelector("input[type='radio']:checked").value;
+        } else if (page.querySelectorAll("input[type='checkbox']:checked").length > 0) {
+            let selectedCheckboxes = page.querySelectorAll("input[type='checkbox']:checked");
+            answer = Array.from(selectedCheckboxes).map(cb => cb.value).join(",");
+        } else if (page.querySelector("textarea")) {
+            answer = page.querySelector("textarea").value;
+        }
 
-    if (page.querySelector("input[type='radio']:checked")) {
-        answer = page.querySelector("input[type='radio']:checked").value;
-    } else if (page.querySelectorAll("input[type='checkbox']:checked").length > 0) {
-        let selectedCheckboxes = page.querySelectorAll("input[type='checkbox']:checked");
-        answer = Array.from(selectedCheckboxes).map(cb => cb.value).join(",");
-    } else if (page.querySelector("textarea")) {
-        answer = page.querySelector("textarea").value;
+        return answer;
     }
 
-    return answer;
-}
-
 // ✅ Change question
-function changeQuestion(index) {
-    if (index < 0 || index >= totalQuestions) return;
+    function changeQuestion(index) {
+        if (index < 0 || index >= totalQuestions) return;
 
-    document.querySelectorAll(".question-page")[currentQuestionIndex].style.display = "none";
-    document.querySelectorAll(".question-page")[index].style.display = "block";
-    currentQuestionIndex = index;
+        document.querySelectorAll(".question-page")[currentQuestionIndex].style.display = "none";
+        document.querySelectorAll(".question-page")[index].style.display = "block";
+        currentQuestionIndex = index;
 
-    document.querySelector(".btn-prev").disabled = currentQuestionIndex === 0;
-    document.querySelector(".btn-next").disabled = currentQuestionIndex === totalQuestions - 1;
+        document.querySelector(".btn-prev").disabled = currentQuestionIndex === 0;
+        document.querySelector(".btn-next").disabled = currentQuestionIndex === totalQuestions - 1;
 
-    updateQuestionPalette();
-}
+        updateQuestionPalette();
+    }
 
     function checkAllQuestionsVisited() {
         let saveButton = document.querySelector(".btn-save");
 
         if (visitedCount >= totalQuestions - 1) {
-            saveButton.style.display = "block"; // ✅ Show button
-            console.log("✅ All questions visited. Showing Save button.");
+            saveButton.disabled = false; // ✅ Enable button
+            console.log("✅ All questions visited. Enabling Save button.");
         } else {
-            saveButton.style.display = "none"; // ❌ Hide button
-            console.log(`❌ ${totalQuestions - visitedCount} questions left. Hiding Save button.`);
+            saveButton.disabled = true; // ❌ Disable button
+            console.log(`❌ ${totalQuestions - visitedCount} questions left. Disabling Save button.`);
         }
     }
+
+
     function showSavePopup() {
         let answeredCount = document.querySelectorAll(".answered").length + 1;
 
@@ -628,6 +632,7 @@ function changeQuestion(index) {
             }
         });
     }
+
     function submitExam() {
         $.ajax({
             url: '/UserExam/SubmitExam',
@@ -642,6 +647,7 @@ function changeQuestion(index) {
             }
         });
     }
+
     function getRemainingTimeFromServer() {
         $.ajax({
             url: '/UserExam/GetRemainingTime',
@@ -687,6 +693,7 @@ function changeQuestion(index) {
     function updateTimerDisplay() {
         $("#time").text(remainingMinutes + " min " + remainingSeconds + " sec");
     }
+
     function showTimeUpPopup() {
         Swal.fire({
             title: "⏳ Time is Up!",
@@ -700,7 +707,9 @@ function changeQuestion(index) {
             showConfirmButton: true,   // Show only OK button
             confirmButtonText: "OK"
         }).then(() => {
-            saveCurrentAnswerAndSubmit(); // Call function to submit attempted answers
+            saveAndChangeQuestion(currentQuestionIndex, function () {
+                submitExam();
+            }); // Call function to submit attempted answers
         });
     }
 </script>
