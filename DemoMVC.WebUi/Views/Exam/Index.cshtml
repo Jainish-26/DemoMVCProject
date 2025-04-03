@@ -17,25 +17,21 @@
     bool AllowedView = _base.CheckPermission(formCode, AccessPermission.IsView);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
-<h2 class="text-center fw-bold mt-4">Exam List</h2>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="d-flex justify-content-end" style="margin-left: 50px; margin-right: 50px">
-    @Html.ActionLink("Create New", "Create", "Exam", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
-    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+<div class="d-flex justify-content-between align-items-center m-2">
+    <h2 class="fw-bold mx-3 ">Exams</h2>
+    <div>
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    </div>
 </div>
-<div class="common_white_box listingpage" style="margin-left: 50px; margin-right: 50px">
+<div class="common_white_box listingpage mx-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.ExamsGridModel>()
             .Name("gridExam")
             .AutoBind(false)
-            //.Excel(excel => excel
-            //  .FileName("FormList.xlsx")
-            //  .Filterable(true)
-            //  .AllPages(true))
             .Columns(columns =>
             {
-
                 columns.Bound(c => c.ExamName).Width("7%").Title("Exam");
                 columns.Bound(c => c.ExamCode).Width("7%").Title("Exam Code");
                 columns.Bound(c => c.TotalMarks).Width("7%").Title("Marks");
@@ -48,7 +44,6 @@
                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
                     .ClientTemplate("<div class='k_action_table'>" +
                     (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'><i class='fa fa-edit'></i></a> " : "") +
-                    (AllowedDelete ? "<a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=ExamId#)'><i class='fa fa-trash'></i></a> " : "") +
                     (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=ExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
                     "<a href='javascript:void(0);' title='Generate Link' onclick=\"openEmailPopup(#=ExamId#)\"><i class='fa fa-link'></i></a>" +
                     "</div>")
@@ -114,11 +109,6 @@
         $('#gridExam').data('kendoGrid').dataSource.read();
         $('#gridExam').data('kendoGrid').refresh();
     });
-
-    function exportToExcel() {
-        var grid = $("#gridExam").data("kendoGrid");
-        grid.saveAsExcel();
-    }
 </script>
 <script>
     function navigateToViewQuestions(ExamId) {

@@ -428,6 +428,7 @@
 
         answersData[questionId] = { AnswerText: answer, IsVisited: true };
         updateQuestionPalette();
+        checkAllQuestionsVisited();
     });
 
     function loadAnswersFromDatabase() {
@@ -523,7 +524,6 @@
             data: JSON.stringify(userAnswerModel),
             success: function () {
                 answersData[questionId] = { AnswerText: answer, IsVisited: true };
-                checkAllQuestionsVisited();
                 if (typeof callback === "function") {
                     callback();
                 } else {
@@ -562,14 +562,14 @@
 
         $(".btn-prev").prop("disabled", currentQuestionIndex === 0);
         $(".btn-next").prop("disabled", currentQuestionIndex === totalQuestions - 1);
-
+        checkAllQuestionsVisited();
         updateQuestionPalette();
     }
 
     function checkAllQuestionsVisited() {
         let saveButton = $(".btn-save");
-        let visitedCount = $(".visited").length;
-        if (visitedCount >= totalQuestions) {
+        let visitedCount = Object.values(answersData).filter(q => q.IsVisited).length;
+        if (visitedCount >=totalQuestions-1) {
             saveButton.prop("disabled", false);
         } else {
             saveButton.prop("disabled", true);

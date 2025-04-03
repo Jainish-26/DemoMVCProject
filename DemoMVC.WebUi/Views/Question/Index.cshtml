@@ -27,25 +27,21 @@
         color: gray; /* Icon color */
     }
 </style>
-<h2 class="text-center fw-bold mt-4">Question List</h2>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<div class="d-flex justify-content-end m-2">
-    @Html.ActionLink("Create New", "Create", "Question", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
-    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+<div class="d-flex justify-content-between align-items-center m-2">
+    <h2 class="fw-bold mx-3 ">Question Bank</h2>
+    <div>
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    </div>
 </div>
 <div class="common_white_box listingpage m-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
             .Name("gridQuestion")
             .AutoBind(false)
-            //.Excel(excel => excel
-            //  .FileName("FormList.xlsx")
-            //  .Filterable(true)
-            //  .AllPages(true))
             .Columns(columns =>
             {
-               
+
                 columns.Bound(c => c.QuestionImage).Width("7%").Title("Image").ClientTemplate(
                 "# if(QuestionImage) { #" +
                 "<img src='/content/QuestionImage/#= QuestionImage #' alt='Question Image' class='grid-image' onclick='openImagePopup(\"#=QuestionId#\")' />" +
@@ -82,19 +78,19 @@
 
                 }
             })
-            
+
             .NoRecords("No record found")
             .Events(evt => evt
                .DataBinding("fnKendoGridCommonDataBinding")
                .DataBound("fnKendoGridDataBoundEvent")
             )
             .Sortable()
-            //.Filterable(filter => filter
-            //    .Mode(GridFilterMode.Row)
-            //    .Extra(false)
-            //    .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
-            //    .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
-            //)
+            .Filterable(filter => filter
+                .Mode(GridFilterMode.Row)
+                .Extra(false)
+                .Operators(o => o.ForString(f => f.Clear().Contains("Contains").DoesNotContain("Does Not Contain").StartsWith("Starts With").EndsWith("Ends With").IsEqualTo("Equal To").IsNotEqualTo("Not Equal To")))
+                .Operators(o => o.ForNumber(g => g.Clear().IsEqualTo("EqualTo").IsNotEqualTo("Not Equal To").IsGreaterThan("Greater Than").IsGreaterThanOrEqualTo("Greater Than Or Equal To").IsLessThan("Less Than").IsLessThanOrEqualTo("Less Than Or Equal To")))
+            )
             .Pageable(pageable => pageable
                 .Refresh(true)
                 .PageSizes(new[] {10,20, 50, 100, 200 })
@@ -102,7 +98,6 @@
             )
              .DataSource(dataSource => dataSource
                  .Ajax()
-                 //.Sort(sortable=>sortable.Add("Name").Ascending())
                  .Read(read => read.Action("GetGridData", "Question")).PageSize(10)
              )
         )

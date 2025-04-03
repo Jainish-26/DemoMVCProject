@@ -1,5 +1,6 @@
 ﻿@model DemoMVC.WebUi.Models.SubjectModel
 @using DemoMVC.Models
+@using DemoMVC.WebUi.Helper
 @{
     if (Model.Id > 0)
     {
@@ -10,6 +11,9 @@
         ViewBag.Title = "Add Subject";
     }
     string formCode = AuthorizeFormAccess.FormAccessCode.SUBJECT.ToString();
+    var formName = FormUtility.GetFormName(formCode);
+    string parentFormname = FormUtility.GetParentFormName(formCode);
+    ViewBag.Title = formName;
 
 }
 
@@ -32,9 +36,27 @@
             background-color: #f4f7f6;
         }
 
+        .breadcrumb_list {
+            margin: 20px 120px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+            .breadcrumb_list ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                gap: 10px;
+            }
+
+                .breadcrumb_list ul li {
+                    display: inline;
+                }
+
         .form-container {
             max-width: 500px;
-            margin: 50px auto;
+            margin-top: 50px;
             padding: 25px;
             background: #ffffff;
             border-radius: 10px;
@@ -44,7 +66,7 @@
             .form-container h2 {
                 text-align: center;
                 margin-bottom: 20px;
-                color: #ff0080; /* Teal Color */
+                color: #007bff; /* Professional Blue */
             }
 
         .form-label {
@@ -52,7 +74,7 @@
         }
 
         .input-group-text {
-            background-color: #ff0080;
+            background-color: #007bff;
             color: white;
             border: none;
         }
@@ -63,21 +85,16 @@
         }
 
         .btn-custom {
-            background: #ff0080;
+            background: #007bff;
             color: white;
             border-radius: 5px;
             padding: 10px;
-            transition: 0.3s;
             width: 100%;
         }
-
             .btn-custom:hover {
-                background: #138496;
+                background: #007bff;
+                color: white;
             }
-
-        .btn-secondary {
-            width: 100%;
-        }
 
         /* Toggle Button Customization */
         .toggle-container {
@@ -125,10 +142,6 @@
             transition: color 0.3s ease-in-out;
         }
 
-        .toggle-input:checked + .toggle-switch + .toggle-label {
-            color: #28a745; /* Green when active */
-        }
-
         /* Hide default checkbox */
         .toggle-input {
             display: none;
@@ -136,7 +149,13 @@
     </style>
 </head>
 <body>
-
+    <div class="breadcrumb_list">
+        <ul>
+            <li><a href="@Url.Action("Index","Subject")"><i class="fa fa-home"></i></a></li>
+            <li><a href="javascript:void(0)">System</a></li>
+            <li>Subjects</li>
+        </ul>
+    </div>
     <div class="container">
         <div class="form-container">
             @{
@@ -192,7 +211,6 @@
                     <div class="toggle-container">
                         <input type="checkbox" id="IsActiveToggle" class="toggle-input" @if (Model.IsActive) { <text> checked</text> }>
                         <label for="IsActiveToggle" class="toggle-switch"></label>
-                        <label for="IsActiveToggle" class="toggle-label">Inactive</label>
                     </div>
                     @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
                 </div>
@@ -200,7 +218,6 @@
                 <!-- Submit & Back Buttons -->
                 <div class="d-flex flex-column gap-2">
                     <button type="submit" class="btn btn-custom"><i class="fa fa-save"></i> Save</button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back</a>
                 </div>
             }
 

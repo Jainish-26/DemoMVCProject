@@ -12,7 +12,7 @@
 
     <script src="@Url.Content("~/Content/inc/bootstrap/js/popper.min.js")"></script>
     <script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap.min.js")"></script>
-    <script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap-datepicker/bootstrap-datepicker.js")"></script>
+    @*<script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap-datepicker/bootstrap-datepicker.js")"></script>*@
     <script src="@Url.Content("~/Content/inc/bootstrap/js/bootstrap-tagsinput/bootstrap-tagsinput.min.js")"></script>
     <!-- BEGIN META -->
     <meta name="keywords" content="your,keywords">
@@ -21,7 +21,7 @@
     <!-- BEGIN STYLESHEETS -->
     <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/css/fonts/fonts.css")" />
     <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap.min.css")" />
-    <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap-datepicker/datepicker3.css")" />
+    @*<link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap-datepicker/datepicker3.css")" />*@
     <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/bootstrap/css/bootstrap-tagsinput/bootstrap-tagsinput.css")" />
     <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/select2/select2.min.css")" />
     <link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/inc/font-awesome/css/font-awesome.min.css")" />
@@ -51,6 +51,7 @@
 
         .header_row {
             background-color: black;
+            opacity : 1;
         }
 
         .brand_row {
@@ -141,7 +142,7 @@
 
 </style>
 </head>
-<body class="left_menu_horizontal">
+<body class="left_menu_horizontal bg-light">
     <style id="gridPageLoader">
         .page-loader {
             position: absolute;
@@ -179,7 +180,7 @@
                                 @foreach (var _main in _menu)
                                 {
                                     <li class="head_menu_dropdown" id="@_main.FormAccessCode" data-facode="@_main.FormAccessCode">
-                                        <a href="@Url.Content(_main.NavigateURL)" style="color:white">
+                                        <a href="@Url.Content(_main.NavigateURL)" style="color:white;">
                                             <!--<i class="fa fa-home"></i>--> <!-- Replace with appropriate icon -->
                                             <span class="menu_text">@_main.Name</span>
                                         </a>

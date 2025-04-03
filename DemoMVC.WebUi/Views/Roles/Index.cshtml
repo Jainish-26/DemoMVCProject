@@ -25,7 +25,6 @@
     <h2 class="fw-bold mx-3 ">Roles List</h2>
     <div>
         @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
-        <button class="btn btn-outline-success btn rounded-pill shadow-sm" onclick="exportToExcel()" style="height:38px;">Export to Excel</button>
     </div>
 </div>
 
@@ -128,12 +127,6 @@
             }
         });
     }
-
-    function exportToExcel() {
-        var grid = $("#gridRoles").data("kendoGrid");
-        grid.saveAsExcel();
-    }
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -249,7 +249,6 @@
                                 <div class="toggle-container">
                                     <input type="checkbox" id="IsActiveToggle" class="toggle-input" @(Model.IsActive ? "checked" : "")>
                                     <label for="IsActiveToggle" class="toggle-switch" style=" margin-right:200px"></label>
-                                    <label for="IsActiveToggle" class="toggle-label">@(Model.IsActive ? "Active" : "Inactive")</label>
                                 </div>
                                 @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
                             </div>
@@ -274,11 +273,8 @@
 
         function updateLabel() {
             if (toggleInput.checked) {
-                label.textContent = "Active";
- 
                 hiddenInput.value = "True";
             } else {
-                label.textContent = "Inactive";
                 hiddenInput.value = "False";
             }
         }

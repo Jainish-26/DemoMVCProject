@@ -19,22 +19,17 @@
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
 
-<h2 class="text-center fw-bold mt-4">Subject List</h2>
-
-<div class="d-flex justify-content-end m-2">
-    @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
-    <button class="btn btn-outline-success btn rounded-pill px-4 shadow-sm" onclick="exportToExcel()" style="height:38px; margin-top:15px">Export to Excel</button>
+<div class="d-flex justify-content-between align-items-center m-2">
+    <h2 class="fw-bold mx-3 ">Question Types</h2>
+    <div>
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+    </div>
 </div>
-
 <div class="common_white_box listingpage m-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.QuestionTypesGridModel>()
           .Name("gridQuestionType")
           .AutoBind(false)
-          //.Excel(excel => excel
-          //      .FileName("RolesList.xlsx")
-          //      .Filterable(true)
-          //      .AllPages(true))
           .Columns(columns =>
           {
               columns.Bound(c => c.Name).Title("Name");
@@ -73,55 +68,6 @@
         $('#gridQuestionType').data('kendoGrid').refresh();
 
     });
-
-    @*function confirmDelete(roleId) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'This role will be permanently deleted!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '@Url.Action("DeleteRole", "Roles")',
-                    type: 'POST',
-                    data: { id: roleId },
-                    success: function (response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: 'Role deleted successfully.',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-                            $('#gridRoles').data('kendoGrid').dataSource.read();
-                            loadRoleChart(); // Refresh chart after delete
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: response.message,
-                                confirmButtonColor: '#d33'
-                            });
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    function exportToExcel() {
-        var grid = $("#gridSubjects").data("kendoGrid");
-        grid.saveAsExcel();
-    }*@
-
-
-
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

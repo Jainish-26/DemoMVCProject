@@ -24,9 +24,9 @@
     });
 </script>
 @Html.HiddenFor(c => c.RoleId)
-<div class="coman_content">
+<div class="coman_content mx-4">
 
-    <div class="subheader m-4">
+    <div class="subheader mx-4">
         <div class="left_title">
             <h2>Role- @Model.RoleName</h2>
             <div class="left breadcrumb_list">
@@ -45,7 +45,7 @@
 
         <label id="alertid" class="bg-success text-white"></label>
 
-        <div class="common_white_box listingpage m-4">
+        <div class="common_white_box listingpage mx-4">
             <div class="page-loader k-loading-image"></div>
             @(Html.Kendo().Grid<DemoMVC.Models.FormRoleMapping>()
             .Name("RoleRights")

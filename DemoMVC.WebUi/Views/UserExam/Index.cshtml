@@ -16,16 +16,12 @@
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
-<h2 class="text-center m-2">Participant List</h2>
-<div class="common_white_box listingpage m-5" style="margin-left: 50px; margin-right: 50px">
+<h2 class="text m-2 mx-4">Participant List</h2>
+<div class="common_white_box listingpage mx-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.UserExamGrid>()
             .Name("gridUserExam")
             .AutoBind(true)
-            //.Excel(excel => excel
-            //  .FileName("FormList.xlsx")
-            //  .Filterable(true)
-            //  .AllPages(true))
             .Columns(columns =>
             {
                 columns.Bound(c => c.Email).Width("7%").Title("Email");

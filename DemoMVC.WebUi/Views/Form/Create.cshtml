@@ -1,6 +1,5 @@
 ﻿@model DemoMVC.WebUi.Models.FormModel
 @using DemoMVC.Models
-@*@using AiRecruitment.Model;*@
 @{
     string formCode = AuthorizeFormAccess.FormAccessCode.FORMMASTER.ToString();
     if (Model.Id > 0)
@@ -12,9 +11,6 @@
         ViewBag.Title = "Add Form";
     }
 }
-@*@Html.Hidden("hdnFormAccessCode", formCode)*@
-
-@*@Html.Hidden("hdnFormAccessCode", AiRecruitment.Model.AuthorizeFormAccess.FormAccessCode.FORM.ToString())*@
 <!DOCTYPE html>
 <html lang="en">
 <head>

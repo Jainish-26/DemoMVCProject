@@ -15,12 +15,9 @@
 
 }
 @Html.Hidden("hdnFormAccessCode", formCode)
-@*@Html.Hidden("hdnFormAccessCode", AiRecruitment.Model.AuthorizeFormAccess.FormAccessCode.ROLES.ToString())
-    @Html.Hidden("hdnGridAccessCode",AiRecruitment.Model.AuthorizeGridAccess.GridAccessCode.GRID_ROLES.ToString())
-    @Html.Hidden("hdnKendoGridId", "gridRoles")*@
-<div class="coman_content">
+<div class="coman_content mx-4">
     <!--This is Title div -->
-    <div class="subheader m-4">
+    <div class="subheader mx-4">
         <div class="left_title">
             <h2>@ViewBag.Title</h2>
             <div class="left breadcrumb_list">
@@ -34,7 +31,7 @@
     </div>
     <!--END Title div-->
 
-    <div class="common_white_box listingpage m-4">
+    <div class="common_white_box listingpage mx-4">
         <div class="page-loader k-loading-image"></div>
         @(Html.Kendo().Grid<DemoMVC.Models.ErrorLogGridModel>()
           .Name("gridErrorLogs")

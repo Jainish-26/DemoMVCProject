@@ -30,9 +30,9 @@
     <style>
         .form-container {
             width: 100%;
-            margin: 0 auto;
-            padding: 15px 25px;
-            background-color: #f8f9fa;
+            margin-inline: 4px;
+/*            padding: 15px 25px;*/
+/*            background-color: #f8f9fa;*/
             border-radius: 8px;
         }
 
@@ -118,8 +118,8 @@
 <body>
     <div>
         <!-- Header Row -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text m-0 p-3">@ViewBag.Title</h2>
+        <div class="d-flex justify-content-between align-items-center mx-4 ">
+            <h2 class="text m-0">@ViewBag.Title</h2>
             <div class="d-flex align-items-center m-2">
                 <p class="fw-bold mb-1 me-3"><span id="totalMarks">0</span></p>
                 <button type="button" onclick="saveExamAndQuestions()" class="btn btn-warning rounded-pill px-4 shadow-sm fw-bold">
@@ -130,9 +130,8 @@
                 </a>
             </div>
         </div>
-
         <!-- Form Container -->
-        <div class="form-container p-3 bg-light rounded">
+        <div class="form-container mx-4">
             @Html.Hidden("hdnFormAccessCode", formCode)
             <form id="form" enctype="multipart/form-data">
                 @Html.HiddenFor(model => model.ExamId)
@@ -184,7 +183,7 @@
                 </div>
             </form>
         </div>
-
+        <h4 class=" text mx-4">Selected Questions</h4>
         <div class="common_white_box listingpage m-4">
             <div class="page-loader k-loading-image"></div>
             @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
@@ -223,6 +222,7 @@
              )
         )
         </div>
+        <h4 class=" text mx-4">Questions Bank</h4>
         <div class="common_white_box listingpage m-4">
             <div class="page-loader k-loading-image"></div>
             @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
@@ -514,7 +514,7 @@
                     var formData = $("#form").serializeArray();
                     var formObject = {};
                     if (!form.valid()) {
-                        alert("Enter Details");
+                        return;
                     }
                     $.each(formData, function (index, field) {
                         formObject[field.name] = field.value;
