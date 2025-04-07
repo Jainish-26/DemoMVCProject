@@ -110,5 +110,42 @@ namespace DemoMVC.Data
                 throw e;
             }
         }
+        public bool CountUserExamByExamId(int ExamId)
+        {
+            try
+            {
+                int examCount = (from i in _db.UserExams where i.ExamId == ExamId select i).Count();
+                if (examCount == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        public List<UserExamGrid> GetByExamId(int ExamId)
+        {
+            var query = (from a in _db.UserAnswers
+                         join e in _db.UserExams on a.UserExamId equals e.UserExamId
+                         join u in _db.UserProfile on e.UserId equals u.UserId
+                         join i in _db.Exams on e.ExamId equals i.ExamId
+                         where e.ExamId == ExamId && e.ResultStatus == Constants.ResultStatus.EVALUATED
+                         select new UserExamGrid
+                         {
+                             UserExamId = e.UserExamId,
+                             Email = u.Email,
+                             ExamName = i.ExamName,
+                             Result = e.Result,
+                             StartTime = e.StartTime
+                         }).Distinct().OrderByDescending(a => a.Result);
+            return query.ToList();
+        }
     }
 }

@@ -118,5 +118,18 @@ namespace DemoMVC.Data
         {
             return (from q in _db.ExamQuestions where QuestionId == q.QuestionId && ExamId == q.ExamId select q.Marks).FirstOrDefault();
         }
+
+        public bool AddAllQuestions(List<ExamQuestions> examQuestions)
+        {
+            try
+            {
+                _db.ExamQuestions.AddRange(examQuestions);
+                _db.SaveChanges();
+                return true;
+            }catch(Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }

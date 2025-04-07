@@ -65,7 +65,7 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Username</label>
-                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control rounded-pill border-primary" })
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control rounded-pill border-primary"})
                     @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
                 </div>
                 <div class="mb-3">
@@ -143,8 +143,17 @@
 
             $("#examForm input").prop("readonly", true);
             $("#startExamBtn").text("Continue Test");
-            $("#cancelBtn").hide(); 
+            $("#cancelBtn").hide();
             $("#UserName").rules("remove", "remote");
+        } else {
+
+            var userName = @Html.Raw(Json.Encode(Model.UserName));
+            var name = @Html.Raw(Json.Encode(Model.Name));
+
+            if (name != null) {
+                $("#examForm input").prop("readonly", true);
+                $("#UserName").rules("remove", "remote");
+            }
         }
     });
 
@@ -157,7 +166,7 @@
         $("#startExamBtn").click(function (e) {
             setTimeout(function () {
                 location.reload();
-            }, 500); 
+            }, 500);
         });
     </script>
 

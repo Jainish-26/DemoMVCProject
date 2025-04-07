@@ -206,6 +206,7 @@
     <Compile Include="Models\ExamModel.cs" />
     <Compile Include="Models\ExamQuestionModel.cs" />
     <Compile Include="Models\FormModel.cs" />
+    <Compile Include="Models\LeaderboardModel.cs" />
     <Compile Include="Models\QuestionAndAnswerModel.cs" />
     <Compile Include="Models\QuestionTypeModel.cs" />
     <Compile Include="Models\RolesModel.cs" />
@@ -2516,6 +2517,7 @@
     <Content Include="Views\UserExam\ExamSummary.cshtml" />
     <Content Include="Views\Shared\ErrorPage.cshtml" />
     <Content Include="Views\UserExamCheck\CheckExam.cshtml" />
+    <Content Include="Views\UserExam\TopScorers.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

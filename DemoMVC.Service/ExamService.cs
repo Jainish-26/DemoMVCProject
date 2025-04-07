@@ -42,5 +42,9 @@ namespace DemoMVC.Service
         {
             return _examProvider.CheckDuplicateExamCode(ExamCode);
         }
+        public int CountCopyOfExams(string examCode)
+        {
+            return _examProvider.CountCopyOfExams(examCode);
+        }
     }
 }

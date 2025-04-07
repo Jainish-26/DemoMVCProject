@@ -48,5 +48,13 @@ namespace DemoMVC.Service
         {
             _userExamProvider.UpdateResultStatus(userExamId);
         }
+        public bool CountUserExamByExamId(int ExamId)
+        {
+            return _userExamProvider.CountUserExamByExamId(ExamId);
+        }
+        public List<UserExamGrid> GetByExamId(int ExamId)
+        {
+            return _userExamProvider.GetByExamId(ExamId);
+        }
     }
 }

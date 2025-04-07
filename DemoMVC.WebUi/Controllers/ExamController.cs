@@ -19,6 +19,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly CommonLookupService _commonLookupService;
         private readonly AnswerService _answerService;
         private readonly MessageService _messageService;
+        private readonly UserExamService _userExamService;
 
         public ExamController()
         {
@@ -28,6 +29,7 @@ namespace DemoMVC.WebUi.Controllers
             _commonLookupService = new CommonLookupService();
             _answerService = new AnswerService();
             _messageService = new MessageService();
+            _userExamService = new UserExamService();
         }
         public ActionResult Index()
         {
@@ -325,6 +327,79 @@ namespace DemoMVC.WebUi.Controllers
             return PartialView("_EmailInputPartial", model);
         }
 
+        public JsonResult CheckUserInExam(int ExamId)
+        {
+            bool Ans = _userExamService.CountUserExamByExamId(ExamId);
+            if (!Ans)
+            {
+                return Json(new { success = false, message = "Exam Already Assigned To Candidate" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = true, examId = ExamId }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
+        public JsonResult CreateDuplicateExam(int ExamId)
+        {
+            try
+            {
+                var examDetails = _examService.GetById(ExamId);
+                var examQuestionDetails = _examQuestionsService.GetExamQuestionsById(ExamId);
+                int countOfCopy = _examService.CountCopyOfExams(examDetails.ExamCode + "COPY");
+
+                Exams exam = new Exams();
+                List<ExamQuestions> examQuestions = new List<ExamQuestions>();
+
+                exam.ExamName = countOfCopy==0 ? examDetails.ExamName+"Copy" :examDetails.ExamName+"Copy"+countOfCopy;
+                exam.ExamCode = countOfCopy == 0 ? examDetails.ExamCode + "COPY" : examDetails.ExamCode + "COPY" + countOfCopy;
+                exam.TotalMarks = examDetails.TotalMarks;
+                exam.PassingMarks = examDetails.PassingMarks;
+                exam.IsActive = examDetails.IsActive;
+                exam.DurationMin = examDetails.DurationMin;
+                exam.StartTime = examDetails.StartTime;
+                exam.EndTime = examDetails.EndTime;
+                exam.ExamStatus = examDetails.ExamStatus;
+                exam.CreatedBy = SessionHelper.UserId;
+                exam.CreatedOn = DateTime.UtcNow;
+
+                int examId = _examService.CreateExam(exam);
+
+                foreach(var q in examQuestionDetails)
+                {
+                    var examQ = new ExamQuestions
+                    {
+                        ExamId = examId,
+                        QuestionId = q.QuestionId,
+                        Marks = q.Marks
+                        
+                    };
+
+                    examQuestions.Add(examQ);
+                }
+
+                bool ans =_examQuestionsService.AddAllQuestions(examQuestions);
+
+                if(ans && examId > 0)
+                {
+                    return Json(new { success = true, message = "Duplicate Exam Created Successfully" }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    if(examId <= 0)
+                    {
+                        return Json(new { success = false, message = "Error While Creating Exam" }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = "Error While Adding Questions In Exam" }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }

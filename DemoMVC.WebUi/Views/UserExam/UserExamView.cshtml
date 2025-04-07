@@ -569,7 +569,7 @@
     function checkAllQuestionsVisited() {
         let saveButton = $(".btn-save");
         let visitedCount = Object.values(answersData).filter(q => q.IsVisited).length;
-        if (visitedCount >=totalQuestions-1) {
+        if (visitedCount >=totalQuestions -1) {
             saveButton.prop("disabled", false);
         } else {
             saveButton.prop("disabled", true);

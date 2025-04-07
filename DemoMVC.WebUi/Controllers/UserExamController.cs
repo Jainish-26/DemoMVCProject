@@ -13,7 +13,7 @@ using WebMatrix.WebData;
 
 namespace DemoMVC.WebUi.Controllers
 {
-    public class UserExamController : Controller
+    public class UserExamController : BaseController
     {
         private readonly ExamService _examService;
         private readonly AnswerService _answerService;
@@ -91,6 +91,8 @@ namespace DemoMVC.WebUi.Controllers
                 var model = new StartTestModel
                 {
                     Email = userDetails.Email,
+                    UserName = userDetails.UserName?? "",
+                    Name = userDetails.Name ?? "",
                     ExamName = examDetails.ExamName,
                     ExamId = userExamDetails.ExamId,
                     Duration = examDetails.DurationMin,
@@ -190,6 +192,10 @@ namespace DemoMVC.WebUi.Controllers
             var userExamDetails = _userExamService.GetByUserToken(userToken);
             var exam = _examService.GetById(userExamDetails.ExamId);
 
+            if(userExamDetails.ExamStatus == Constants.UserExamStatus.COMPLETED)
+            {
+                return RedirectToAction("ExamSummary", new { id = exam.ExamId });
+            }
             var examModel = new ExamModel
             {
                 ExamId = exam.ExamId,
@@ -488,6 +494,31 @@ namespace DemoMVC.WebUi.Controllers
                 minutes = remainingTime.Minutes,
                 seconds = remainingTime.Seconds
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult TopScorers()
+        {
+            LeaderboardModel model = new LeaderboardModel();
+            BindExams(ref model);
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult GetTopScorers([DataSourceRequest] DataSourceRequest request,int ExamId)
+        {
+            var data = _userExamService.GetByExamId(ExamId);
+            return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+        }
+
+        public LeaderboardModel BindExams(ref LeaderboardModel leaderboard)
+        {
+            var getExam = _examService.GetAllExam();
+            //leaderboard._ExamList.Add(new SelectListItem() { Text = "Select Exam", Value = "" });
+            foreach (var exam in getExam)
+            {
+                leaderboard._ExamList.Add(new SelectListItem() { Text = exam.ExamName.Trim(), Value = exam.ExamId.ToString() });
+            }
+
+            return leaderboard;
         }
     }
 }

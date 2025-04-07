@@ -62,5 +62,6 @@ namespace DemoMVC.Models
 
         public string ResultStatus { get; set; }
         public string ResultBadgeCode { get; set; }
+        public DateTime? StartTime { get; set; }
     }
 }

@@ -1,0 +1,91 @@
+﻿@model DemoMVC.WebUi.Models.LeaderboardModel
+@using DemoMVC.Models
+@using Kendo.Mvc.UI
+
+@{
+    ViewBag.Title = "TopScorers";
+}
+
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .form-select {
+        padding: 12px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+</style>
+
+
+<div class="d-flex justify-content-between align-items-center m-4 mx-4">
+    <h2 class="mb-0">Leaderboard</h2>
+
+    <div>
+        @Html.DropDownListFor(model => model.ExamId, Model._ExamList, new { @class = "form-select", @id = "ddlExamList" })
+        <input type="text" id="gridSearchBox" class="form-control mb-2" placeholder="Search..." style="width: 250px;" />
+        @Html.ValidationMessageFor(model => model.ExamId, "", new { @class = "text-danger d-block mt-1" })
+    </div>
+</div>
+<div class="common_white_box listingpage mx-4">
+    <div class="page-loader k-loading-image"></div>
+    @(Html.Kendo().Grid<DemoMVC.Models.UserExamGrid>()
+     .Name("gridLeaderBoard")
+     .AutoBind(true)
+     .Columns(columns =>
+     {
+         columns.Bound(c => c.Email).Width("10%").Title("Participant");
+         columns.Bound(c => c.ExamName).Width("10%").Title("Technology");
+         columns.Bound(c => c.Result).Width("10%").Title("Score").Sortable(true);
+         columns.Bound(c => c.StartTime)
+        .Width("10%")
+        .Title("Date")
+        .Format("{0:yyyy-MM-dd}");
+     })
+     .NoRecords("No record found")
+     .Events(evt => evt
+        .DataBinding("fnKendoGridCommonDataBinding")
+        .DataBound("fnKendoGridDataBoundEvent")
+     )
+     //.Sortable()
+     .Pageable(pageable => pageable
+         .Refresh(true)
+         .PageSizes(new[] {10, 20, 50, 100, 200 })
+         .ButtonCount(5)
+     )
+     .DataSource(dataSource => dataSource
+         .Ajax()
+         .Read(read => read.Action("GetTopScorers", "UserExam").Data("getExamId"))
+         //.Sort(sort => sort.Add(c => c.Result).Descending())
+         .PageSize(10)
+     )
+ )
+</div>
+
+<script>
+    $(document).ready(function () {
+        // On change of dropdown, refresh Kendo Grid
+        $("#ddlExamList").change(function () {
+            $("#gridLeaderBoard").data("kendoGrid").dataSource.read();
+        });
+    });
+
+    // Function to get selected ExamId
+    function getExamId() {
+        return { examId: $("#ddlExamList").val() };
+    }
+</script>
+
+
+
+
+
+

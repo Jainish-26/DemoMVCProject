@@ -43,7 +43,8 @@
                     .HeaderHtmlAttributes(new { @class = "center_text" })
                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
                     .ClientTemplate("<div class='k_action_table'>" +
-                    (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Exam") + "/#=ExamId#'><i class='fa fa-edit'></i></a> " : "") +
+                    (AllowedEdit ? "<a href='javascript:void(0);' title='Edit Details' onclick=\"fnEditExam(#=ExamId#)\"><i class='fa fa-edit'></i></a> " : "") +
+                    (AllowedAdd ? "<a href='javascript:void(0);' title='Edit Details' onclick=\"fnDuplicateExam(#=ExamId#)\"><i class='fa fa-clone'></i></a> " : "") +
                     (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=ExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
                     "<a href='javascript:void(0);' title='Generate Link' onclick=\"openEmailPopup(#=ExamId#)\"><i class='fa fa-link'></i></a>" +
                     "</div>")
@@ -51,10 +52,6 @@
                     .Title("Action")
                     .Width("7%")
                     .Sortable(false);
-                }
-                else
-                {
-
                 }
             })
             .NoRecords("No record found")
@@ -81,9 +78,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Exam Questions</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+
             </div>
             <div class="modal-body">
                 <!-- Partial view content will be loaded here -->
@@ -129,14 +127,56 @@
             }
         });
     }
+    function fnEditExam(examId)
+    {
+        $.ajax({
+            url: '/Exam/CheckUserInExam',
+            type: 'GET',
+            data: { examId: examId },
+            success: function (response) {
+                if (response.success) {
+
+                    window.location.href = '/Exam/Create/' + response.examId;
+                } else {
+
+                    Swal.fire("Warning", response.message, "warning");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "Something went wrong!", "error");
+            }
+        });
+    }
+
+    function fnDuplicateExam(examId) {
+        $.ajax({
+            url: '/Exam/CreateDuplicateExam',
+            type: 'GET',
+            data: { examId: examId },
+            success: function (response) {
+                if (response.success) {
+                    $('#gridExam').data('kendoGrid').dataSource.read();
+                    $('#gridExam').data('kendoGrid').refresh();
+                    Swal.fire("Success", response.message, "success");
+                } else {
+
+                    Swal.fire("Warning", response.message, "warning");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "Something went wrong!", "error");
+            }
+        });
+    }
+
     function openEmailPopup(examId) {
-        var grid = $("#gridExam").data("kendoGrid");  
+        var grid = $("#gridExam").data("kendoGrid");
         var dataSource = grid.dataSource.data();
 
         var dataItem = dataSource.find(item => item.ExamId == examId);
 
         if (dataItem) {
-            var examStatus = dataItem.ExamStatus; 
+            var examStatus = dataItem.ExamStatus;
 
             if (examStatus === "PUBLISHED") {
                 $.ajax({
@@ -184,6 +224,7 @@
 
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
 

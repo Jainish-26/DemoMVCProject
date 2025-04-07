@@ -79,5 +79,11 @@ namespace DemoMVC.Data
                                   select e).ToList();
             return getExamDetails;
         }
+
+        public int CountCopyOfExams(string examCode)
+        {
+            var countExamCode = (from i in _db.Exams where i.ExamCode.Contains(examCode) select i).Count();
+            return countExamCode;
+        }
     }
 }

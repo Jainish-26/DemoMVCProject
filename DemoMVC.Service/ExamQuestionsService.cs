@@ -53,5 +53,9 @@ namespace DemoMVC.Service
         {
             return _examQuestionsProvider.GetMarksByQuestionId(QuestionId, ExamId);
         }
+        public bool AddAllQuestions(List<ExamQuestions> examQuestions)
+        {
+            return _examQuestionsProvider.AddAllQuestions(examQuestions);
+        }
     }
 }
