@@ -503,9 +503,24 @@ namespace DemoMVC.WebUi.Controllers
             return View(model);
         }
         [HttpPost]
-        public ActionResult GetTopScorers([DataSourceRequest] DataSourceRequest request,int ExamId)
+        public ActionResult GetTopScorers([DataSourceRequest] DataSourceRequest request,int ExamId,string searchTerm)
         {
             var data = _userExamService.GetByExamId(ExamId);
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+
+                data = data
+                    .ToList()
+                    .Where(x =>
+                        (x.Email != null && x.Email.ToLower().Contains(searchTerm)) ||
+                        (x.ExamName != null && x.ExamName.ToLower().Contains(searchTerm)) ||
+                        x.Result.ToString().Contains(searchTerm) ||
+                        (x.StartTime.HasValue && x.StartTime.Value.ToString("dd-MM-yyyy").Contains(searchTerm))
+                    )
+                    .ToList();
+            }
+
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 

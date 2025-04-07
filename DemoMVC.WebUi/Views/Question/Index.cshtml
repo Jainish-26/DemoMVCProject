@@ -26,14 +26,26 @@
         font-size: 50px; /* Adjust for the icon */
         color: gray; /* Icon color */
     }
+    #gridSearchBox {
+        min-width: 250px;
+        margin-left: 15px;
+        min-height: 38px;
+    }
+        #gridSearchBox::placeholder {
+            color: #6c757d; /* Light gray placeholder color */
+            opacity: 1; /* Ensure placeholder is visible */
+        }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <div class="d-flex justify-content-between align-items-center m-2">
-    <h2 class="fw-bold mx-3 ">Question Bank</h2>
-    <div>
+    <h2 class="fw-bold mx-3">Question Bank</h2>
+    <div class="d-flex align-items-center gap-3">
+        @Html.TextBox("gridSearchBox", null, new { @class = "form-control", placeholder = "Search...", style = "width: 250px;" })
         @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-warning btn rounded-pill px-4 shadow-sm fw-bold m-3" })
+
     </div>
 </div>
+
 <div class="common_white_box listingpage m-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.QuestionGridModel>()
@@ -67,7 +79,7 @@
                     .HeaderHtmlAttributes(new { @class = "center_text" })
                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
                     .ClientTemplate("<div class='k_action_table'>" +
-                        (AllowedEdit ? "<a title='Edit' href='" + Url.Action("Create", "Question") + "/#=QuestionId#'><i class='fa fa-edit'></i></a>" : "") +
+                        (AllowedEdit ? "<a href='javascript:void(0);' title='Edit Details' onclick=\"fnEditQuestion(#=QuestionId#)\"><i class='fa fa-edit'></i></a> " : "") +
                         (AllowedDelete ? " <a href='javascript:void(0);' title='Delete' onclick='confirmDelete(#=QuestionId#)'><i class='fa fa-trash'></i></a>" : "") +
                         (AllowedEdit ? "<a href='javascript:void()' onclick=\"fnShowDetails(#= QuestionId #)\"><i class='fa fa-eye'></i></a>":" ")+
                         "</div>")
@@ -98,7 +110,8 @@
             )
              .DataSource(dataSource => dataSource
                  .Ajax()
-                 .Read(read => read.Action("GetGridData", "Question")).PageSize(10)
+                 .Read(read => read.Action("GetGridData", "Question").Data("getFilterData"))
+                 .PageSize(10)
              )
         )
 </div>
@@ -106,15 +119,20 @@
 <div id="imageModalContainer"></div>
 <div id="questionModelContainer"></div>
 <script>
+    function getFilterData() {
+        return {
+            searchTerm: $("#gridSearchBox").val()
+        };
+    }
     $(document).ready(function () {
         $('#gridQuestion').data('kendoGrid').dataSource.read();
         $('#gridQuestion').data('kendoGrid').refresh();
     });
-
-        function exportToExcel() {
-            var grid = $("#gridQuestion").data("kendoGrid");
-        grid.saveAsExcel();
-    }
+    $('#gridSearchBox').on('input', function () {
+        $('#gridQuestion').data('kendoGrid').dataSource.read();
+    });
+    
+    //Delete Questions
     function confirmDelete(roleId) {
     Swal.fire({
         title: 'Are you sure?',
@@ -154,17 +172,13 @@
         }
     });
     }
-
-
     function openImagePopup(QuestionId) {
-        console.log("Question ID:", QuestionId);
         $.ajax({
             url: '@Url.Action("GetImagePopup", "Question")',
             type: 'GET',
             data: { id: QuestionId },
 
             success: function (response) {
-                console.log("Question ID:", response);
                 // Append modal content and show it
                 $("#imageModalContainer").html(response);
                 $("#imageModal").modal("show");
@@ -186,6 +200,25 @@
             },
             error: function () {
                 alert(" Failed To Load Data");
+            }
+        });
+    }
+    function fnEditQuestion(questionId) {
+        $.ajax({
+            url: '/Question/CheckQuestionInExam',
+            type: 'GET',
+            data: { questionId: questionId },
+            success: function (response) {
+                if (response.success) {
+
+                    window.location.href = '/Question/Create/' + response.questionId;
+                } else {
+
+                    Swal.fire("Warning", response.message, "warning");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "Something went wrong!", "error");
             }
         });
     }

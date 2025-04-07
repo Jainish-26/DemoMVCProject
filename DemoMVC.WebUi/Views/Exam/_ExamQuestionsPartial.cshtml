@@ -1,78 +1,153 @@
-@model DemoMVC.WebUi.Models.ExamQuestionViewModel
-@{ 
+﻿@model DemoMVC.WebUi.Models.UserExamCheckingModel
+
+@{
     var count = 1;
+    bool isCheckingMode = Model.UserExamId > 0;
 }
 
-<!-- Exam Header -->
+<style>
+    .answer-item {
+        padding: 8px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+        padding-left: 25px;
+    }
+</style>
+
 <div class="card shadow-sm p-3 mb-4">
     <h3 class="fw-bold">@Model.Exam.ExamName</h3>
     <div class="row">
         <div class="col-md-3"><strong>Exam Code:</strong> @Model.Exam.ExamCode</div>
         <div class="col-md-3"><strong>Total Marks:</strong> @Model.Exam.TotalMarks</div>
-        <div class="col-md-3"><strong>Passing Marks:</strong> @Model.Exam.PassingMarks</div>
+        @if (isCheckingMode)
+        {
+            var totalMarks = Model.UserAnswers?.Sum(a => a.ObtainedMarks) ?? 0;
+            <div class="col-md-3"><strong>Result:</strong> @totalMarks</div>
+        }
+        else
+        {
+            <div class="col-md-3"><strong>Passing Marks:</strong> @Model.Exam.PassingMarks</div>
+        }
         <div class="col-md-3"><strong>Duration:</strong> @Model.Exam.DurationMin mins</div>
     </div>
 </div>
 
-<!-- Questions List -->
-@foreach (var question in Model.Questions)
+@for (int i = 0; i < Model.Questions.Count; i++)
 {
-    
+    var question = Model.Questions[i];
+    var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.AnswerText.Trim()).ToList();
+    var userAnswer = Model.UserAnswers?.FirstOrDefault(a => a.QuestionId == question.QuestionId);
+    var userAnswersList = userAnswer?.Answer?.Split(',').Select(a => a.Trim()).ToList() ?? new List<string>();
+
     <div class="card shadow-sm p-3 mb-4">
-        <h5 class="fw-bold">Q - @count. @question.QuestionText (Marks :- @question.Marks)</h5>
-        
-        <!-- Show Image if Available -->
+        <h5 class="fw-bold">Q@(i + 1): @question.QuestionText (Marks: @question.Marks)</h5>
+
         @if (!string.IsNullOrEmpty(question.QuestionImage))
         {
-            <div class="mb-2">
-                <img src="~/content/QuestionImage/@question.QuestionImage" alt="Question Image" class="img-fluid" style="max-width: 300px; display: block;">
-            </div>
+            <img src="~/content/QuestionImage/@question.QuestionImage" class="img-fluid mb-2" style="max-width: 300px;" />
         }
 
-        <!-- Show Options Based on Question Type -->
-        <div class="answers-section">
-            <div class="answers-heading">Answers:</div>
-            <div class="answer-options">
-                @if (question.QuestionType == "Single Choice MCQ")
-                {
-                    foreach (var answer in question.Answers)
-                    {
-                        <div class="answer-item @(answer.IsCorrect ? "correct" : "")">
-                            <div class="d-flex align-items-center" style="padding-left:25px">
-                                <input type="radio" name="selectedAnswer" value="@answer.AnswerText"
-                                       @(answer.IsCorrect ? "checked" : "") class="form-check-input" disabled>
-                                <span class="answer-text">@answer.AnswerText</span>
-                            </div>
-                        </div>
-                    }
-                }
-                else if (question.QuestionType == "Multiple Choice MCQ")
-                {
-                    foreach (var answer in question.Answers)
-                    {
-                        <div class="answer-item @(answer.IsCorrect ? "correct" : "")">
-                            <div class="d-flex align-items-center" style="padding-left:25px">
-                                <input type="checkbox" name="selectedAnswers" value="@answer.AnswerText"
-                                       @(answer.IsCorrect ? "checked" : "") class="form-check-input" disabled>
-                                <span class="answer-text">@answer.AnswerText</span>
-                            </div>
-                        </div>
-                    }
-                }
-                else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
-                {
-                    <div class="text-answer-box">
-                        <input type="text" class="form-control" style="color: #000; font-weight: 500;"
-                               value="@(question.Answers.FirstOrDefault()?.AnswerText ?? "")" disabled>
-                    </div>
-                }
-                else
-                {
-                    <p class="text-muted">Invalid Question Type</p>
-                }
-            </div>
-        </div>
+        @if (question.QuestionType == "Single Choice MCQ")
+        {
+            if (isCheckingMode)
+            {
+                <div><strong>Obtained Marks:</strong> <span style="color: blue; font-weight: bold;">@(userAnswer?.ObtainedMarks ?? 0)</span></div>
+            }
 
+            foreach (var answer in question.Answers)
+            {
+                bool isCorrectAnswer = answer.IsCorrect;
+                bool isUserAnswer = userAnswer?.Answer?.Trim() == answer.AnswerText.Trim();
+
+                <div class="answer-item">
+                    <input type="radio" disabled
+                           @(isCheckingMode ? (isUserAnswer ? "checked" : "") : (isCorrectAnswer ? "checked" : "") ) />
+                    <span>@answer.AnswerText</span>
+
+                    @if (isCheckingMode)
+                    {
+                        if (isCorrectAnswer && isUserAnswer)
+                        {
+                            <span style="color: green; font-weight: bold;">✅</span>
+                        }
+                        else if (isUserAnswer && !isCorrectAnswer)
+                        {
+                            <span style="color: red; font-weight: bold;">❌</span>
+                        }
+                        else if (isCorrectAnswer)
+                        {
+                            <span style="color: green; font-weight: bold;">✔</span>
+                        }
+                    }
+                    else if (isCorrectAnswer)
+                    {
+                        <span style="color: green; font-weight: bold;">✔</span>
+                    }
+                </div>
+            }
+        }
+        else if (question.QuestionType == "Multiple Choice MCQ")
+        {
+            if (isCheckingMode)
+            {
+                <div><strong>Obtained Marks:</strong> <span style="color: blue; font-weight: bold;">@(userAnswer?.ObtainedMarks ?? 0)</span></div>
+            }
+
+            foreach (var answer in question.Answers)
+            {
+                bool isCorrectAnswer = correctAnswers.Contains(answer.AnswerText.Trim());
+                bool isUserAnswer = userAnswersList.Contains(answer.AnswerText.Trim());
+
+                <div class="answer-item">
+                    <input type="checkbox" disabled
+                           @(isCheckingMode ? (isUserAnswer ? "checked" : "") : (isCorrectAnswer ? "checked" : "") ) />
+                    <span>@answer.AnswerText</span>
+
+                    @if (isCheckingMode)
+                    {
+                        if (isCorrectAnswer && isUserAnswer)
+                        {
+                            <span style="color: green; font-weight: bold;">✅</span>
+                        }
+                        else if (isUserAnswer && !isCorrectAnswer)
+                        {
+                            <span style="color: red; font-weight: bold;">❌</span>
+                        }
+                        else if (isCorrectAnswer)
+                        {
+                            <span style="color: green; font-weight: bold;">✔</span>
+                        }
+                    }
+                    else if (isCorrectAnswer)
+                    {
+                        <span style="color: green; font-weight: bold;">✔</span>
+                    }
+                </div>
+            }
+
+        }
+        else if (question.QuestionType == "Text Answer" || question.QuestionType == "SQL Query")
+        {
+            if (isCheckingMode)
+            {
+                <div class="mb-2">
+                    <label><strong>Obtained Marks:</strong></label>
+                    <input type="number" class="form-control" value="@(userAnswer?.ObtainedMarks ?? 0)" readonly style="width: 100px; font-weight: bold;" />
+                </div>
+                <div class="mb-2">
+                    <label><strong>User Answer:</strong></label>
+                    <textarea class="form-control" readonly>@(userAnswer?.Answer ?? "Not answered")</textarea>
+                </div>
+            }
+
+            <div class="mb-2">
+                <label><strong>Correct Answer(s):</strong></label>
+                <textarea class="form-control" readonly>@string.Join(", ", correctAnswers)</textarea>
+            </div>
+        }
+        else
+        {
+            <p class="text-danger">Invalid Question Type</p>
+        }
     </div>
-    count++;
 }

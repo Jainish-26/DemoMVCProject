@@ -300,9 +300,21 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             var data = _questionService.GetAllQuestionsGridModel();
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                data = data
+                    .Where(x =>
+                        (x.Subject != null && x.Subject.ToLower().Contains(searchTerm.ToLower())) ||
+                        (x.Type != null && x.Type.ToLower().Contains(searchTerm.ToLower())) ||
+                        (x.QuestionText != null && x.QuestionText.ToLower().Contains(searchTerm.ToLower())) ||
+                        (x.Difficulty != null && x.Difficulty.ToLower().Contains(searchTerm.ToLower())) ||
+                        (x.Marks != null && x.Marks.ToString().Contains(searchTerm))
+                    )
+                    .AsQueryable();
+            }
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
@@ -438,6 +450,17 @@ namespace DemoMVC.WebUi.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
+        public JsonResult CheckQuestionInExam(int QuestionId)
+        {
+            bool Ans = _questionService.CheckQuestionInExam(QuestionId);
+            if (!Ans)
+            {
+                return Json(new { success = false, message = "Question Already Assigned To Exam" }, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new { success = true, questionId = QuestionId }, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

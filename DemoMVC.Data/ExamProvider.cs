@@ -21,13 +21,15 @@ namespace DemoMVC.Data
 
         public IQueryable<ExamsGridModel> GetExamGridModal()
         {
-            return (from e in _db.Exams
+            return (from e in _db.Exams join
+                    c in _db.CommonLookup on e.ExamStatus equals c.Code into examStatusJoin
+                    from c in examStatusJoin.DefaultIfEmpty()
                     select new ExamsGridModel
                     {
                         ExamId = e.ExamId,
                         ExamName = e.ExamName,
                         ExamCode = e.ExamCode,
-                        BadgeCode = (from code in _db.CommonLookup where e.ExamStatus == code.Code select code.BadgeCode).FirstOrDefault(),
+                        BadgeCode = c != null ? c.BadgeCode : null,
                         ExamStatus = e.ExamStatus,
                         TotalMarks = e.TotalMarks,
                         DurationMin = e.DurationMin,

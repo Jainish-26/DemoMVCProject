@@ -24,8 +24,9 @@ namespace DemoMVC.Data
 
         public IQueryable<QuestionGridModel> GetAllQuestionsGridModel()
         {
-            return (from q in _db.Questions
-                        //where q.IsActive == true
+            return (from q in _db.Questions join
+                    c in _db.CommonLookup  on q.Difficulty equals c.Code into difficultyJoin
+                    from c in difficultyJoin.DefaultIfEmpty()
                     select new QuestionGridModel
                     {
                         QuestionId = q.QuestionId,
@@ -33,11 +34,10 @@ namespace DemoMVC.Data
                         Subject = q.Subject.SubjectName,
                         QuestionText = q.QuestionText,
                         QuestionImage = q.QuestionImage,
-                        BadgeCode = (from difficulty in _db.CommonLookup where q.Difficulty == difficulty.Code select difficulty.BadgeCode).FirstOrDefault(),
+                        BadgeCode = c!=null ? c.BadgeCode : null,
                         Marks = q.Marks,
                         Difficulty = q.Difficulty,
                         IsActive = q.IsActive,
-
                     }).AsQueryable();
         }
 
@@ -157,6 +157,20 @@ namespace DemoMVC.Data
             return _db.Questions
                 .Where(q => questionIds.Contains(q.QuestionId))
                 .ToList();
+        }
+
+        public bool CheckQuestionInExam(int QuestionId)
+        {
+            int count = (from i in _db.ExamQuestions where QuestionId == i.QuestionId select i).Count();
+
+            if (count == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

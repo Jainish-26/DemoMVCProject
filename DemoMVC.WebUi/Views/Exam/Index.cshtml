@@ -73,15 +73,40 @@
         )
 </div>
 
-<div id="examDetailsModal" class="modal fade" tabindex="-1" role="dialog">
+<style>
+    /* Override Bootstrap modal to appear top-right */
+    .modal.right-top .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        margin: 0;
+        height: 100vh;
+        width: 1000px; /* Adjust width as needed */
+        max-width: 100%;
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.right-top .modal-content {
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+    }
+
+    /* Optional: make modal body scrollable if content is long */
+    .modal.right-top .modal-body {
+        overflow-y: auto;
+    }
+</style>
+
+<!-- Modal -->
+<div id="examDetailsModal" class="modal fade right-top" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Exam Questions</h5>
+                <h5 class="modal-title">Question And Answers</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-
             </div>
             <div class="modal-body">
                 <!-- Partial view content will be loaded here -->

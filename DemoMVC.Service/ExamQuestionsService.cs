@@ -14,9 +14,9 @@ namespace DemoMVC.Service
             _examQuestionsProvider = new ExamQuestionsProvider();
         }
 
-        public int CraeteExamQuestion(ExamQuestions model)
+        public void CraeteExamQuestion(List<ExamQuestions> model)
         {
-            return _examQuestionsProvider.CraeteExamQuestion(model);
+             _examQuestionsProvider.CraeteExamQuestion(model);
         }
 
         public IQueryable<QuestionGridModel> GetExamQuestionsGrid(int? examId)
@@ -34,9 +34,9 @@ namespace DemoMVC.Service
             return _examQuestionsProvider.GetExamQuestionsById(ExamId);
         }
 
-        public bool DeleteExamQuestion(int QuestionId, int ExamId)
+        public void DeleteExamQuestion(HashSet<int> questionIds, int ExamId)
         {
-            return _examQuestionsProvider.DeleteExamQuestion(QuestionId, ExamId);
+            _examQuestionsProvider.DeleteExamQuestion(questionIds, ExamId);
         }
 
         public int GetTotalMarks(int? ExamId)
@@ -44,9 +44,9 @@ namespace DemoMVC.Service
             return _examQuestionsProvider.GetTotalMarks(ExamId);
         }
 
-        public int UpdateExamQuestion(ExamQuestions examQuestions)
+        public void UpdateExamQuestion(List<ExamQuestions> examQuestions)
         {
-            return _examQuestionsProvider.UpdateExamQuestion(examQuestions);
+             _examQuestionsProvider.UpdateExamQuestion(examQuestions);
         }
 
         public int GetMarksByQuestionId(int QuestionId, int ExamId)

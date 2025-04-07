@@ -54,13 +54,12 @@ namespace DemoMVC.Data
         }
 
 
-        public int CraeteExamQuestion(ExamQuestions model)
+        public void CraeteExamQuestion(List<ExamQuestions> model)
         {
             try
             {
-                _db.ExamQuestions.Add(model);
+                _db.ExamQuestions.AddRange(model);
                 _db.SaveChanges();
-                return model.ExamQuestionId;
             }
             catch (Exception e)
             {
@@ -82,36 +81,34 @@ namespace DemoMVC.Data
             return (from eq in _db.ExamQuestions where eq.QuestionId == QuestionId && eq.ExamId == ExamId select eq).FirstOrDefault();
         }
 
-        public int UpdateExamQuestion(ExamQuestions examQuestions)
+        public void UpdateExamQuestion(List<ExamQuestions> examQuestions)
         {
             try
             {
                 _db.Entry(examQuestions).State = System.Data.Entity.EntityState.Modified;
                 _db.SaveChanges();
-                return examQuestions.ExamQuestionId;
             }
             catch (Exception e)
             {
                 throw e;
             }
         }
-        public bool DeleteExamQuestion(int QuestionId, int ExamId)
+        public void DeleteExamQuestion(HashSet<int> questionIds, int ExamId)
         {
-            var examQuestion = GetByExamAndQuestionId(QuestionId, ExamId);
-            try
+            if (questionIds.Any())
             {
-                if (examQuestion != null)
+                // Find the questions that match the given question IDs and ExamId
+                var questionsToDelete = _db.ExamQuestions
+                    .Where(eq => questionIds.Contains(eq.QuestionId) && eq.ExamId == ExamId)
+                    .ToList();
+
+                // If there are questions to delete, remove them
+                if (questionsToDelete.Any())
                 {
-                    _db.ExamQuestions.Remove(examQuestion);
-                    _db.SaveChanges();
-                    return true;
+                    _db.ExamQuestions.RemoveRange(questionsToDelete); // Batch delete
+                    _db.SaveChanges(); // Save changes to the database
                 }
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
-            return false;
         }
 
         public int GetMarksByQuestionId(int QuestionId, int ExamId)

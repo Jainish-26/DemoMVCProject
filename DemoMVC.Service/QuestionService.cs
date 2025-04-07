@@ -54,5 +54,10 @@ namespace DemoMVC.Service
         {
             return _questionProvider.GetQuestionsByExamId(examId);
         }
+
+        public bool CheckQuestionInExam(int QuestionId)
+        {
+            return _questionProvider.CheckQuestionInExam(QuestionId);
+        }
     }
 }

@@ -23,18 +23,38 @@
         transition: all 0.3s;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
     }
+
+    #ddlExamList {
+        min-width: 100px;
+        padding-right: 50px;
+    }
+
+    #gridSearchBox {
+        min-width: 250px;
+        margin-left: 15px;
+        min-height: 45px;
+    }
+
+        #gridSearchBox::placeholder {
+            color: #6c757d; /* Bootstrap default gray */
+            opacity: 1; /* Make sure it's visible */
+        }
 </style>
 
 
 <div class="d-flex justify-content-between align-items-center m-4 mx-4">
     <h2 class="mb-0">Leaderboard</h2>
 
-    <div>
+    <div class="d-flex align-items-center gap-3">
         @Html.DropDownListFor(model => model.ExamId, Model._ExamList, new { @class = "form-select", @id = "ddlExamList" })
-        <input type="text" id="gridSearchBox" class="form-control mb-2" placeholder="Search..." style="width: 250px;" />
-        @Html.ValidationMessageFor(model => model.ExamId, "", new { @class = "text-danger d-block mt-1" })
+        <input type="search" id="gridSearchBox" class="form-control" placeholder="Search..." style="width: 250px;" />
     </div>
 </div>
+
+<div class="mx-4">
+    @Html.ValidationMessageFor(model => model.ExamId, "", new { @class = "text-danger d-block mt-1" })
+</div>
+
 <div class="common_white_box listingpage mx-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.UserExamGrid>()
@@ -44,11 +64,25 @@
      {
          columns.Bound(c => c.Email).Width("10%").Title("Participant");
          columns.Bound(c => c.ExamName).Width("10%").Title("Technology");
-         columns.Bound(c => c.Result).Width("10%").Title("Score").Sortable(true);
+         columns.Bound(c => c.Result)
+            .Width("10%")
+            .Title("Score")
+            .ClientTemplate("#= Result.toString() #")
+            .Sortable(true);
          columns.Bound(c => c.StartTime)
-        .Width("10%")
-        .Title("Date")
-        .Format("{0:yyyy-MM-dd}");
+            .Width("10%")
+            .Title("Date")
+            .Format("{0:dd-MM-yyyy}");
+         columns.Bound(c => c.UserExamId)
+            .HeaderHtmlAttributes(new { @class = "center_text" })
+            .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
+            .ClientTemplate("<div class='k_action_table'>" +
+            ("<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=UserExamId#)\"><i class='fa fa-eye'></i></a>") +
+            "</div>")
+            .Filterable(false)
+            .Title("Action")
+            .Width("7%")
+            .Sortable(false);
      })
      .NoRecords("No record found")
      .Events(evt => evt
@@ -63,29 +97,86 @@
      )
      .DataSource(dataSource => dataSource
          .Ajax()
-         .Read(read => read.Action("GetTopScorers", "UserExam").Data("getExamId"))
+         .Read(read => read.Action("GetTopScorers", "UserExam").Data("getFilterData"))
+         .ServerOperation(true)
          //.Sort(sort => sort.Add(c => c.Result).Descending())
          .PageSize(10)
      )
  )
 </div>
+<style>
+    /* Override Bootstrap modal to appear top-right */
+    .modal.right-top .modal-dialog {
+        position: fixed;
+        top: 0;
+        right: 0;
+        margin: 0;
+        height: 100vh;
+        width: 1000px; /* Adjust width as needed */
+        max-width: 100%;
+        transition: transform 0.3s ease-out;
+    }
 
+    .modal.right-top .modal-content {
+        height: 100vh;
+        border-radius: 0;
+        border: none;
+    }
+
+    /* Optional: make modal body scrollable if content is long */
+    .modal.right-top .modal-body {
+        overflow-y: auto;
+    }
+</style>
+
+<!-- Modal -->
+<div id="examDetailsModal" class="modal fade right-top" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Candidate Response</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Partial view content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
 <script>
+    function getFilterData() {
+        return {
+            examId: $("#ddlExamList").val(),
+            searchTerm: $("#gridSearchBox").val()
+        };
+    }
+
     $(document).ready(function () {
-        // On change of dropdown, refresh Kendo Grid
-        $("#ddlExamList").change(function () {
-            $("#gridLeaderBoard").data("kendoGrid").dataSource.read();
+        // Search box typing
+        $('#gridSearchBox').on('input', function () {
+            $('#gridLeaderBoard').data('kendoGrid').dataSource.read();
+        });
+
+        // Dropdown selection
+        $('#ddlExamList').on('change', function () {
+            $('#gridLeaderBoard').data('kendoGrid').dataSource.read();
         });
     });
 
-    // Function to get selected ExamId
-    function getExamId() {
-        return { examId: $("#ddlExamList").val() };
+    function fnShowDetails(userExamId) {
+        $.ajax({
+            url: '/Exam/GetExamQuestionDetails',
+            type: 'GET',
+            data: { userExamId: userExamId },
+            success: function (response) {
+                $("#examDetailsModal .modal-body").html(response);
+                $("#examDetailsModal").modal('show');
+            },
+            error: function () {
+                alert("Error loading exam details.");
+            }
+        });
     }
 </script>
-
-
-
-
-
-

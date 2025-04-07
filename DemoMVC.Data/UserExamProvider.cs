@@ -59,7 +59,7 @@ namespace DemoMVC.Data
                         Result = e.Result,
                         ResultStatus = e.ResultStatus,
                         ResultBadgeCode = (from code in _db.CommonLookup where e.ResultStatus == code.Code select code.BadgeCode).FirstOrDefault()
-                    }).AsQueryable();
+                    }).Distinct().AsQueryable();
         }
 
         public UserExams GetByUserExamId(int UserExamId)

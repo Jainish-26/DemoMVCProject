@@ -20,6 +20,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly AnswerService _answerService;
         private readonly MessageService _messageService;
         private readonly UserExamService _userExamService;
+        private readonly UserAnswerService _userAnswerService;
 
         public ExamController()
         {
@@ -30,6 +31,7 @@ namespace DemoMVC.WebUi.Controllers
             _answerService = new AnswerService();
             _messageService = new MessageService();
             _userExamService = new UserExamService();
+            _userAnswerService = new UserAnswerService();
         }
         public ActionResult Index()
         {
@@ -171,7 +173,7 @@ namespace DemoMVC.WebUi.Controllers
                 obj.CreatedBy = userId;
                 obj.CreatedOn = DateTime.UtcNow;
                 obj.ExamId = _examService.CreateExam(obj);
-
+                var createQuestions = new List<ExamQuestions>();
 
                 foreach (var question in model.SelectedQuestions)
                 {
@@ -181,7 +183,12 @@ namespace DemoMVC.WebUi.Controllers
                         QuestionId = question.QuestionId,
                         Marks = question.Marks
                     };
-                    _examQuestionsService.CraeteExamQuestion(examQuestion);
+
+                    createQuestions.Add(examQuestion);
+                }
+                if (createQuestions.Any())
+                {
+                    _examQuestionsService.CraeteExamQuestion(createQuestions); 
                 }
             }
             else
@@ -190,9 +197,11 @@ namespace DemoMVC.WebUi.Controllers
                 obj.UpdatedOn = DateTime.UtcNow;
                 _examService.UpdateExam(obj);
 
-
                 var existingExamQuestions = _examQuestionsService.GetExamQuestionsById(obj.ExamId).ToList();
 
+                var createQuestions = new List<ExamQuestions>();
+                var updateQuestions = new List<ExamQuestions>();
+                var deleteQuestionIds = new HashSet<int>();
 
                 var selectedQuestionIds = new HashSet<int>(model.SelectedQuestions.Select(q => q.QuestionId));
 
@@ -208,23 +217,36 @@ namespace DemoMVC.WebUi.Controllers
                             QuestionId = question.QuestionId,
                             Marks = question.Marks
                         };
-                        _examQuestionsService.CraeteExamQuestion(newExamQuestion);
+                        createQuestions.Add(newExamQuestion);
                     }
                     else if (existingExamQuestion.Marks != question.Marks)
                     {
-
                         existingExamQuestion.Marks = question.Marks;
-                        _examQuestionsService.UpdateExamQuestion(existingExamQuestion);
+                        updateQuestions.Add(existingExamQuestion);
                     }
                 }
-
 
                 foreach (var existingExamQuestion in existingExamQuestions)
                 {
                     if (!selectedQuestionIds.Contains(existingExamQuestion.QuestionId))
                     {
-                        _examQuestionsService.DeleteExamQuestion(existingExamQuestion.QuestionId, obj.ExamId);
+                        deleteQuestionIds.Add(existingExamQuestion.QuestionId);
                     }
+                }
+
+                if (createQuestions.Any())
+                {
+                    _examQuestionsService.CraeteExamQuestion(createQuestions);
+                }
+
+                if (updateQuestions.Any())
+                {
+                    _examQuestionsService.UpdateExamQuestion(updateQuestions); 
+                }
+
+                if (deleteQuestionIds.Any())
+                {
+                    _examQuestionsService.DeleteExamQuestion(deleteQuestionIds, obj.ExamId);
                 }
             }
             return model;
@@ -279,28 +301,39 @@ namespace DemoMVC.WebUi.Controllers
                 return Json(true);
             }
         }
-        public ActionResult GetExamQuestionDetails(int ExamId)
+        public ActionResult GetExamQuestionDetails(int? ExamId,int? userExamId)
         {
-            var questions = _questionService.GetQuestionsByExamId(ExamId)
-            .Select(q => new QuestionAndAnswerModel
+            int id;
+            if (userExamId.HasValue)
             {
-                QuestionId = q.QuestionId,
-                QuestionText = q.QuestionText,
-                IsActive = q.IsActive,
-                QuestionImage = q.QuestionImage,
-                Difficulty = q.Difficulty,
-                QuestionType = q.QuestionType.QuestionTypeName,
-                Subject = q.Subject.SubjectName,
-                Marks = q.Marks,
-                Answers = _answerService.GetByQuestionId(q.QuestionId)
-                    .Select(ans => new AnswerViewModel
-                    {
-                        AnswerText = ans.AnswerText,
-                        IsCorrect = ans.IsCorrect
-                    }).ToList()
-            }).ToList();
+                var userExamDetails = _userExamService.GetByUserExamId(userExamId.Value);
+                id = userExamId != null ? userExamDetails.ExamId : ExamId.Value;
+            }
+            else
+            {
+                id = ExamId.Value;
+            }
 
-            var examDetails = _examService.GetById(ExamId);
+                var questions = _questionService.GetQuestionsByExamId(id)
+                .Select(q => new QuestionAndAnswerModel
+                {
+                    QuestionId = q.QuestionId,
+                    QuestionText = q.QuestionText,
+                    IsActive = q.IsActive,
+                    QuestionImage = q.QuestionImage,
+                    Difficulty = q.Difficulty,
+                    QuestionType = q.QuestionType.QuestionTypeName,
+                    Subject = q.Subject.SubjectName,
+                    Marks = q.Marks,
+                    Answers = _answerService.GetByQuestionId(q.QuestionId)
+                        .Select(ans => new AnswerViewModel
+                        {
+                            AnswerText = ans.AnswerText,
+                            IsCorrect = ans.IsCorrect
+                        }).ToList()
+                }).ToList();
+
+            var examDetails = _examService.GetById(id);
 
             ExamModel exam = new ExamModel
             {
@@ -312,13 +345,35 @@ namespace DemoMVC.WebUi.Controllers
                 TotalMarks = examDetails.TotalMarks,
             };
 
-            ExamQuestionViewModel eqvm = new ExamQuestionViewModel
+            if (userExamId.HasValue)
+            {
+                var userAnswers = _userAnswerService.GetAllAnswerByUser(userExamId.Value).Select(a => new UserAnswerModel
+                {
+                    Answer = a.AnswerText,
+                    QuestionId = a.QuestionId,
+                    UserAnswerId = a.UserAnswerId,
+                    UserExamId = a.UserExamId,
+                    ObtainedMarks = a.ObtainedMarks
+                }).OrderBy(q => q.QuestionId).ToList();
+
+                UserExamCheckingModel uecm = new UserExamCheckingModel
+                {
+                    Exam = exam,
+                    Questions = questions,
+                    UserExamId = userExamId.Value,
+                    UserAnswers = userAnswers
+                };
+
+                return PartialView("_ExamQuestionsPartial", uecm);
+            }
+
+            UserExamCheckingModel model = new UserExamCheckingModel
             {
                 Exam = exam,
                 Questions = questions,
             };
 
-            return PartialView("_ExamQuestionsPartial", eqvm);
+            return PartialView("_ExamQuestionsPartial", model);
         }
 
         public ActionResult GetEmailPartial(int ExamId)
