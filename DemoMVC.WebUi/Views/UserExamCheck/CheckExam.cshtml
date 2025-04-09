@@ -1,6 +1,7 @@
 ﻿@model DemoMVC.WebUi.Models.UserExamCheckingModel
 @using Newtonsoft.Json
 @{
+    ViewBag.Title = "Exam Checking";
     var userExamId = Model.UserExamId;
 }
 <style>
@@ -268,6 +269,7 @@
     <div><p><strong>Exam Code:</strong> @Model.Exam.ExamCode</p></div>
     <div><p><strong>Total Marks:</strong> @Model.Exam.TotalMarks</p></div>
     <div><p><strong>Passing Marks:</strong> @Model.Exam.PassingMarks</p></div>
+    <div><p><strong>Candidate Name:</strong> @Model.UserProfile.Name</p></div>
 </div>
 
 <div class="exam-container">
@@ -407,16 +409,19 @@
         debugger
         updatePaletteStatus();
         $("input.evaluate-toggle").each(function () {
+            debugger
             let index = $(this).attr('id').split('-')[1];
             let marksInput = $("#marks-" + index);
-            let isChecked = $(this).prop('checked');
+            let userAns = userAnswers[index];
+            let isEvaluated = userAns.IsEvaluate;
+            let marks = userAns.ObtainedMarks;
 
-            // Enable or disable the input based on the checkbox state
-            if (isChecked) {
-                marksInput.prop("disabled", false); // Enable the input if checked
+            if (isEvaluated) {
+                $(this).prop("checked", true);
+                marksInput.prop("disabled", false).val(marks);
             } else {
-                marksInput.prop("disabled", true); // Disable the input if unchecked
-                marksInput.val(0); // Clear the value if unchecked
+                $(this).prop("checked", false);
+                marksInput.prop("disabled", true).val(0);
             }
         });
     });
@@ -626,6 +631,5 @@
     });
 
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DemoMVC.Models;
+using System.Collections.Generic;
 
 namespace DemoMVC.WebUi.Models
 {
@@ -8,5 +9,6 @@ namespace DemoMVC.WebUi.Models
         public ExamModel Exam { get; set; }
         public List<QuestionAndAnswerModel> Questions { get; set; }
         public List<UserAnswerModel> UserAnswers { get; set; }
+        public UserProfile UserProfile { get; set; }
     }
 }

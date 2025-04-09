@@ -16,6 +16,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly QuestionService _questionService;
         private readonly ExamQuestionsService _examQuestionsService;
         private readonly AnswerService _answerService;
+        private readonly UserProfileService _userProfileService;
         public UserExamCheckController()
         {
             _userExamService = new UserExamService();
@@ -24,6 +25,7 @@ namespace DemoMVC.WebUi.Controllers
             _examQuestionsService = new ExamQuestionsService();
             _questionService = new QuestionService();
             _answerService = new AnswerService();
+            _userProfileService = new UserProfileService();
         }
         public ActionResult Index()
         {
@@ -67,10 +69,12 @@ namespace DemoMVC.WebUi.Controllers
                 QuestionId = a.QuestionId,
                 UserAnswerId = a.UserAnswerId,
                 UserExamId = a.UserExamId,
-                ObtainedMarks = a.ObtainedMarks
+                ObtainedMarks = a.ObtainedMarks,
+                IsEvaluate = a.IsEvaluate
             }).OrderBy(q => q.QuestionId).ToList();
 
-            _userExamService.UpdateResultStatus(userExamId);
+            var user = _userProfileService.GetUserById(userExamDetails.UserId);
+
             // ✅ Automatic Checking for MCQs
             foreach (var question in questions)
             {
@@ -81,29 +85,19 @@ namespace DemoMVC.WebUi.Controllers
                     if (question.QuestionTypeId == 1 || question.QuestionTypeId == 2)
                     {
                         userAnswer.IsEvaluate = true;
-                        
                     }
-                    else
-                    {
-                        if(userAnswer.ObtainedMarks > 0)
-                        {
-                            userAnswer.IsEvaluate = true;
-                        }
-                        else
-                        {
-                            userAnswer.IsEvaluate = false;
-                        }
-                    }
+                   
                 }
             }
-
             var model = new UserExamCheckingModel
             {
                 UserExamId = userExamId,
                 Exam = examModel,
                 Questions = questions,
-                UserAnswers = userAnswers
+                UserAnswers = userAnswers,
+                UserProfile = user
             };
+            _userExamService.UpdateResultStatus(userExamId);
             return View(model);
         }
 
