@@ -64,4 +64,33 @@ namespace DemoMVC.Models
         public string ResultBadgeCode { get; set; }
         public DateTime? StartTime { get; set; }
     }
+    public class StatusSummary
+    {
+        public int Pending { get; set; }
+        public int Ongoing { get; set; }
+        public int InReview { get; set; }
+        public int Evaluated { get; set; }
+        public int Completed { get; set; }
+    }
+
+    public class TimeAnalysis
+    {
+        public int Hour { get; set; }
+        public int Count { get; set; }
+    }
+    public class DailyExamCount
+    {
+        public string Date { get; set; }
+        public int Count { get; set; }
+    }
+
+    public class ExamAnalysis
+    {
+        public string ExamName { get; set; }
+        public int Pending { get; set; }
+        public int Ongoing { get; set; }
+        public int InReview { get; set; }
+        public int Evaluated { get; set; }
+        public int Completed { get; set; }
+    }
 }

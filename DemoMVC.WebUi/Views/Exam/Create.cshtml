@@ -394,7 +394,7 @@
          }
     </script>
     @*Send Exam And Questions In Controller By AJAX*@
-    <script>
+<script>
         var selectedQuestionsByGrid = {};
         var unselectedQuestionsByGrid = {};
         var preselectedQuestions = {};
@@ -556,9 +556,7 @@
                     data: JSON.stringify(requestData),
                     contentType: "application/json",
                     success: function (response) {
-                        Swal.fire("Success!", "Exam and questions saved successfully.", "success").then(() => {
-                            location.reload();
-                        });
+                        window.location.href = '@Url.Action("Index","Exam")';
                     },
                     error: function () {
                         Swal.fire("Error!", "Failed to save data. Please try again.", "error");
@@ -572,7 +570,7 @@
         });
 
 
-    </script>
+</script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>

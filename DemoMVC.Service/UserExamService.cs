@@ -56,5 +56,25 @@ namespace DemoMVC.Service
         {
             return _userExamProvider.GetByExamId(ExamId);
         }
+        public StatusSummary GetExamResultStatusSummary()
+        {
+            return _userExamProvider.GetExamResultStatusSummary();
+        }
+        public StatusSummary GetExamStatusSummary()
+        {
+            return _userExamProvider.GetExamStatusSummary();
+        }
+        public List<TimeAnalysis> GetUserExamStartTimeAnalysis()
+        {
+            return _userExamProvider.GetUserExamStartTimeAnalysis();
+        }
+        public List<DailyExamCount> GetDayWiseExamCount()
+        {
+            return _userExamProvider.GetDayWiseExamCount();
+        }
+        public List<ExamAnalysis> ExamAnalysisChart()
+        {
+            return _userExamProvider.ExamAnalysisChart();
+        }
     }
 }

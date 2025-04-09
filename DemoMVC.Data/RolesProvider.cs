@@ -98,15 +98,18 @@ namespace DemoMVC.Data
 
         public List<RoleUserCountModel> GetRolesWithUserCount()
         {
-            var data = (from r in _db.webpages_Roles
-                        join ur in _db.webpages_UsersInRoles on r.RoleId equals ur.RoleId into userGroup
-                        select new RoleUserCountModel
-                        {
-                            RoleName = r.RoleName,
-                            IsActive = r.IsActive,
-                            UserCount = userGroup.Count()
-                        }).ToList();
-
+            var data = _db.webpages_Roles
+            .GroupJoin(
+                _db.webpages_UsersInRoles,
+                role => role.RoleId,
+                userInRole => userInRole.RoleId,
+                (role, users) => new RoleUserCountModel
+                {
+                    RoleName = role.RoleName,
+                    IsActive = role.IsActive,
+                    UserCount = users.Count()
+                }
+            ).ToList();
             return data;
         }
 

@@ -87,5 +87,19 @@ namespace DemoMVC.Data
             var countExamCode = (from i in _db.Exams where i.ExamCode.Contains(examCode) select i).Count();
             return countExamCode;
         }
+
+        public List<CandidatePerExam> CountCandidatePerExam()
+        {
+            var data = (from i in _db.UserExams join 
+                       e in _db.Exams on i.ExamId equals e.ExamId
+                       group i by e.ExamName into count select new CandidatePerExam
+                       {
+                           ExamName = count.Key,
+                           TotalCandidate = count.Count()
+
+                       }).ToList();
+
+            return data;
+        } 
     }
 }

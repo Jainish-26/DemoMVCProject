@@ -159,7 +159,6 @@ namespace DemoMVC.WebUi.Controllers
 
             obj.ExamId = model.Exam.ExamId;
             obj.ExamName = model.Exam.ExamName;
-            obj.ExamCode = model.Exam.ExamCode;
             obj.TotalMarks = model.Exam.TotalMarks;
             obj.PassingMarks = model.Exam.PassingMarks;
             obj.IsActive = model.Exam.IsActive;
@@ -170,6 +169,7 @@ namespace DemoMVC.WebUi.Controllers
 
             if (model.Exam.ExamId == 0)
             {
+                obj.ExamCode = model.Exam.ExamCode;
                 obj.CreatedBy = userId;
                 obj.CreatedOn = DateTime.UtcNow;
                 obj.ExamId = _examService.CreateExam(obj);
@@ -414,7 +414,7 @@ namespace DemoMVC.WebUi.Controllers
                 exam.DurationMin = examDetails.DurationMin;
                 exam.StartTime = examDetails.StartTime;
                 exam.EndTime = examDetails.EndTime;
-                exam.ExamStatus = examDetails.ExamStatus;
+                exam.ExamStatus = Constants.ExamStatus.DRAFT;
                 exam.CreatedBy = SessionHelper.UserId;
                 exam.CreatedOn = DateTime.UtcNow;
 

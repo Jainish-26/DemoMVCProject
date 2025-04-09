@@ -44,7 +44,7 @@
                     .HtmlAttributes(new { @class = "kendogrid_Action center_text" })
                     .ClientTemplate("<div class='k_action_table'>" +
                     (AllowedEdit ? "<a href='javascript:void(0);' title='Edit Details' onclick=\"fnEditExam(#=ExamId#)\"><i class='fa fa-edit'></i></a> " : "") +
-                    (AllowedAdd ? "<a href='javascript:void(0);' title='Edit Details' onclick=\"fnDuplicateExam(#=ExamId#)\"><i class='fa fa-clone'></i></a> " : "") +
+                    (AllowedAdd ? "<a href='javascript:void(0);' title='Clone Exam' onclick=\"fnDuplicateExam(#=ExamId#)\"><i class='fa fa-clone'></i></a> " : "") +
                     (AllowedEdit ? "<a href='javascript:void(0);' title='View Details' onclick=\"fnShowDetails(#=ExamId#)\"><i class='fa fa-eye'></i></a>" : "") +
                     "<a href='javascript:void(0);' title='Generate Link' onclick=\"openEmailPopup(#=ExamId#)\"><i class='fa fa-link'></i></a>" +
                     "</div>")

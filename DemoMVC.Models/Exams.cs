@@ -55,4 +55,11 @@ namespace DemoMVC.Models
         public bool IsActive { get; set; }
         public int DurationMin { get; set; }
     }
+
+    public class CandidatePerExam 
+    {
+        public int ExamId { get; set; }
+        public string ExamName { get; set; }
+        public int TotalCandidate { get; set; }
+    }
 }

@@ -50,8 +50,9 @@
         }
 
         .header_row {
-            background-color: black;
-            opacity : 1;
+            background-color: white;
+            opacity: 1;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .brand_row {
@@ -91,7 +92,7 @@
             align-items: center;
             padding: 10px;
             text-decoration: none;
-            color: white; /* Menu text color */
+            color: black; /* Menu text color */
         }
 
             .head_menu_dropdown a:hover {
@@ -165,7 +166,7 @@
     <nav>
         <div>
             <div class="header_row">
-                <div class="brand" style="background-color:black; padding-left:50px;">
+                <div class="brand" style="padding-left:50px;">
                     <div class="brand_row">
                         <img src="~/content/images/Web_Logo.png" alt="OEMS" />
                         <p class="gradient-title" style="font-size:30px">OEMS</p>
@@ -180,7 +181,7 @@
                                 @foreach (var _main in _menu)
                                 {
                                     <li class="head_menu_dropdown" id="@_main.FormAccessCode" data-facode="@_main.FormAccessCode">
-                                        <a href="@Url.Content(_main.NavigateURL)" style="color:white;">
+                                        <a href="@Url.Content(_main.NavigateURL)" style="color:black;">
                                             <!--<i class="fa fa-home"></i>--> <!-- Replace with appropriate icon -->
                                             <span class="menu_text">@_main.Name</span>
                                         </a>

@@ -211,6 +211,7 @@
                     <div class="toggle-container">
                         <input type="checkbox" id="IsActiveToggle" class="toggle-input" @if (Model.IsActive) { <text> checked</text> }>
                         <label for="IsActiveToggle" class="toggle-switch"></label>
+                        <label for="IsActiveToggle" class="toggle-label">Inactive</label>
                     </div>
                     @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
                 </div>

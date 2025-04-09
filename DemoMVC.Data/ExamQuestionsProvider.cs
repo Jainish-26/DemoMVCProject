@@ -85,14 +85,22 @@ namespace DemoMVC.Data
         {
             try
             {
-                _db.Entry(examQuestions).State = System.Data.Entity.EntityState.Modified;
+                // Loop through each item in the list and set its state to Modified
+                foreach (var question in examQuestions)
+                {
+                    _db.Entry(question).State = System.Data.Entity.EntityState.Modified;
+                }
+
+                // Save the changes to the database
                 _db.SaveChanges();
             }
             catch (Exception e)
             {
-                throw e;
+                // You can log the error here instead of throwing the exception directly
+                throw new Exception("An error occurred while updating the exam questions.", e);
             }
         }
+
         public void DeleteExamQuestion(HashSet<int> questionIds, int ExamId)
         {
             if (questionIds.Any())

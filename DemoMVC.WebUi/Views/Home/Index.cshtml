@@ -2,192 +2,710 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<h2 class="dashboard-heading">Dashboard</h2>
-<br />
-<br />
-<br />
-<div class="dashboard-container">
-    <!-- Users Per Role Chart -->
-    <div class="chart-box">
-        <h4 class="text-center text-white">Users Per Role</h4>
-        <div class="chart-container">
-            <canvas id="roleChart"></canvas>
+<div id="userRoleSummary" class="d-flex flex-wrap justify-content-center mx-auto"></div>
+
+<!-- Row 1: 4 Charts -->
+<div class="row g-4 dashboard-graph-row m-3">
+    <!-- 1. Result Status -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+        <div class="chart-card text-center">
+            <h5 class="chart-title">🧾 Result Status</h5>
+            <div id="resultStatusChart" class="amchart-container" style="height: 250px;"></div>
+            <div class="legend-row">
+                <div class="legend-item">
+                    <span class="legend-color bg-primary"></span>
+                    <div class="legend-label">Pending</div>
+                    <div id="pendingVal" class="legend-value">0%</div>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color bg-warning"></span>
+                    <div class="legend-label">In Review</div>
+                    <div id="reviewVal" class="legend-value">0%</div>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color bg-success"></span>
+                    <div class="legend-label">Evaluated</div>
+                    <div id="evaluatedVal" class="legend-value">0%</div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Active vs Inactive Users Chart -->
-    <div class="chart-box">
-        <h4 class="text-center text-white">Active vs Inactive Users</h4>
-        <div class="chart-container">
-            <canvas id="userStatusChart"></canvas>
+    <!-- 2. User Status -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+        <div class="chart-card text-center">
+            <h5 class="chart-title">👥 User Status</h5>
+            <div id="userStatusChart" style="height: 300px;"></div>
+        </div>
+    </div>
+
+    <!-- 3. Exam Status -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+        <div class="chart-card text-center">
+            <h5 class="chart-title">📝 Exam Status</h5>
+            <div class="chart-canvas mb-2">
+                <canvas id="examStatusChart" style="max-height: 250px;"></canvas>
+            </div>
+            <div class="legend-row">
+                <div class="legend-item">
+                    <span class="legend-color bg-primary"></span>
+                    <div class="legend-label">Pending</div>
+                    <div id="examPendingVal" class="legend-value">0%</div>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color bg-warning"></span>
+                    <div class="legend-label">Ongoing</div>
+                    <div id="examOngoingVal" class="legend-value">0%</div>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color bg-success"></span>
+                    <div class="legend-label">Completed</div>
+                    <div id="examCompletedVal" class="legend-value">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Day-wise Exams -->
+    <div class="col-lg-3 col-md-6 col-sm-12">
+        <div class="chart-card text-center">
+            <h5 class="chart-title">📅 Day-wise Exams</h5>
+            <div id="dayWiseExamChart" class="amchart-container" style="height: 300px; min-width:300px;"></div>
         </div>
     </div>
 </div>
 
+<!-- Row 2: 2 Charts -->
+<div class="row g-4 dashboard-graph-row m-3">
+    <!-- 5. Exam Start Time -->
+    <div class="col-lg-6 col-md-12 col-sm-12">
+        <div class="chart-card text-center">
+            <h5 class="chart-title">🕒 Exam Start Time</h5>
+            <div id="examStartTimeChart" class="amchart-container" style="height: 250px;"></div>
+        </div>
+    </div>
+
+    <!-- 6. Exam Analysis (Stacked) -->
+    <div class="col-lg-6 col-md-12 col-sm-12">
+        <div class="chart-card text-center">
+            <h5 class="chart-title">📊 Exam Analysis</h5>
+            <div id="examStatusChartStacked" style="height: 250px;"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<!-- Styles -->
+@*<link rel="stylesheet" href="https://cdn.amcharts.com/lib/5/index.css" type="text/css" />*@
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+
 <script>
     $(document).ready(function () {
-        loadRoleChart();
+        loadUserRoleSummary();
+        loadResultStatusChart();
+        loadExamStatusChart();
         loadUserStatusChart();
+        loadExamStartTimeChart();
+        loadDayWiseExamChart();
+        loadExamStatusStackedChart();
     });
 
-    function loadRoleChart() {
+    function loadUserRoleSummary() {
         $.getJSON('/Home/GetRoleChartData', function (data) {
-            console.log(data);
-            var labels = data.map(item => item.RoleName);
-            var values = data.map(item => item.UserCount);
+            let container = $("#userRoleSummary");
+            container.empty();
 
-            var ctx = document.getElementById("roleChart").getContext("2d");
-            new Chart(ctx, {
-                type: 'pie',
+            const iconMap = {
+                "Admin": { icon: "fa-user-shield", color: "#007bff" },
+                "sadmin": { icon: "fa-user-secret", color: "#6f42c1" },
+                "User": { icon: "fa-user", color: "#20c997" },
+                "Manager": { icon: "fa-user-tie", color: "#fd7e14" },
+                "TeamLead": { icon: "fa-users-gear", color: "#6610f2" },
+                "HR": { icon: "fa-briefcase", color: "#d63384" },
+                "Candidate": { icon: "fa-user-graduate", color: "#198754" }
+            };
+
+            const row = $('<div class="d-flex flex-wrap justify-content-center gap-3"></div>');
+
+            data.forEach(item => {
+                const role = iconMap[item.RoleName] || { icon: "fa-user", color: "#6c757d" };
+
+                const card = `
+            <div class="card role-card shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="role-title">${item.RoleName}</div>
+                        <div class="role-count">${item.UserCount}</div>
+                    </div>
+                    <div>
+                        <i class="fas ${role.icon} fa-2x" style="color: ${role.color};"></i>
+                    </div>
+                </div>
+            </div>`;
+                row.append(card);
+            });
+
+            container.append(row);
+        });
+    }
+
+    function loadResultStatusChart() {
+        $.getJSON('/Home/GetExamResultStatusSummary', function (data) {
+            const { Pending, InReview, Evaluated } = data;
+            const total = Pending + InReview + Evaluated;
+
+            // Calculate and display percentages
+            $('#pendingVal').text(Math.round((Pending / total) * 100) + '%');
+            $('#reviewVal').text(Math.round((InReview / total) * 100) + '%');
+            $('#evaluatedVal').text(Math.round((Evaluated / total) * 100) + '%');
+
+            // Clear any existing chart instances
+            am5.array.each(am5.registry.rootElements, function (root) {
+                if (root.dom.id === "resultStatusChart") {
+                    root.dispose();
+                }
+            });
+
+            // Create root element
+            var root = am5.Root.new("resultStatusChart");
+
+            // Set themes
+            root.setThemes([am5themes_Animated.new(root)]);
+
+            // Create chart
+            var chart = root.container.children.push(
+                am5percent.PieChart.new(root, {
+                    layout: root.verticalLayout,
+                    innerRadius: am5.percent(50)
+                })
+            );
+
+            // Create series
+            var series = chart.series.push(
+                am5percent.PieSeries.new(root, {
+                    valueField: "value",
+                    categoryField: "category",
+                    endAngle: 270
+                })
+            );
+
+            // Set custom colors for slices
+            series.slices.template.adapters.add("fill", function (fill, target) {
+                var category = target.dataItem.get("category");
+                if (category === "Pending") return am5.color("#007bff");
+                if (category === "In Review") return am5.color("#ffc107");
+                if (category === "Evaluated") return am5.color("#28a745");
+                return fill;
+            });
+
+            // Add labels
+            series.slices.template.set("tooltipText", "{category}: {value} ({valuePercentTotal.formatNumber('#.0')}%)");
+
+            // Set data
+            series.data.setAll([
+                { category: "Pending", value: Pending },
+                { category: "In Review", value: InReview },
+                { category: "Evaluated", value: Evaluated }
+            ]);
+
+            //// Add legend
+            //var legend = chart.children.push(am5.Legend.new(root, {
+            //    centerX: am5.percent(50),
+            //    x: am5.percent(50),
+            //    layout: root.horizontalLayout
+            //}));
+            //legend.data.setAll(series.dataItems);
+            series.labels.template.set("forceHidden", true);
+            series.ticks.template.set("forceHidden", true);
+            //series.slices.template.set("tooltipText", "");
+
+            // Animation
+            series.appear(1000, 100);
+        });
+    }
+
+    function loadExamStatusChart() {
+        $.getJSON('/Home/GetExamStatusSummary', function (data) {
+            const { Pending, Ongoing, Completed } = data;
+            const total = Pending + Ongoing + Completed;
+            const safeTotal = total === 0 ? 1 : total;
+
+            // Update percentage text
+            $('#examPendingVal').text(Math.round((Pending / safeTotal) * 100) + '%');
+            $('#examOngoingVal').text(Math.round((Ongoing / safeTotal) * 100) + '%');
+            $('#examCompletedVal').text(Math.round((Completed / safeTotal) * 100) + '%');
+
+            // Destroy old chart if exists
+            if (window.examStatusChartInstance) {
+                window.examStatusChartInstance.destroy();
+            }
+
+            const ctx = document.getElementById('examStatusChart').getContext('2d');
+
+            window.examStatusChartInstance = new Chart(ctx, {
+                type: 'doughnut',
                 data: {
-                    labels: labels,
-
-                    datasets: [{
-                        label: 'Users per Role',
-                        data: values,
-                        backgroundColor: [
-                            '#00ffff', '#00ff99', '#33ccff', '#ff00ff', '#ff0099',
-                            '#ff6600', '#66ff66', '#9933ff', '#ffcc00', '#ff3366',
-                            '#3399ff', '#cc33cc', '#99ff33', '#ff3300', '#33ffcc',
-                            '#ffcc99', '#6600ff', '#33cc33', '#ff9900', '#ccff66'
-                        ]
-
-                    }]
+                    labels: ['Completed', 'Remaining', 'Ongoing', 'Remaining', 'Pending', 'Remaining'],
+                    datasets: [
+                        {
+                            data: [Completed, safeTotal - Completed],
+                            backgroundColor: ['#28a745', '#e0e0e0'],
+                            borderWidth: 0,
+                            cutout: '65%',
+                            radius: '90%'
+                        },
+                        {
+                            data: [Ongoing, safeTotal - Ongoing],
+                            backgroundColor: ['#ffc107', '#e0e0e0'],
+                            borderWidth: 0,
+                            cutout: '65%',
+                            radius: '75%'
+                        },
+                        {
+                            data: [Pending, safeTotal - Pending],
+                            backgroundColor: ['#007bff', '#e0e0e0'],
+                            borderWidth: 0,
+                            cutout: '65%',
+                            radius: '60%'
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true, // true ensures fixed aspect
                     plugins: {
-
-                        legend: {
-                            position: "bottom",
-                            labels: {
-                                font: { size: 14, }, // Increase font size for legend
-                                color: "white"
-                            }
-                        }
+                        legend: { display: false },
+                        tooltip: { enabled: false }
                     }
                 }
             });
         });
     }
 
+    let userStatusChartRoot; // Declare globally or outside the function
+
     function loadUserStatusChart() {
+        if (!document.getElementById("userStatusChart")) {
+            console.error("Chart container not found!");
+            return;
+        }
+
         $.getJSON('/Home/GetUserStatusChartData', function (data) {
             var labels = data.map(item => item.Status);
             var values = data.map(item => item.Count);
 
-            var ctx = document.getElementById("userStatusChart").getContext("2d");
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'User Status',
-                        data: values,
-                        backgroundColor: ['#27ae60', '#e74c3c']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            ticks: {
-                                font: { size: 14 }, // Larger font size for better visibility
-                                autoSkip: false,
-                                color: "white",
-
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                font: { size: 14 },// Increase font size for Y-axis
-                                color: "white"
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom', // Move legend below for clarity
-                            labels: {
-                                font: { size: 14 },
-                                color: "white"
-                            }
-                        }
-                    }
+            am5.ready(function () {
+                // Properly dispose of previous chart root
+                if (userStatusChartRoot) {
+                    userStatusChartRoot.dispose();
                 }
+
+                // Create root
+                userStatusChartRoot = am5.Root.new("userStatusChart");
+
+                // Set themes
+                userStatusChartRoot.setThemes([
+                    am5themes_Animated.new(userStatusChartRoot)
+                ]);
+
+                // Create chart
+                var chart = userStatusChartRoot.container.children.push(am5xy.XYChart.new(userStatusChartRoot, {
+                    panX: true,
+                    panY: true,
+                    wheelX: "none",
+                    wheelY: "none"
+                }));
+
+                chart.set("cursor", am5xy.XYCursor.new(userStatusChartRoot, {}));
+
+                // Create axes
+                var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(userStatusChartRoot, {
+                    categoryField: "status",
+                    renderer: am5xy.AxisRendererX.new(userStatusChartRoot, { minGridDistance: 30 })
+                }));
+
+                var xData = labels.map(label => ({ status: label }));
+                xAxis.data.setAll(xData);
+
+                var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(userStatusChartRoot, {
+                    renderer: am5xy.AxisRendererY.new(userStatusChartRoot, {})
+                }));
+
+                // Create series
+                var series = chart.series.push(am5xy.ColumnSeries.new(userStatusChartRoot, {
+                    name: "User Status",
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "count",
+                    categoryXField: "status",
+                    tooltip: am5.Tooltip.new(userStatusChartRoot, {
+                        labelText: "{name}: {valueY}"
+                    })
+                }));
+
+                const colors = ["#007bff", "#28a745", "#007bff"]; // Blue, Yellow, Green
+
+                var chartData = labels.map((label, index) => ({
+                    status: label,
+                    count: values[index],
+                    color: am5.color(colors[index % colors.length])
+                }));
+
+                series.data.setAll(chartData);
+
+                series.columns.template.adapters.add("fill", function (fill, target) {
+                    return target.dataItem.dataContext.color;
+                });
+                series.columns.template.adapters.add("stroke", function (stroke, target) {
+                    return target.dataItem.dataContext.color;
+                });
+
+
+                // Legend
+                chart.children.push(am5.Legend.new(userStatusChartRoot, {
+                    centerX: am5.percent(50),
+                    x: am5.percent(50),
+                    y: am5.percent(20),
+                    layout: am5.Layout.horizontal
+                }));
             });
         });
     }
+
+    function loadExamStartTimeChart(apiUrl = '@Url.Action("GetUserExamStartTimeData", "Home")') {
+        am5.ready(function () {
+            var root = am5.Root.new("examStartTimeChart");
+
+            root.setThemes([am5themes_Animated.new(root)]);
+
+            var chart = root.container.children.push(
+                am5xy.XYChart.new(root, {
+                    panX: false,
+                    panY: false,
+                    wheelX: "none",
+                    wheelY: "none",
+                    layout: root.verticalLayout
+                })
+            );
+
+            var xAxis = chart.xAxes.push(
+                am5xy.CategoryAxis.new(root, {
+                    categoryField: "Hour",
+                    renderer: am5xy.AxisRendererX.new(root, {
+                        minGridDistance: 30
+                    }),
+                    tooltip: am5.Tooltip.new(root, {})
+                })
+            );
+
+            var yAxis = chart.yAxes.push(
+                am5xy.ValueAxis.new(root, {
+                    renderer: am5xy.AxisRendererY.new(root, {})
+                })
+            );
+
+            var series = chart.series.push(
+                am5xy.ColumnSeries.new(root, {
+                    name: "Exam Starts",
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "Count",
+                    categoryXField: "Hour",
+                    tooltip: am5.Tooltip.new(root, {
+                        labelText: "Hour: {categoryX}\nCount: {valueY}"
+                    })
+                })
+            );
+
+            series.columns.template.setAll({
+                tooltipText: "Hour: {categoryX}\nCount: {valueY}",
+                cornerRadiusTL: 6,
+                cornerRadiusTR: 6,
+                tooltipY: 0,
+                strokeOpacity: 0
+            });
+
+            $.getJSON(apiUrl, function (data) {
+                data.forEach(item => {
+                    item.Hour = item.Hour.toString().padStart(2, '0') + ":00";
+                });
+
+                xAxis.data.setAll(data);
+                series.data.setAll(data);
+            });
+
+            series.appear(1000);
+            chart.appear(1000, 100);
+        });
+    }
+
+    function loadDayWiseExamChart(apiUrl = '/Home/GetDayWiseExamCount') {
+        am5.ready(function () {
+            var root = am5.Root.new("dayWiseExamChart");
+            root.setThemes([am5themes_Animated.new(root)]);
+
+            var chart = root.container.children.push(
+                am5xy.XYChart.new(root, {
+                    panX: true,
+                    panY: true,
+                    wheelX: "panX",
+                    wheelY: "zoomX",
+                    layout: root.verticalLayout
+                })
+            );
+
+            var xAxis = chart.xAxes.push(
+                am5xy.CategoryAxis.new(root, {
+                    categoryField: "Date",
+                    renderer: am5xy.AxisRendererX.new(root, { minGridDistance: 40 }),
+                    tooltip: am5.Tooltip.new(root, {})
+                })
+            );
+
+            var yAxis = chart.yAxes.push(
+                am5xy.ValueAxis.new(root, {
+                    renderer: am5xy.AxisRendererY.new(root, {})
+                })
+            );
+
+            var series = chart.series.push(
+                am5xy.LineSeries.new(root, {
+                    name: "Exams",
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "Count",
+                    categoryXField: "Date",
+                    tooltip: am5.Tooltip.new(root, {
+                        labelText: "{valueY} Exams on {categoryX}"
+                    }),
+                    stroke: am5.color(0x007bff),
+                    tension: 0.8 // for curve
+                })
+            );
+
+            series.strokes.template.setAll({
+                strokeWidth: 2
+            });
+
+            series.bullets.push(function () {
+                return am5.Bullet.new(root, {
+                    sprite: am5.Circle.new(root, {
+                        radius: 4,
+                        fill: series.get("stroke")
+                    })
+                });
+            });
+
+            // Fetch data from controller
+            $.getJSON(apiUrl, function (data) {
+                data.forEach(item => {
+                    const date = new Date(item.Date);
+                    const day = date.getDate().toString().padStart(2, '0');   // e.g., 09
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // e.g., 04
+                    item.Date = `${day}-${month}`; // e.g., "09 04"
+                });
+
+                xAxis.data.setAll(data);
+                series.data.setAll(data);
+            });
+
+            chart.appear(1000, 100);
+            series.appear(1000);
+        });
+    }
+
+    function loadExamStatusStackedChart() {
+        if (!document.getElementById("examStatusChartStacked")) return;
+
+        $.getJSON('/Home/ExamAnalysisChart', function (data) {
+            am5.ready(function () {
+                // Dispose previous chart
+                if (window.examStatusChartRoot) {
+                    window.examStatusChartRoot.dispose();
+                }
+
+                // Create root
+                window.examStatusChartRoot = am5.Root.new("examStatusChartStacked");
+
+                examStatusChartRoot.setThemes([
+                    am5themes_Animated.new(examStatusChartRoot)
+                ]);
+
+                // Create chart
+                var chart = examStatusChartRoot.container.children.push(
+                    am5xy.XYChart.new(examStatusChartRoot, {
+                        panX: true,
+                        panY: true,
+                        wheelX: "none",
+                        wheelY: "none",
+                        layout: examStatusChartRoot.verticalLayout
+                    })
+                );
+
+                // Create X Axis (Categories - Exam Names)
+                var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(examStatusChartRoot, {
+                    categoryField: "ExamName",
+                    renderer: am5xy.AxisRendererX.new(examStatusChartRoot, {
+                        minGridDistance: 30
+                    })
+                }));
+
+                xAxis.data.setAll(data);
+
+                // Create Y Axis (Counts)
+                var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(examStatusChartRoot, {
+                    renderer: am5xy.AxisRendererY.new(examStatusChartRoot, {})
+                }));
+
+                // Function to create stacked series
+                function createSeries(name, field, color) {
+                var series = chart.series.push(
+                    am5xy.ColumnSeries.new(examStatusChartRoot, {
+                        name: name,
+                        stacked: true,
+                        xAxis: xAxis,
+                        yAxis: yAxis,
+                        valueYField: field,
+                        categoryXField: "ExamName",
+                        tooltip: am5.Tooltip.new(examStatusChartRoot, {
+                            labelText: "[bold]{name}[/]\n{categoryX}: {valueY}"
+                        })
+                    })
+                );
+
+                series.columns.template.setAll({
+                    tooltipY: 0,
+                    strokeOpacity: 1,
+                    stroke: am5.color("#ffffff"), // separate stacked bars
+                    fill: am5.color(color),
+                    tooltipText: "{name}\n{categoryX}: {valueY}"
+                });
+
+                series.data.setAll(data);
+                return series;
+            }
+
+
+                // Add series for Pending, Ongoing, Completed
+                createSeries("Pending", "Pending", "#007bff");     // Bootstrap primary blue
+                createSeries("Ongoing", "Ongoing", "#ffc107");     // Bootstrap warning yellow
+                createSeries("Completed", "Completed", "#28a745"); // Bootstrap success green
+
+                // Add legend
+                var legend = chart.children.push(
+                    am5.Legend.new(examStatusChartRoot, {
+                        centerX: am5.percent(50),
+                        x: am5.percent(50)
+                    })
+                );
+                legend.data.setAll(chart.series.values);
+            });
+        });
+    }
+
 </script>
 
 <style>
-    /* Gradient Background - Professional Look */
     body {
-        background: linear-gradient(to right, #2c3e50, #4ca1af);
-        color: white;
-        font-family: 'Arial', sans-serif;
+        background: white;
+        color: black;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
     }
 
-    .dashboard-heading {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 2.5rem;
-        font-weight: bold;
-        background: linear-gradient(to right, #00ff99, #33ccff); /* Light Green */
-        background: linear-gradient(to right, #00ff99,#33ccff); /* Light Blue & Green */
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Dashboard Layout */
-    .dashboard-container {
+    #userRoleSummary {
+        padding: 20px;
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 20px;
-        padding: 20px;
     }
 
-    /* Chart Box Styling */
-    .chart-box {
-        width: 50%;
-        max-width: 500px;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        padding: 20px;
+    /* Role cards */
+    .role-card {
+        background: #f8f9fa;
+        color: #343a40;
         border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        text-align: center;
+        width: 200px;
+        min-height: 90px;
+        transition: 0.3s ease;
+        border: none;
+        margin-left: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
-    /* Chart Container */
-    .chart-container {
-        width: 100%;
-        height: 300px; /* Ensures the bar chart fits */
-        overflow: hidden;
-    }
-
-    /* Canvas Styling */
-    canvas {
-        width: 100% !important;
-        height: auto !important;
-    }
-
-    /* Responsive Design */
-    @@media (max-width: 768px) {
-        .dashboard-container {
-            flex-direction: column;
-            align-items: center;
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
-        .chart-box {
-            width: 90%;
+    /* Title */
+    .role-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    /* Count */
+    .role-count {
+        font-size: 1.6rem;
+        font-weight: bold;
+    }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        #userRoleSummary .card {
+            width: 90% !important;
         }
+    }
+
+    /* Container for each card */
+    .chart-card {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 1rem;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+
+    .chart-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .legend-row {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+    }
+
+    .legend-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0.25rem;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        margin-bottom: 4px;
     }
 </style>

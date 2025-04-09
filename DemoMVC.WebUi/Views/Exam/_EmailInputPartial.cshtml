@@ -77,7 +77,6 @@
                 if (response.success) {
                     Swal.fire({ title: 'Exam Link Generated', icon: 'success' }).then(() => {
                         $("#emailModal").modal("hide"); // ❌ Bootstrap 4 style
-
                     });
                 } else {
                     Swal.fire("Error", response.message, "error");

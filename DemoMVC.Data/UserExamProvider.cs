@@ -147,5 +147,80 @@ namespace DemoMVC.Data
                          }).Distinct().OrderByDescending(a => a.Result);
             return query.ToList();
         }
+        public StatusSummary GetExamResultStatusSummary()
+        {
+            var result = new StatusSummary
+            {
+                Pending = _db.UserExams.Count(x => x.ResultStatus == Constants.ResultStatus.PENDING),
+                InReview = _db.UserExams.Count(x => x.ResultStatus == Constants.ResultStatus.INREVIEW),
+                Evaluated = _db.UserExams.Count(x => x.ResultStatus == Constants.ResultStatus.EVALUATED)
+            };
+
+            return result;
+        }
+
+        public StatusSummary GetExamStatusSummary()
+        {
+            var result = new StatusSummary
+            {
+                Pending = _db.UserExams.Count(x => x.ExamStatus == Constants.UserExamStatus.PENDING),
+                Ongoing = _db.UserExams.Count(x => x.ExamStatus == Constants.UserExamStatus.ONGOING),
+                Completed = _db.UserExams.Count(x => x.ExamStatus == Constants.UserExamStatus.COMPLETED)
+            };
+
+            return result;
+        }
+        public List<TimeAnalysis> GetUserExamStartTimeAnalysis()
+        {
+            var data = _db.UserExams
+                .Where(ue => ue.StartTime != null)
+                .GroupBy(ue => ue.StartTime.Value.Hour)
+                .Select(g => new TimeAnalysis
+                {
+                    Hour = g.Key,
+                    Count = g.Count()
+                })
+                .OrderBy(g => g.Hour)
+                .ToList();
+
+            return data;
+        }
+        public List<DailyExamCount> GetDayWiseExamCount()
+        {
+            var groupedData = _db.UserExams
+                .Where(e => e.StartTime != null)
+                .GroupBy(e => System.Data.Entity.DbFunctions.TruncateTime(e.StartTime))
+                .Select(g => new
+                {
+                    Date = g.Key,
+                    Count = g.Count()
+                })
+                .ToList()
+                .Select(g => new DailyExamCount
+                {
+                    Date = g.Date.Value.ToString("yyyy-MM-dd"),
+                    Count = g.Count
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return groupedData;
+        }
+
+        public List<ExamAnalysis> ExamAnalysisChart()
+        {
+            var data = (from i in _db.UserExams
+                        join
+                         e in _db.Exams on i.ExamId equals e.ExamId
+                        group i by new { i.ExamId, e.ExamName } into g
+                        select new ExamAnalysis
+                        {
+                            ExamName = g.Key.ExamName,
+                            Pending = g.Count(x=>x.ExamStatus == Constants.UserExamStatus.PENDING),
+                            Ongoing = g.Count(x => x.ExamStatus == Constants.UserExamStatus.ONGOING),
+                            Completed = g.Count(x => x.ExamStatus == Constants.UserExamStatus.COMPLETED)
+                        }).ToList();
+            return data;
+        }
     }
 }
