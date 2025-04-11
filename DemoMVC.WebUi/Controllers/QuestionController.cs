@@ -297,9 +297,16 @@ namespace DemoMVC.WebUi.Controllers
                                 MediaName = Path.GetFileNameWithoutExtension(i.FileName).Trim(),
                                 MediaType = Path.GetExtension(i.FileName)
                             };
-                            var QueMedia = media.MediaName + media.MediaType;
-                            i.SaveAs(Server.MapPath("~/content/QuestionImage/") + QueMedia);
-                            addImages.Add(media);
+                            if (media.MediaType!=".jpg" || media.MediaType != ".png")
+                            {
+                                 ModelState.AddModelError("QuestionImage", "Only  .jpg And .png Files Are Allowed");
+                            }
+                            else
+                            {
+                                var QueMedia = media.MediaName + media.MediaType;
+                                i.SaveAs(Server.MapPath("~/content/QuestionImage/") + QueMedia);
+                                addImages.Add(media);
+                            }
                         }
                     }
                 }

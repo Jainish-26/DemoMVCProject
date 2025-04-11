@@ -231,6 +231,8 @@
     <Content Include="content\css\login.css" />
     <Content Include="content\css\style.css" />
     <Content Include="content\css\toast.css" />
+    <Content Include="content\fancybox\fancybox.css" />
+    <Content Include="content\fancybox\fancybox.umd.js" />
     <Content Include="content\images\attach.svg" />
     <Content Include="content\images\BackImage.png" />
     <Content Include="content\images\BGC_auth_letter_smart_screen_logo.png" />
