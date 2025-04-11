@@ -512,21 +512,25 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+
         const fileInput = document.getElementById("questionImageInput");
         const fileNameDisplay = document.querySelector(".file-name");
         const previewContainer = document.getElementById("imagePreviewContainer");
         const existingImageContainer = document.getElementById("existingImages");
 
-        // Array to hold selected files temporarily
+        // Track all files across multiple selections
         let selectedFiles = [];
 
-        // Handle new file selection
         fileInput.addEventListener("change", function () {
-            selectedFiles = Array.from(fileInput.files);
+            const newFiles = Array.from(fileInput.files);
+
+            // Merge new files with existing ones
+            selectedFiles = [...selectedFiles, ...newFiles];
+
+            updateInputFiles(); // Important to update the input with combined files
             updatePreview();
         });
 
-        // Update file preview area
         function updatePreview() {
             previewContainer.innerHTML = "";
 
@@ -556,7 +560,6 @@
                     delBtn.style.right = "5px";
                     delBtn.style.cursor = "pointer";
 
-                    // Remove file from preview and array
                     delBtn.addEventListener("click", function () {
                         selectedFiles.splice(index, 1);
                         updateInputFiles();
@@ -572,25 +575,23 @@
             });
         }
 
-        // Sync selectedFiles to actual file input
         function updateInputFiles() {
             const dataTransfer = new DataTransfer();
             selectedFiles.forEach(file => dataTransfer.items.add(file));
             fileInput.files = dataTransfer.files;
         }
 
-        // Handle delete for existing images from server
+        // Delete already existing image (from server)
         if (existingImageContainer) {
             existingImageContainer.addEventListener("click", function (e) {
                 if (e.target.closest(".delete-existing")) {
                     const wrapper = e.target.closest(".existing-image-wrapper");
                     if (wrapper) {
-                        wrapper.remove(); // removes image and associated <input type="hidden">
+                        wrapper.remove();
                     }
                 }
             });
         }
-
         // IsActive toggle logic
         var toggleInput = document.getElementById("IsActiveToggle");
         var hiddenInput = document.getElementById("IsActive");

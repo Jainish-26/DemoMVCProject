@@ -172,6 +172,10 @@
             success: function (response) {
                 $("#questionModelContainer").html(response);
                 $("#questionDetailsModal").modal("show");
+
+                $('#questionDetailsModal').on('hidden.bs.modal', function () {
+                    $('#questionModelContainer').html('');
+                });
             },
             error: function () {
                 alert(" Failed To Load Data");

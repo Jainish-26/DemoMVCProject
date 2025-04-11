@@ -21,6 +21,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly MessageService _messageService;
         private readonly UserExamService _userExamService;
         private readonly UserAnswerService _userAnswerService;
+        private readonly QuestionMediaService _questionMediaService;
 
         public ExamController()
         {
@@ -32,6 +33,7 @@ namespace DemoMVC.WebUi.Controllers
             _messageService = new MessageService();
             _userExamService = new UserExamService();
             _userAnswerService = new UserAnswerService();
+            _questionMediaService = new QuestionMediaService();
         }
         public ActionResult Index()
         {
@@ -314,13 +316,18 @@ namespace DemoMVC.WebUi.Controllers
                 id = ExamId.Value;
             }
 
-                var questions = _questionService.GetQuestionsByExamId(id)
-                .Select(q => new QuestionAndAnswerModel
+            var questions = _questionService.GetQuestionsByExamId(id)
+            .Select(q =>
+            {
+                List<string> mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId)
+                                .Select(m => m.MediaName+m.MediaType).ToList();
+
+                return new QuestionAndAnswerModel
                 {
                     QuestionId = q.QuestionId,
                     QuestionText = q.QuestionText,
                     IsActive = q.IsActive,
-                    //QuestionImage = q.QuestionImage,
+                    QuestionImage = mediaList.Any() && mediaList!=null ? mediaList : null,
                     Difficulty = q.Difficulty,
                     QuestionType = q.QuestionType.QuestionTypeName,
                     Subject = q.Subject.SubjectName,
@@ -331,7 +338,9 @@ namespace DemoMVC.WebUi.Controllers
                             AnswerText = ans.AnswerText,
                             IsCorrect = ans.IsCorrect
                         }).ToList()
-                }).ToList();
+                };
+            }).ToList();
+            
 
             var examDetails = _examService.GetById(id);
 

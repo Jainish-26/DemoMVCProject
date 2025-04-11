@@ -52,7 +52,7 @@
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         height: fit-content;
-        min-height: 570px;
+        min-height: 640px;
     }
 
         /* Palette Heading */
@@ -141,26 +141,15 @@
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         position: relative;
-        min-height: 550px;
+        min-height: 640px;
     }
 
     .question-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 20px;
         font-weight: bold;
         padding-bottom: 10px;
-    }
-
-    .question-marks {
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    h3 {
-        font-size: 20px;
-        font-weight: bold;
     }
 
     .text-answer-box textarea {
@@ -175,15 +164,39 @@
 
     .question-page {
         display: none;
+        max-height: 600px; /* adjust as needed */
+        overflow-y: auto;
+        padding-right: 10px; /* prevent content hiding under scrollbar */
     }
 
         .question-page.active {
             display: block;
+            overflow-y: auto;
         }
 
+
     .answer-item {
-        padding: 10px;
+        margin-left:10px;
+        margin-bottom: 10px;
+    }
+
+        .answer-item .d-flex {
+            gap: 10px; /* space between icon and text */
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap; /* wrap if too long, optional */
+        }
+
+    .form-check-input {
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .answer-text {
         font-size: 18px;
+        line-height: 1.4;
+        cursor: pointer;
     }
 
     img {
@@ -289,7 +302,7 @@
     }
 
 </style>
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <div class="exam-header">
     <div><h2>@Model.Exam.ExamName</h2></div>
@@ -310,16 +323,46 @@
 
                 <div class="question-page @(i == 0 ? "active" : "")" id="question-@i" data-question-id="@question.QuestionId">
                     <div class="question-header">
-                        <h3>Q@(i + 1): @question.QuestionText</h3>
+                        <h4>Q@(i + 1): @question.QuestionText</h4>
                         <span class="question-marks">Marks: @question.Marks</span>
                     </div>
 
-                    @if (!string.IsNullOrEmpty(question.QuestionImage))
+                    @if (question.QuestionImage != null && question.QuestionImage.Any())
                     {
-                        <div class="mb-2">
-                            <img src="~/content/QuestionImage/@question.QuestionImage" alt="Question Image">
+                        var carouselId = $"carousel_{question.QuestionId}";
+                        <div id="@carouselId" class="carousel slide mb-3 mx-auto shadow-sm"
+                             data-bs-ride="carousel"
+                             style="max-width: 500px; height: 250px; overflow: hidden; border-radius: 8px; background-color: #f9f9f9;">
+
+                            <div class="carousel-inner h-100 w-100">
+                                @for (int s = 0; s < question.QuestionImage.Count; s++)
+                                {
+                                    var image = question.QuestionImage[s];
+                                    <div class="carousel-item @(s == 0 ? "active" : "") h-100">
+                                        <div class="d-flex justify-content-center align-items-center h-100">
+                                            <img src="@Url.Content("~/content/QuestionImage/" + image)"
+                                                 alt="Question Image @(s + 1)"
+                                                 class="img-fluid"
+                                                 style="max-height: 100%; max-width: 100%; object-fit: contain;" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (question.QuestionImage.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            }
                         </div>
                     }
+
 
                     @if (question.QuestionType == "Single Choice MCQ")
                     {
@@ -395,7 +438,7 @@
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     $(document).ready(function () {
     let userExamId = @viewBagUserExamId;

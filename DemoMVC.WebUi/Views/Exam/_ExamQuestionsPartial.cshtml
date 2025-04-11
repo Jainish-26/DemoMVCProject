@@ -42,10 +42,14 @@
     <div class="card shadow-sm p-3 mb-4">
         <h5 class="fw-bold">Q@(i + 1): @question.QuestionText (Marks: @question.Marks)</h5>
 
-        @if (!string.IsNullOrEmpty(question.QuestionImage))
+        @if (question.QuestionImage != null && question.QuestionImage.Any())
         {
-            <img src="~/content/QuestionImage/@question.QuestionImage" class="img-fluid mb-2" style="max-width: 300px;" />
+            foreach (var image in question.QuestionImage)
+            {
+                <img src="~/content/QuestionImage/@image" class="img-fluid mb-2" style="max-width: 600px; min-height:200px" />
+            }
         }
+
 
         @if (question.QuestionType == "Single Choice MCQ")
         {

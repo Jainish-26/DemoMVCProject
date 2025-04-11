@@ -29,8 +29,9 @@ namespace DemoMVC.Data
         {
             try
             {
-                var media = from i in _db.QuestionMedia where QuestionId == i.QuestionId select i;
-                return media.ToList();
+                return _db.QuestionMedia
+                      .Where(m => m.QuestionId == QuestionId)
+                      .ToList();
             }
             catch(Exception e)
             {

@@ -6,6 +6,7 @@ using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -23,6 +24,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly ExamQuestionsService _examQuestionsService;
         private readonly MessageService _messageService;
         private readonly UserAnswerService _userAnswerService;
+        private readonly QuestionMediaService _questionMediaService;
 
         public UserExamController()
         {
@@ -34,6 +36,7 @@ namespace DemoMVC.WebUi.Controllers
             _examQuestionsService = new ExamQuestionsService();
             _messageService = new MessageService();
             _userAnswerService = new UserAnswerService();
+            _questionMediaService = new QuestionMediaService();
         }
         public ActionResult Index()
         {
@@ -206,19 +209,29 @@ namespace DemoMVC.WebUi.Controllers
                 DurationMin = exam.DurationMin
             };
 
-            var questions = _questionService.GetQuestionsByExamId(userExamDetails.ExamId)
-            .Select(q => new QuestionAndAnswerModel
+            var questions = _questionService.GetQuestionsByExamId(exam.ExamId)
+            .Select(q =>
             {
-                QuestionId = q.QuestionId,
-                QuestionText = q.QuestionText,
-                //QuestionImage = q.QuestionImage,
-                QuestionType = q.QuestionType.QuestionTypeName,
-                Marks = _examQuestionsService.GetMarksByQuestionId(q.QuestionId, userExamDetails.ExamId),
-                Answers = _answerService.GetByQuestionId(q.QuestionId)
-                    .Select(ans => new AnswerViewModel
-                    {
-                        AnswerText = ans.AnswerText,
-                    }).ToList()
+                List<string> mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId)
+                                .Select(m => m.MediaName + m.MediaType).ToList();
+
+                return new QuestionAndAnswerModel
+                {
+                    QuestionId = q.QuestionId,
+                    QuestionText = q.QuestionText,
+                    IsActive = q.IsActive,
+                    QuestionImage = mediaList.Any() && mediaList != null ? mediaList : null,
+                    Difficulty = q.Difficulty,
+                    QuestionType = q.QuestionType.QuestionTypeName,
+                    Subject = q.Subject.SubjectName,
+                    Marks = q.Marks,
+                    Answers = _answerService.GetByQuestionId(q.QuestionId)
+                        .Select(ans => new AnswerViewModel
+                        {
+                            AnswerText = ans.AnswerText,
+                            IsCorrect = ans.IsCorrect
+                        }).ToList()
+                };
             }).ToList();
             var model = new ExamQuestionViewModel
             {
