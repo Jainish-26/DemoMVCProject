@@ -53,13 +53,6 @@
             .AutoBind(false)
             .Columns(columns =>
             {
-
-                columns.Bound(c => c.QuestionImage).Width("7%").Title("Image").ClientTemplate(
-                "# if(QuestionImage) { #" +
-                "<img src='/content/QuestionImage/#= QuestionImage #' alt='Question Image' class='grid-image' onclick='openImagePopup(\"#=QuestionId#\")' />" +
-                "# } else { #" +
-                "<i class='fas fa-image grid-image' onclick='openImagePopup(\"#= QuestionId #\")'></i>" +
-                "# } #" );
                 columns.Bound(c => c.Subject).Width("7%").Title("Subject");
                 columns.Bound(c => c.Type).Width("7%").Title("Answer Type");
                 columns.Bound(c => c.QuestionText).Width("50%").Title("Question")
@@ -87,7 +80,6 @@
                         .Title("Action")
                         .Width("8%")
                         .Sortable(false);
-
                 }
             })
 
@@ -172,23 +164,6 @@
         }
     });
     }
-    function openImagePopup(QuestionId) {
-        $.ajax({
-            url: '@Url.Action("GetImagePopup", "Question")',
-            type: 'GET',
-            data: { id: QuestionId },
-
-            success: function (response) {
-                // Append modal content and show it
-                $("#imageModalContainer").html(response);
-                $("#imageModal").modal("show");
-            },
-            error: function () {
-                alert("Failed to load image.");
-            }
-        });
-    }
-
     function fnShowDetails(QuestionId) {
         $.ajax({
             url: '@Url.Action("GetQuestionDetails","Question")',

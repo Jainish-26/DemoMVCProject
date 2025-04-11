@@ -33,5 +33,6 @@ namespace DemoMVC.Models
         public DbSet<ExamQuestions> ExamQuestions { get; set; }
         public DbSet<UserExams> UserExams { get; set; }
         public DbSet<UserAnswers> UserAnswers { get; set; }
+        public DbSet<QuestionMedia> QuestionMedia { get; set; }
     }
 }

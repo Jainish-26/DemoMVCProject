@@ -11,153 +11,6 @@
     }
     string formCode = AuthorizeFormAccess.FormAccessCode.QUESTION.ToString();
 }
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-@Html.Hidden("hdnFormAccessCode", formCode)
-@using (Html.BeginForm("Create", "Question", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-
-    @Html.HiddenFor(model => model.QuestionId)
-    @Html.AntiForgeryToken()
-    <div class="container custom-form">
-        <div class="form-header text-center">
-            <h4>@(Model.QuestionId > 0 ? "Edit Question" : "Create Question")</h4>
-            <div class="form-divider"></div>
-        </div>
-
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-
-        <div class="row g-4">
-            <!-- Left Column -->
-            <div class="col-md-7">
-                <div class="row g-3">
-                    <!-- Question Type -->
-                    <div class="col-md-4">
-                        <label class="form-label">Question Type</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-question-circle"></i></span>
-                            @Html.DropDownListFor(model => model.QuestionTypeId, Model._questionTypeList, new { @class = "form-select" })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.QuestionTypeId, "", new { @class = "text-danger" })
-                    </div>
-                    <!-- Subject -->
-                    <div class="col-md-4">
-                        <label class="form-label">Subject</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-book"></i></span>
-                            @Html.DropDownListFor(model => model.SubjectId, Model._subjectList, new { @class = "form-select" })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.SubjectId, "", new { @class = "text-danger" })
-                    </div>
-                    <!-- Difficulty -->
-                    <div class="col-md-4">
-                        <label class="form-label">Difficulty</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
-                            @Html.DropDownListFor(model => model.Difficulty, Model._difficultyList, new { @class = "form-select" })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Difficulty, "", new { @class = "text-danger" })
-                    </div>
-                    <!-- Question Text -->
-                    <div class="col-12">
-                        @Html.LabelFor(model => model.QuestionText, new { @class = "form-label" })
-                        @Html.TextAreaFor(model => model.QuestionText, new { @class = "form-control", rows = "2", style = "resize: none; width: 95%;" })
-                        @Html.ValidationMessageFor(model => model.QuestionText, "", new { @class = "text-danger" })
-                    </div>
-                    <!-- Marks -->
-                    <div class="col-md-6">
-                        <label class="form-label">Marks</label>
-                        @Html.EditorFor(model => model.Marks, new { htmlAttributes = new { @class = "form-control", type = "text", id = "marksInput" } })
-                        @Html.ValidationMessageFor(model => model.Marks, "", new { @class = "text-danger" })
-                    </div>
-                    <!-- IsActive -->
-                    <div class="col-12 mt-3">
-                        <label class="form-label">Status</label>
-                        <div class="toggle-container">
-                            <input type="checkbox" id="IsActiveToggle" class="toggle-input" @(Model.IsActive ? "checked" : "")>
-                            <label for="IsActiveToggle" class="toggle-label">
-                            </label>
-                            @*<span class="status-text" style=" padding-left:200px">@(Model.IsActive ? "" : "")</span>*@
-                            @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
-                        </div>
-                    </div>
-                   
-                        <!-- Image -->
-                        <!-- Image Section -->
-                        <div class="col-12 mt-3">
-                            <label class="form-label">Question Image</label>
-                            <div class="file-input-wrapper">
-                                <input type="file" class="form-control" name="QuestionImage" id="questionImageInput" />
-                                @Html.HiddenFor(model=>model.QuestionImage)
-                                <label for="questionImageInput" class="file-input-label"><i class="fas fa-upload me-2"></i> Choose file</label>
-                                <span class="file-name">@(string.IsNullOrEmpty(Model.QuestionImage) ? "No file chosen" : Model.QuestionImage)</span>
-                            </div>
-
-                            @if (!string.IsNullOrEmpty(Model.QuestionImage))
-                            {
-                                <div class="mt-2 position-relative">
-                                    <img src="@Url.Content("~/content/QuestionImage/" + Model.QuestionImage)" alt="Question Image" class="preview-image img-fluid border rounded" />
-
-                                    <!-- Delete Button -->
-                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" id="deleteImageBtn" data-questionid="@Model.QuestionId">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-
-                                    <!-- Hidden input field to store deleted status -->
-                                    @Html.Hidden("IsImageDeleted", "false", new { id = "IsImageDeleted" })
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-            <!-- Right Column - Answer Section -->
-            <div class="col-md-5">
-                <div class="card answer-section">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i> Answers</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="answer-container" class="d-flex flex-column gap-2">
-                            @if (Model.Answers != null && Model.Answers.Any())
-                            {
-                                for (int i = 0; i < Model.Answers.Count; i++)
-                                {
-                                    <div class="row g-2 answer-item">
-                                        <div class="col-md-8" style="margin-top:5px">
-                                            @Html.TextAreaFor(m => m.Answers[i].AnswerText, new { @class = "form-control answer-text", placeholder = "Enter answer" })
-                                            @Html.ValidationMessageFor(m => m.Answers[i].AnswerText, "", new { @class = "text-danger answer-error" })
-                                        </div>
-
-                                        <div class="col-md-3 d-flex align-items-center">
-                                            <div class="toggle-container small-toggle">
-                                                <input type="checkbox" id="IsCorrectToggle_@i" class="toggle-input answer-toggle" @(Model.Answers[i].IsCorrect ? "checked" : "")>
-                                                <label for="IsCorrectToggle_@i" class="toggle-label">
-                                                </label>
-                                                <span class="status-text">Correct</span>
-                                                @Html.HiddenFor(m => m.Answers[i].IsCorrect, new { @id = $"IsCorrect_{i}" })
-                                            </div>
-                                        </div>
-                                        <div class="col-md-1 d-flex align-items-center">
-                                            <button type="button" class="btn btn-danger remove-answer"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </div>
-                                }
-                            }
-                        </div>
-                        <button type="button" id="addAnswerBtn" class="btn btn-success add-answer mt-3"><i class="fas fa-plus me-2"></i> Add Answer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-actions text-center mt-4">
-            <button type="submit" class="btn btn-primary">Save</button>
-            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
-        </div>
-    </div>
-}
-
 <style>
     /* General Styles */
     body {
@@ -474,7 +327,14 @@
             background-color: #7f8c8d;
             color: white;
         }
+    .file-input-wrapper label {
+        cursor: pointer;
+    }
 
+    .file-name {
+        vertical-align: middle;
+        font-style: italic;
+    }
     /* Responsive Adjustments */
     @@media (max-width: 768px) {
         .custom-form {
@@ -496,16 +356,240 @@
         }
     }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@Html.Hidden("hdnFormAccessCode", formCode)
+@using (Html.BeginForm("Create", "Question", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+
+    @Html.HiddenFor(model => model.QuestionId)
+    @Html.AntiForgeryToken()
+    <div class="container custom-form">
+        <div class="form-header text-center">
+            <h4>@(Model.QuestionId > 0 ? "Edit Question" : "Create Question")</h4>
+            <div class="form-divider"></div>
+        </div>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-md-7">
+                <div class="row g-3">
+                    <!-- Question Type -->
+                    <div class="col-md-4">
+                        <label class="form-label">Question Type</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-question-circle"></i></span>
+                            @Html.DropDownListFor(model => model.QuestionTypeId, Model._questionTypeList, new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.QuestionTypeId, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Subject -->
+                    <div class="col-md-4">
+                        <label class="form-label">Subject</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-book"></i></span>
+                            @Html.DropDownListFor(model => model.SubjectId, Model._subjectList, new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.SubjectId, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Difficulty -->
+                    <div class="col-md-4">
+                        <label class="form-label">Difficulty</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
+                            @Html.DropDownListFor(model => model.Difficulty, Model._difficultyList, new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Difficulty, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Question Text -->
+                    <div class="col-12">
+                        @Html.LabelFor(model => model.QuestionText, new { @class = "form-label" })
+                        @Html.TextAreaFor(model => model.QuestionText, new { @class = "form-control", rows = "2", style = "resize: none; width: 95%;" })
+                        @Html.ValidationMessageFor(model => model.QuestionText, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- Marks -->
+                    <div class="col-md-6">
+                        <label class="form-label">Marks</label>
+                        @Html.EditorFor(model => model.Marks, new { htmlAttributes = new { @class = "form-control", type = "text", id = "marksInput" } })
+                        @Html.ValidationMessageFor(model => model.Marks, "", new { @class = "text-danger" })
+                    </div>
+                    <!-- IsActive -->
+                    <div class="col-12 mt-3">
+                        <label class="form-label">Status</label>
+                        <div class="toggle-container">
+                            <input type="checkbox" id="IsActiveToggle" class="toggle-input" @(Model.IsActive ? "checked" : "")>
+                            <label for="IsActiveToggle" class="toggle-label">
+                            </label>
+                            @*<span class="status-text" style=" padding-left:200px">@(Model.IsActive ? "" : "")</span>*@
+                            @Html.HiddenFor(model => model.IsActive, new { @id = "IsActive" })
+                        </div>
+                    </div>
+                    <!-- Image Section -->
+                    <div class="col-12 mt-3">
+                        <label class="form-label">Question Images</label>
+
+                        <div class="file-input-wrapper position-relative">
+                            <!-- 👇 Hidden actual file input -->
+                            <input type="file" name="QuestionImage" id="questionImageInput" multiple hidden />
+
+                            <!-- 👇 Custom styled label to open file dialog -->
+                            <label for="questionImageInput" class="btn btn-outline-primary">
+                                <i class="fas fa-upload me-2"></i> Choose files
+                            </label>
+
+                            <span class="file-name ms-2">No files chosen</span>
+                        </div>
+
+                        <!-- 👇 Preview for new images -->
+                        <div id="imagePreviewContainer" class="d-flex flex-wrap gap-3 mt-3"></div>
+
+                        <!-- 👇 Already existing images -->
+                        @if (Model.QuestionImage != null && Model.QuestionImage.Any())
+                        {
+                            <div id="existingImages" class="d-flex flex-wrap gap-3 mt-3">
+                                @foreach (var image in Model.QuestionImage)
+                                {
+                                    <div class="position-relative d-inline-block me-2 existing-image-wrapper">
+                                        <img src="@Url.Content("~/content/QuestionImage/" + image)" class="img-thumbnail" style="max-width: 200px;" />
+                                        <span class="delete-existing text-danger bg-white rounded-circle p-1" style="position:absolute; top:5px; right:5px; cursor:pointer;">
+                                            <i class="fas fa-times-circle"></i>
+                                        </span>
+                                        <input type="hidden" name="ExistingImages" value="@image" class="existing-image-hidden" />
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+             </div>
+
+            <!-- Right Column - Answer Section -->
+            <div class="col-md-5">
+                <div class="card answer-section">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list-ul me-2"></i> Answers</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="answer-container" class="d-flex flex-column gap-2">
+                            @if (Model.Answers != null && Model.Answers.Any())
+                            {
+                                for (int i = 0; i < Model.Answers.Count; i++)
+                                {
+                                    <div class="row g-2 answer-item">
+                                        <div class="col-md-8" style="margin-top:5px">
+                                            @Html.TextAreaFor(m => m.Answers[i].AnswerText, new { @class = "form-control answer-text", placeholder = "Enter answer" })
+                                            @Html.ValidationMessageFor(m => m.Answers[i].AnswerText, "", new { @class = "text-danger answer-error" })
+                                        </div>
+
+                                        <div class="col-md-3 d-flex align-items-center">
+                                            <div class="toggle-container small-toggle">
+                                                <input type="checkbox" id="IsCorrectToggle_@i" class="toggle-input answer-toggle" @(Model.Answers[i].IsCorrect ? "checked" : "")>
+                                                <label for="IsCorrectToggle_@i" class="toggle-label">
+                                                </label>
+                                                <span class="status-text">Correct</span>
+                                                @Html.HiddenFor(m => m.Answers[i].IsCorrect, new { @id = $"IsCorrect_{i}" })
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-center">
+                                            <button type="button" class="btn btn-danger remove-answer"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" id="addAnswerBtn" class="btn btn-success add-answer mt-3"><i class="fas fa-plus me-2"></i> Add Answer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions text-center mt-4">
+            <button type="submit" class="btn btn-primary">Save</button>
+            @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-secondary" })
+        </div>
+    </div>
+}
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // File input enhancement
         const fileInput = document.getElementById("questionImageInput");
-        const fileName = document.querySelector(".file-name");
+        const fileNameDisplay = document.querySelector(".file-name");
+        const previewContainer = document.getElementById("imagePreviewContainer");
+        const existingImageContainer = document.getElementById("existingImages");
 
+        // Array to hold selected files temporarily
+        let selectedFiles = [];
+
+        // Handle new file selection
         fileInput.addEventListener("change", function () {
-            fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
+            selectedFiles = Array.from(fileInput.files);
+            updatePreview();
         });
+
+        // Update file preview area
+        function updatePreview() {
+            previewContainer.innerHTML = "";
+
+            if (selectedFiles.length > 0) {
+                fileNameDisplay.textContent = selectedFiles.map(file => file.name).join(", ");
+            } else {
+                fileNameDisplay.textContent = "No files chosen";
+            }
+
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "position-relative d-inline-block me-2 mb-2";
+
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "img-thumbnail";
+                    img.style.maxWidth = "150px";
+                    img.style.maxHeight = "150px";
+
+                    const delBtn = document.createElement("span");
+                    delBtn.innerHTML = '<i class="fas fa-times-circle text-danger bg-white rounded-circle p-1"></i>';
+                    delBtn.style.position = "absolute";
+                    delBtn.style.top = "5px";
+                    delBtn.style.right = "5px";
+                    delBtn.style.cursor = "pointer";
+
+                    // Remove file from preview and array
+                    delBtn.addEventListener("click", function () {
+                        selectedFiles.splice(index, 1);
+                        updateInputFiles();
+                        updatePreview();
+                    });
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(delBtn);
+                    previewContainer.appendChild(wrapper);
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Sync selectedFiles to actual file input
+        function updateInputFiles() {
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => dataTransfer.items.add(file));
+            fileInput.files = dataTransfer.files;
+        }
+
+        // Handle delete for existing images from server
+        if (existingImageContainer) {
+            existingImageContainer.addEventListener("click", function (e) {
+                if (e.target.closest(".delete-existing")) {
+                    const wrapper = e.target.closest(".existing-image-wrapper");
+                    if (wrapper) {
+                        wrapper.remove(); // removes image and associated <input type="hidden">
+                    }
+                }
+            });
+        }
 
         // IsActive toggle logic
         var toggleInput = document.getElementById("IsActiveToggle");

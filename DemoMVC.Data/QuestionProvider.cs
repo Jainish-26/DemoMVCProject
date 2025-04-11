@@ -33,7 +33,6 @@ namespace DemoMVC.Data
                         Type = q.QuestionType.QuestionTypeName,
                         Subject = q.Subject.SubjectName,
                         QuestionText = q.QuestionText,
-                        QuestionImage = q.QuestionImage,
                         BadgeCode = c!=null ? c.BadgeCode : null,
                         Marks = q.Marks,
                         Difficulty = q.Difficulty,

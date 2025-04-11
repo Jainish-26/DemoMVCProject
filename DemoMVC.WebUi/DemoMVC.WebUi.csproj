@@ -2503,7 +2503,6 @@
     <Content Include="Views\QuestionType\Create.cshtml" />
     <Content Include="Views\Question\Create.cshtml" />
     <Content Include="Views\Question\Index.cshtml" />
-    <Content Include="Views\Question\_ImagePopup.cshtml" />
     <Content Include="Views\Question\_QuestionDetailsPopUp.cshtml" />
     <Content Include="Views\Exam\Index.cshtml" />
     <Content Include="Views\Exam\Create.cshtml" />

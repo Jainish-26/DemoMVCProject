@@ -124,16 +124,21 @@
                         </div>
 
 
-
-                        @if (!string.IsNullOrEmpty(Model.QuestionImage))
+                        @*Show All Images Of Questions*@
+                        @if (Model.QuestionImage != null && Model.QuestionImage.Any())
                         {
-                            <div class="image-container">
-                                <img src="~/content/QuestionImage/@Model.QuestionImage"
-                                     class="question-image"
-                                     alt="Question Image">
+                            <div class="image-container d-flex flex-wrap gap-3">
+                                @foreach (var image in Model.QuestionImage)
+                                {
+                                    <div class="position-relative d-inline-block me-2">
+                                        <img src="@Url.Content("~/content/QuestionImage/" + image)"
+                                             class="question-image img-thumbnail"
+                                             style="max-width: 200px;"
+                                             alt="Question Image" />
+                                    </div>
+                                }
                             </div>
                         }
-
 
                         @if (!string.IsNullOrEmpty(access))
                         {

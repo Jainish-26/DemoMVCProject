@@ -20,6 +20,7 @@ namespace DemoMVC.WebUi.Controllers
         public readonly QuestionTypeService _questionTypeService;
         public readonly SubjectService _subjectService;
         public readonly CommonLookupService _commonLookupService;
+        public readonly QuestionMediaService _questionMediaService;
 
         public QuestionController()
         {
@@ -28,6 +29,7 @@ namespace DemoMVC.WebUi.Controllers
             _questionTypeService = new QuestionTypeService();
             _subjectService = new SubjectService();
             _commonLookupService = new CommonLookupService();
+            _questionMediaService = new QuestionMediaService();
         }
         // GET: Question
         public ActionResult Index(int? ExamId)
@@ -40,6 +42,7 @@ namespace DemoMVC.WebUi.Controllers
             return View();
         }
 
+        [HttpGet]
         public ActionResult Create(int? id)
         {
             string actionPermission = "";
@@ -59,6 +62,7 @@ namespace DemoMVC.WebUi.Controllers
 
             int userId = SessionHelper.UserId;
             QuestionAndAnswerModel model = new QuestionAndAnswerModel();
+            List<string> imageList = new List<string>();
 
             if (id.HasValue)
             {
@@ -69,7 +73,6 @@ namespace DemoMVC.WebUi.Controllers
                     model.QuestionId = id.Value;
                     model.QuestionText = que.QuestionText;
                     model.Marks = que.Marks;
-                    model.QuestionImage = que.QuestionImage;
                     model.IsActive = que.IsActive;
                     model.Difficulty = que.Difficulty;
                     model.SubjectId = que.SubjectId;
@@ -84,6 +87,18 @@ namespace DemoMVC.WebUi.Controllers
                             IsCorrect = ans.IsCorrect,
                         }).ToList();
 
+                    var media = _questionMediaService.GetMediaByQuestionId(que.QuestionId);
+
+                    if (media.Any())
+                    {
+                        foreach(var i in media)
+                        {
+                            var imageName = i.MediaName + i.MediaType;
+                            imageList.Add(imageName);
+                        }
+                    }
+
+                    model.QuestionImage = imageList;
                 }
             }
             BindLevel(ref model);
@@ -93,7 +108,7 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(QuestionAndAnswerModel model, HttpPostedFileBase QuestionImage)
+        public ActionResult Create(QuestionAndAnswerModel model, List<HttpPostedFileBase> QuestionImage, List<string> ExistingImages)
         {
             string actionPermission = "";
             if (model.QuestionId == 0)
@@ -132,7 +147,7 @@ namespace DemoMVC.WebUi.Controllers
                     {
                         if (OptionCnt >= 2)
                         {
-                            SaveAndUpdateQuestion(model, QuestionImage);
+                            SaveAndUpdateQuestion(model, QuestionImage, ExistingImages);
                             return RedirectToAction("Index");
                         }
                         else
@@ -146,7 +161,7 @@ namespace DemoMVC.WebUi.Controllers
                     }
                     else
                     {
-                        SaveAndUpdateQuestion(model, QuestionImage);
+                        SaveAndUpdateQuestion(model, QuestionImage, ExistingImages);
                         return RedirectToAction("Index");
                     }
                 }
@@ -168,23 +183,16 @@ namespace DemoMVC.WebUi.Controllers
             }
         }
 
-        public QuestionAndAnswerModel SaveAndUpdateQuestion(QuestionAndAnswerModel model, HttpPostedFileBase QuestionImage)
+        public QuestionAndAnswerModel SaveAndUpdateQuestion(QuestionAndAnswerModel model, List<HttpPostedFileBase> QuestionImage, List<string> ExistingImages)
         {
             int userId = SessionHelper.UserId;
             Questions que = new Questions();
             Answers ans = new Answers();
+            List<QuestionMedia> imageList = new List<QuestionMedia>();
 
             if (model.QuestionId > 0)
             {
                 que = _questionService.GetById(model.QuestionId);
-            }
-
-            if (QuestionImage != null)
-            {
-                string uniqueCode = new string(Enumerable.Range(0, 10).Select(_ => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"[new Random().Next(62)]).ToArray());
-
-                que.QuestionImage = uniqueCode + Path.GetExtension(QuestionImage.FileName);
-                QuestionImage.SaveAs(Server.MapPath("~/content/QuestionImage/") + que.QuestionImage);
             }
 
             que.QuestionText = model.QuestionText;
@@ -201,6 +209,26 @@ namespace DemoMVC.WebUi.Controllers
                 que.CreatedOn = DateTime.UtcNow;
                 que.QuestionId = _questionService.CreateQuestion(que);
 
+                if (QuestionImage.Any())
+                {
+                    foreach (var i in QuestionImage)
+                    {
+                        if (i != null)
+                        {
+                            var media = new QuestionMedia
+                            {
+                                QuestionId = que.QuestionId,
+                                MediaName = Path.GetFileNameWithoutExtension(i.FileName).Trim(),
+                                MediaType = Path.GetExtension(i.FileName)
+                            };
+                            var QueMedia = media.MediaName+ media.MediaType;
+                            i.SaveAs(Server.MapPath("~/content/QuestionImage/") + QueMedia);
+                            imageList.Add(media);
+                        }
+                    }
+                    _questionMediaService.AddMedia(imageList);
+                }
+            
                 if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
                 {
                     ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
@@ -232,7 +260,51 @@ namespace DemoMVC.WebUi.Controllers
                 que.UpdatedBy = userId;
                 que.UpdatedOn = DateTime.UtcNow;
                 _questionService.UpdateQuestions(que);
+                List<QuestionMedia> addImages = new List<QuestionMedia>();
 
+                _questionMediaService.RemoveExistingImages(que.QuestionId,ExistingImages);
+
+                if (ExistingImages != null && ExistingImages.Any())
+                {
+                    foreach(var i in ExistingImages)
+                    {
+                        if (i != null)
+                        {
+                            string fileName = i;
+                            string[] parts = fileName.Split('.');
+                            string namePart = parts[0];
+                            string extensionPart = "."+parts[1];
+                            var media = new QuestionMedia
+                            {
+                                QuestionId = que.QuestionId,
+                                MediaName = namePart,
+                                MediaType = extensionPart
+                            };
+                            addImages.Add(media);
+                        }
+                    }
+                }
+
+                if (QuestionImage.Any())
+                {
+                    foreach (var i in QuestionImage)
+                    {
+                        if (i != null)
+                        {
+                            var media = new QuestionMedia
+                            {
+                                QuestionId = que.QuestionId,
+                                MediaName = Path.GetFileNameWithoutExtension(i.FileName).Trim(),
+                                MediaType = Path.GetExtension(i.FileName)
+                            };
+                            var QueMedia = media.MediaName + media.MediaType;
+                            i.SaveAs(Server.MapPath("~/content/QuestionImage/") + QueMedia);
+                            addImages.Add(media);
+                        }
+                    }
+                }
+
+                _questionMediaService.AddMedia(addImages);
                 var existingAnswers = _answerService.GetByQuestionId(que.QuestionId);
 
                 var answersToKeep = new List<int>();
@@ -303,7 +375,7 @@ namespace DemoMVC.WebUi.Controllers
         public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             var data = _questionService.GetAllQuestionsGridModel();
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 data = data
                     .Where(x =>
@@ -311,7 +383,7 @@ namespace DemoMVC.WebUi.Controllers
                         (x.Type != null && x.Type.ToLower().Contains(searchTerm.ToLower())) ||
                         (x.QuestionText != null && x.QuestionText.ToLower().Contains(searchTerm.ToLower())) ||
                         (x.Difficulty != null && x.Difficulty.ToLower().Contains(searchTerm.ToLower())) ||
-                        (x.Marks != null && x.Marks.ToString().Contains(searchTerm))
+                        (x.Marks != 0 && x.Marks.ToString().Contains(searchTerm))
                     )
                     .AsQueryable();
             }
@@ -397,14 +469,23 @@ namespace DemoMVC.WebUi.Controllers
         public ActionResult GetQuestionDetails(int id, string access)
         {
             var question = _questionService.GetById(id);
-
+            var media = _questionMediaService.GetMediaByQuestionId(id);
+            List<string> imageList = new List<string>();
+            if (media.Any())
+            {
+                foreach (var i in media)
+                {
+                    var imageName = i.MediaName + i.MediaType;
+                    imageList.Add(imageName);
+                }
+            }
             ViewBag.Access = access;
             QuestionAndAnswerModel model = new QuestionAndAnswerModel
             {
                 QuestionText = question.QuestionText,
                 IsActive = question.IsActive,
-                QuestionImage = question.QuestionImage,
                 Difficulty = question.Difficulty,
+                QuestionImage=imageList,
                 QuestionType = question.QuestionType.QuestionTypeName,
                 Subject = question.Subject.SubjectName,
                 Marks = question.Marks,

@@ -217,6 +217,16 @@
           <Property Name="ModifiedBy" Type="Int32" />
           <Property Name="ModifiedOn" Type="DateTime" />
         </EntityType>
+        <EntityType Name="QuestionMedia" customannotation:ClrType="DemoMVC.Models.QuestionMedia, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MediaName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="MediaType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="QuestionId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Questions" Relationship="Self.QuestionMedia_Questions" FromRole="QuestionMedia_Questions_Source" ToRole="QuestionMedia_Questions_Target" />
+        </EntityType>
         <EntityType Name="UserAnswers" customannotation:ClrType="DemoMVC.Models.UserAnswers, DemoMVC.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <Key>
             <PropertyRef Name="UserAnswerId" />
@@ -379,6 +389,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="QuestionMedia_Questions">
+          <End Role="QuestionMedia_Questions_Source" Type="Self.QuestionMedia" Multiplicity="*" />
+          <End Role="QuestionMedia_Questions_Target" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <ReferentialConstraint>
+            <Principal Role="QuestionMedia_Questions_Target">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="QuestionMedia_Questions_Source">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="UserAnswers_Question">
           <End Role="UserAnswers_Question_Source" Type="Self.UserAnswers" Multiplicity="*" />
           <End Role="UserAnswers_Question_Target" Type="Self.Questions" Multiplicity="1">
@@ -449,6 +473,7 @@
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" />
+          <EntitySet Name="QuestionMedia" EntityType="Self.QuestionMedia" />
           <EntitySet Name="UserAnswers" EntityType="Self.UserAnswers" />
           <EntitySet Name="UserExams" EntityType="Self.UserExams" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" />
@@ -478,6 +503,10 @@
           <AssociationSet Name="ExamQuestions_Questions" Association="Self.ExamQuestions_Questions">
             <End Role="ExamQuestions_Questions_Source" EntitySet="ExamQuestions" />
             <End Role="ExamQuestions_Questions_Target" EntitySet="Questions" />
+          </AssociationSet>
+          <AssociationSet Name="QuestionMedia_Questions" Association="Self.QuestionMedia_Questions">
+            <End Role="QuestionMedia_Questions_Source" EntitySet="QuestionMedia" />
+            <End Role="QuestionMedia_Questions_Target" EntitySet="Questions" />
           </AssociationSet>
           <AssociationSet Name="UserAnswers_Question" Association="Self.UserAnswers_Question">
             <End Role="UserAnswers_Question_Source" EntitySet="UserAnswers" />
@@ -719,6 +748,16 @@
                 <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
                 <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="QuestionMedia">
+            <EntityTypeMapping TypeName="DemoMVC.Models.QuestionMedia">
+              <MappingFragment StoreEntitySet="QuestionMedia">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="MediaName" ColumnName="MediaName" />
+                <ScalarProperty Name="MediaType" ColumnName="MediaType" />
+                <ScalarProperty Name="QuestionId" ColumnName="QuestionId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1017,6 +1056,15 @@
           <Property Name="ModifiedBy" Type="int" Nullable="true" />
           <Property Name="ModifiedOn" Type="datetime" Nullable="true" />
         </EntityType>
+        <EntityType Name="QuestionMedia">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MediaName" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="MediaType" Type="nvarchar(max)" Nullable="true" />
+          <Property Name="QuestionId" Type="int" customannotation:Index="{ Name: IX_QuestionId, Order: 0 }" Nullable="false" />
+        </EntityType>
         <EntityType Name="UserAnswers">
           <Key>
             <PropertyRef Name="UserAnswerId" />
@@ -1175,6 +1223,20 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="QuestionMedia_Questions">
+          <End Role="Questions" Type="Self.Questions" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="QuestionMedia" Type="Self.QuestionMedia" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Questions">
+              <PropertyRef Name="QuestionId" />
+            </Principal>
+            <Dependent Role="QuestionMedia">
+              <PropertyRef Name="QuestionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="UserAnswers_Question">
           <End Role="Questions" Type="Self.Questions" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -1245,6 +1307,7 @@
           <EntitySet Name="FormRoleMapping" EntityType="Self.FormRoleMapping" Schema="dbo" Table="FormRoleMapping" />
           <EntitySet Name="Forms" EntityType="Self.Forms" Schema="dbo" Table="Forms" />
           <EntitySet Name="Message_Mst" EntityType="Self.Message_Mst" Schema="dbo" Table="Message_Mst" />
+          <EntitySet Name="QuestionMedia" EntityType="Self.QuestionMedia" Schema="dbo" Table="QuestionMedia" />
           <EntitySet Name="UserAnswers" EntityType="Self.UserAnswers" Schema="dbo" Table="UserAnswers" />
           <EntitySet Name="UserExams" EntityType="Self.UserExams" Schema="dbo" Table="UserExams" />
           <EntitySet Name="webpages_Membership" EntityType="Self.webpages_Membership" Schema="dbo" Table="webpages_Membership" />
@@ -1274,6 +1337,10 @@
           <AssociationSet Name="ExamQuestions_Questions" Association="Self.ExamQuestions_Questions">
             <End Role="Questions" EntitySet="Questions" />
             <End Role="ExamQuestions" EntitySet="ExamQuestions" />
+          </AssociationSet>
+          <AssociationSet Name="QuestionMedia_Questions" Association="Self.QuestionMedia_Questions">
+            <End Role="Questions" EntitySet="Questions" />
+            <End Role="QuestionMedia" EntitySet="QuestionMedia" />
           </AssociationSet>
           <AssociationSet Name="UserAnswers_Question" Association="Self.UserAnswers_Question">
             <End Role="Questions" EntitySet="Questions" />

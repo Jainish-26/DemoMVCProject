@@ -211,7 +211,7 @@ namespace DemoMVC.WebUi.Controllers
             {
                 QuestionId = q.QuestionId,
                 QuestionText = q.QuestionText,
-                QuestionImage = q.QuestionImage,
+                //QuestionImage = q.QuestionImage,
                 QuestionType = q.QuestionType.QuestionTypeName,
                 Marks = _examQuestionsService.GetMarksByQuestionId(q.QuestionId, userExamDetails.ExamId),
                 Answers = _answerService.GetByQuestionId(q.QuestionId)

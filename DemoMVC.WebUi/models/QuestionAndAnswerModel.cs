@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DemoMVC.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
@@ -17,7 +18,7 @@ namespace DemoMVC.WebUi.Models
         public int QuestionId { get; set; }
         [Required(ErrorMessage = "Question text is required.")]
         public string QuestionText { get; set; }
-        public string QuestionImage { get; set; }
+        public List<string> QuestionImage { get; set; }
         [Required(ErrorMessage = "Marks are required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Marks must be a positive number.")]
         public int Marks { get; set; }
@@ -57,7 +58,5 @@ namespace DemoMVC.WebUi.Models
         public DateTime CreatedOn { get; set; }
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
-
-
     }
 }

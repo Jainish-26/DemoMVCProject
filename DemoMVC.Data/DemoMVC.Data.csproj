@@ -103,6 +103,7 @@
     <Compile Include="FormsProvider.cs" />
     <Compile Include="MessageProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuestionMediaProvider.cs" />
     <Compile Include="QuestionProvider.cs" />
     <Compile Include="RolesProvider.cs" />
     <Compile Include="QuestionTypeProvider.cs" />

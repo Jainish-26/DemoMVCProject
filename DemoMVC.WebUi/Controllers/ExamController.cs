@@ -320,7 +320,7 @@ namespace DemoMVC.WebUi.Controllers
                     QuestionId = q.QuestionId,
                     QuestionText = q.QuestionText,
                     IsActive = q.IsActive,
-                    QuestionImage = q.QuestionImage,
+                    //QuestionImage = q.QuestionImage,
                     Difficulty = q.Difficulty,
                     QuestionType = q.QuestionType.QuestionTypeName,
                     Subject = q.Subject.SubjectName,
