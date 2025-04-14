@@ -39,34 +39,31 @@ namespace DemoMVC.Data
             }
         }
 
-        public void RemoveExistingImages(int QuestionId, List<string> ExistingImages)
+        public void RemoveExistingImages(List<int> DeleteIds)
         {
             try
             {
-                var data = (from i in _db.QuestionMedia where i.QuestionId == QuestionId select i).ToList();
-
+                var data = _db.QuestionMedia.Where(i => DeleteIds.Contains(i.Id)).ToList();
                 foreach (var image in data)
                 {
                     string fullImageName = image.MediaName + image.MediaType;
 
-                    if (!ExistingImages.Contains(fullImageName, StringComparer.OrdinalIgnoreCase))
-                    {
-                        string imagePath = Path.Combine(HttpContext.Current.Server.MapPath("~/content/QuestionImage/"), fullImageName);
-                        if (System.IO.File.Exists(imagePath))
-                        {
-                            System.IO.File.Delete(imagePath);
-                        }
+                    string imagePath = Path.Combine(HttpContext.Current.Server.MapPath("~/content/QuestionImage/"), fullImageName);
 
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
                     }
+
                     _db.QuestionMedia.Remove(image);
                 }
-
                 _db.SaveChanges();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw e;
             }
-        } 
+        }
+
     }
 }

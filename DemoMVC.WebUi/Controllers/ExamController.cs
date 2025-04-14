@@ -327,7 +327,7 @@ namespace DemoMVC.WebUi.Controllers
                     QuestionId = q.QuestionId,
                     QuestionText = q.QuestionText,
                     IsActive = q.IsActive,
-                    QuestionImage = mediaList.Any() && mediaList!=null ? mediaList : null,
+                    //QuestionImage = mediaList.Any() && mediaList!=null ? mediaList : null,
                     Difficulty = q.Difficulty,
                     QuestionType = q.QuestionType.QuestionTypeName,
                     Subject = q.Subject.SubjectName,

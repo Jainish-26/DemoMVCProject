@@ -4,6 +4,8 @@
     ViewBag.Title = "Exam Checking";
     var userExamId = Model.UserExamId;
 }
+<link href="~/content/fancybox/fancybox.css" rel="stylesheet" />
+
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -129,15 +131,15 @@
         background-color: green;
     }
 
-    .red{
-        background-color :red ;
+    .red {
+        background-color: red;
     }
 
 
     /* Existing Styles - Keeping Your Question Container UI */
     .question-container {
         padding: 25px;
-        margin-top :20px;
+        margin-top: 20px;
         background: #fff;
         border-radius: 8px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -211,14 +213,14 @@
     }
 
 
-    
+
     /*Save Button*/
     .navigation-buttons {
         position: absolute;
         bottom: 15px;
         left: 0;
         right: 0;
-        width:80%;
+        width: 80%;
         display: flex;
         justify-content: space-between; /* Ensures buttons are spaced evenly */
         padding: 10px 20px; /* Adds padding for better spacing */
@@ -287,7 +289,33 @@
                     <div class="question-header">
                         <h3>Q@(i + 1): @question.QuestionText (Marks : @question.Marks)</h3>
                     </div>
+                    @if (question.QuestionImages != null && question.QuestionImages.Any())
+                    {
+                        var galleryId = $"gallery_{question.QuestionId}";
 
+                        <div class="image-gallery mb-3">
+                            <div class="row g-2">
+                                @for (int s = 0; s < question.QuestionImages.Count; s++)
+                                {
+                                    var image = question.QuestionImages[s].MediaName + question.QuestionImages[s].MediaType;
+                                    var fullImagePath = Url.Content("~/content/QuestionImage/" + image);
+                                    var thumbIndex = s;
+
+                                    <div class="col-4 col-md-3">
+                                        <a href="@fullImagePath"
+                                           data-fancybox="@galleryId"
+                                           data-caption=@image
+                                           class="d-block thumbnail-link">
+                                            <img src="@fullImagePath"
+                                                 alt="Question Image @(thumbIndex + 1)"
+                                                 class="img-thumbnail w-100"
+                                                 style="height: 100px; object-fit: cover;" />
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
                     @if (question.QuestionType == "Single Choice MCQ")
                     {
                         bool isCorrect = userAnswer != null && correctAnswers.Contains(userAnswer.Answer);
@@ -403,7 +431,7 @@
         </div>
     </div>
 </div>
-
+<script src="~/content/fancybox/fancybox.umd.js"></script>
 <script>
     $(document).ready(function () {
         debugger
@@ -424,8 +452,22 @@
                 marksInput.prop("disabled", true).val(0);
             }
         });
-    });
 
+        Fancybox.bind("[data-fancybox]", {
+            // Options
+            buttons: [
+                "zoom",
+                "slideShow",
+                "fullScreen",
+                "download",
+                "thumbs",
+                "close"
+            ],
+            thumbs: {
+                autoStart: true, // Show thumbnails on opening
+            }
+        });
+    });
     // Store User Answer IDs and Marks in JavaScript Variables
     let userAnswers = @Html.Raw(JsonConvert.SerializeObject(Model.UserAnswers));
     let questionMarks = @Html.Raw(JsonConvert.SerializeObject(Model.Questions.Select(q => q.Marks)));
@@ -455,7 +497,7 @@
                 $(this).addClass("for-review"); // For Review (Orange)
             } else if (!userAnswer) {
                 $(this).addClass("not-visited"); // Not Attempted (Gray)
-            } 
+            }
         });
     }
 
@@ -501,7 +543,7 @@
                         if (callback) callback(); // Proceed even if there is an error
                     }
                 });
-            } else {    
+            } else {
                 if (callback) callback(); // Proceed even if the checkbox is not checked
             }
         } else {

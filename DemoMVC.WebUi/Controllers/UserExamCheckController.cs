@@ -17,6 +17,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly ExamQuestionsService _examQuestionsService;
         private readonly AnswerService _answerService;
         private readonly UserProfileService _userProfileService;
+        private readonly QuestionMediaService _questionMediaService;
         public UserExamCheckController()
         {
             _userExamService = new UserExamService();
@@ -26,6 +27,7 @@ namespace DemoMVC.WebUi.Controllers
             _questionService = new QuestionService();
             _answerService = new AnswerService();
             _userProfileService = new UserProfileService();
+            _questionMediaService = new QuestionMediaService();
         }
         public ActionResult Index()
         {
@@ -47,20 +49,24 @@ namespace DemoMVC.WebUi.Controllers
             };
 
             var questions = _questionService.GetQuestionsByExamId(userExamDetails.ExamId)
-            .Select(q => new QuestionAndAnswerModel
+            .Select(q =>
             {
-                QuestionId = q.QuestionId,
-                QuestionTypeId = q.QuestionTypeId,
-                QuestionText = q.QuestionText,
-                //QuestionImage = q.QuestionImage,
-                QuestionType = q.QuestionType.QuestionTypeName,
-                Marks = _examQuestionsService.GetMarksByQuestionId(q.QuestionId, userExamDetails.ExamId),
-                Answers = _answerService.GetByQuestionId(q.QuestionId)
+                var mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId);
+                return new QuestionAndAnswerModel
+                {
+                    QuestionId = q.QuestionId,
+                    QuestionTypeId = q.QuestionTypeId,
+                    QuestionText = q.QuestionText,
+                    QuestionImages = mediaList.Any() && mediaList != null ? mediaList : null,
+                    QuestionType = q.QuestionType.QuestionTypeName,
+                    Marks = _examQuestionsService.GetMarksByQuestionId(q.QuestionId, userExamDetails.ExamId),
+                    Answers = _answerService.GetByQuestionId(q.QuestionId)
                     .Select(ans => new AnswerViewModel
                     {
                         IsCorrect = ans.IsCorrect,
                         AnswerText = ans.AnswerText
                     }).ToList()
+                };
             }).OrderBy(q => q.QuestionId).ToList();
 
             var userAnswers = _userAnswerService.GetAllAnswerByUser(userExamId).Select(a => new UserAnswerModel

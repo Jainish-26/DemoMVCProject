@@ -23,9 +23,9 @@ namespace DemoMVC.Service
         {
             return _questionMediaProvider.GetMediaByQuestionId(QuestionId);
         }
-        public void RemoveExistingImages(int QuestionId,List<string> ExistingImages)
+        public void RemoveExistingImages(List<int> DeleteIds)
         {
-            _questionMediaProvider.RemoveExistingImages(QuestionId, ExistingImages);
+            _questionMediaProvider.RemoveExistingImages(DeleteIds);
         }
     }
 }

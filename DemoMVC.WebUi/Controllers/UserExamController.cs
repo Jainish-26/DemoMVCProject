@@ -212,15 +212,14 @@ namespace DemoMVC.WebUi.Controllers
             var questions = _questionService.GetQuestionsByExamId(exam.ExamId)
             .Select(q =>
             {
-                List<string> mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId)
-                                .Select(m => m.MediaName + m.MediaType).ToList();
+                var mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId);
 
                 return new QuestionAndAnswerModel
                 {
                     QuestionId = q.QuestionId,
                     QuestionText = q.QuestionText,
                     IsActive = q.IsActive,
-                    QuestionImage = mediaList.Any() && mediaList != null ? mediaList : null,
+                    QuestionImages = mediaList.Any() && mediaList != null ? mediaList : null,
                     Difficulty = q.Difficulty,
                     QuestionType = q.QuestionType.QuestionTypeName,
                     Subject = q.Subject.SubjectName,

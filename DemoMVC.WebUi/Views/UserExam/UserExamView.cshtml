@@ -333,15 +333,15 @@
                         <span class="question-marks">Marks: @question.Marks</span>
                     </div>
 
-                    @if (question.QuestionImage != null && question.QuestionImage.Any())
+                    @if (question.QuestionImages != null && question.QuestionImages.Any())
                     {
                         var galleryId = $"gallery_{question.QuestionId}";
 
                         <div class="image-gallery mb-3">
                             <div class="row g-2">
-                                @for (int s = 0; s < question.QuestionImage.Count; s++)
+                                @for (int s = 0; s < question.QuestionImages.Count; s++)
                                 {
-                                    var image = question.QuestionImage[s];
+                                    var image = question.QuestionImages[s].MediaName + question.QuestionImages[s].MediaType;
                                     var fullImagePath = Url.Content("~/content/QuestionImage/" + image);
                                     var thumbIndex = s;
 

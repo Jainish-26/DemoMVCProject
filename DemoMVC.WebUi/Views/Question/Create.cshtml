@@ -431,31 +431,37 @@
                         <label class="form-label">Question Images</label>
 
                         <div class="file-input-wrapper position-relative">
-                            <input type="file" name="QuestionImage" id="questionImageInput" multiple hidden accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+                            <input type="file" name="newFiles" id="questionImageInput" multiple hidden accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
                             <label for="questionImageInput" class="btn btn-outline-primary">
                                 <i class="fas fa-upload me-2"></i> Choose files
                             </label>
-                            @Html.ValidationMessageFor(x => x.QuestionImage)
+                            @Html.ValidationMessageFor(x => x.QuestionImages)
                             <span class="file-name ms-2">No files chosen</span>
                         </div>
                         <div id="imagePreviewContainer" class="d-flex flex-wrap gap-3 mt-3"></div>
 
-                        @if (Model.QuestionImage != null && Model.QuestionImage.Any())
+                        @if (Model.QuestionImages != null && Model.QuestionImages.Any())
                         {
                             <div id="existingImages" class="d-flex flex-wrap gap-3 mt-3">
-                                @foreach (var image in Model.QuestionImage)
+                                @for (int i = 0; i < Model.QuestionImages.Count; i++)
                                 {
                                     <div class="position-relative d-inline-block me-2 existing-image-wrapper">
-                                        <img src="@Url.Content("~/content/QuestionImage/" + image)" class="img-thumbnail" style="max-width: 200px;" />
+                                        <img src="@Url.Content("~/content/QuestionImage/" + Model.QuestionImages[i].MediaName + Model.QuestionImages[i].MediaType)" class="img-thumbnail" style="max-width: 200px;" />
+
                                         <span class="delete-existing text-danger bg-white rounded-circle p-1" style="position:absolute; top:5px; right:5px; cursor:pointer;">
                                             <i class="fas fa-times-circle"></i>
                                         </span>
-                                        <input type="hidden" name="ExistingImages" value="@image" class="existing-image-hidden" />
+
+                                        <!-- Properly bound hidden inputs -->
+                                        <input type="hidden" name="QuestionImages[@i].Id" value="@Model.QuestionImages[i].Id" />
+                                        <input type="hidden" name="QuestionImages[@i].MediaName" value="@Model.QuestionImages[i].MediaName" />
+                                        <input type="hidden" name="QuestionImages[@i].MediaType" value="@Model.QuestionImages[i].MediaType" />
                                     </div>
                                 }
                             </div>
                         }
                     </div>
+
                 </div>
             </div>
 

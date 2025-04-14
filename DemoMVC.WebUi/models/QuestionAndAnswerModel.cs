@@ -18,7 +18,7 @@ namespace DemoMVC.WebUi.Models
         public int QuestionId { get; set; }
         [Required(ErrorMessage = "Question text is required.")]
         public string QuestionText { get; set; }
-        public List<string> QuestionImage { get; set; }
+        public List<QuestionMedia> QuestionImages { get; set; }
         [Required(ErrorMessage = "Marks are required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Marks must be a positive number.")]
         public int Marks { get; set; }
