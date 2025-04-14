@@ -150,7 +150,7 @@
             var userName = @Html.Raw(Json.Encode(Model.UserName));
             var name = @Html.Raw(Json.Encode(Model.Name));
 
-            if (name != null) {
+            if (name != null && name!="") {
                 $("#examForm input").prop("readonly", true);
                 $("#UserName").rules("remove", "remote");
             }

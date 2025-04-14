@@ -284,7 +284,6 @@ namespace DemoMVC.WebUi.Controllers
                         }
                     }
                 }
-
                 if (QuestionImage.Any())
                 {
                     foreach (var i in QuestionImage)

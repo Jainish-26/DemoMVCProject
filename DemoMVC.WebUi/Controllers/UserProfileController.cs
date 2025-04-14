@@ -1,4 +1,5 @@
-﻿using DemoMVC.Helper;
+﻿using ClosedXML.Excel;
+using DemoMVC.Helper;
 using DemoMVC.Models;
 using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
@@ -6,6 +7,8 @@ using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -222,6 +225,48 @@ namespace DemoMVC.WebUi.Controllers
                 }
             }
             return Json(_DefaultFormList, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult ExportUserProfiles()
+        {
+            DataTable dt = _userProfileService.GetUserProfileDataFromEF();
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                var ws = wb.Worksheets.Add("User Profiles");
+
+                // Add DataTable
+                ws.Cell(2, 1).InsertTable(dt);
+
+                // Title Row
+                ws.Cell("A1").Value = "User Profiles Report";
+                ws.Range("A1:L1").Merge().Style
+                    .Font.SetBold()
+                    .Font.SetFontSize(16)
+                    .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                    .Fill.SetBackgroundColor(XLColor.LightBlue);
+
+                // Header Formatting
+                ws.Row(2).Style
+                    .Font.SetBold()
+                    .Fill.SetBackgroundColor(XLColor.LightGray);
+
+                // Adjust columns
+                ws.Columns().AdjustToContents();
+
+                // Freeze top two rows (title + headers)
+                ws.SheetView.FreezeRows(2);
+
+                // Export
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    stream.Position = 0;
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "UserProfiles.xlsx");
+                }
+            }
+
         }
     }
 }

@@ -114,10 +114,22 @@ namespace DemoMVC.WebUi.Controllers
             }
             else if (question.QuestionType == "Multiple Choice MCQ")
             {
-                var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.AnswerText).ToList();
-                var userAnswers = userAnswer.Answer?.Split(',').Select(a => a.Trim()).ToList() ?? new List<string>();
+                var correctAnswers = new HashSet<string>(
+                                question.Answers
+                                .Where(a => a.IsCorrect)
+                                .Select(a => a.AnswerText.Trim().ToLowerInvariant())
+                    );
 
-                bool isCorrect = userAnswers.Count == correctAnswers.Count && userAnswers.All(correctAnswers.Contains);
+                var userAnswers = string.IsNullOrWhiteSpace(userAnswer.Answer)
+                    ? new HashSet<string>()
+                    : new HashSet<string>(
+                        userAnswer.Answer
+                            .Split(',')
+                            .Select(a => a.Trim().ToLowerInvariant())
+                    );
+
+                bool isCorrect = correctAnswers.SetEquals(userAnswers);
+
 
                 if (isCorrect)
                 {

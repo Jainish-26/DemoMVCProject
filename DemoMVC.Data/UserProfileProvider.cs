@@ -1,5 +1,6 @@
 ﻿using DemoMVC.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace DemoMVC.Data
@@ -133,6 +134,31 @@ namespace DemoMVC.Data
         public List<string> GetAllEmails()
         {
             return (from e in _db.UserProfile select e.Email).ToList();
+        }
+        public DataTable GetUserProfileDataFromEF()
+        {
+
+            var users = _db.UserProfile
+                .Select(u => new
+                {
+                    u.UserId,
+                    u.UserName,
+                    u.Email,
+                    u.Name,
+                    u.IsActive,
+                    u.IsDeleted,
+                    u.CreatedOn,
+                    u.CreatedBy,
+                    u.UpdatedBy,
+                    u.UpdatedOn,
+                    u.PhoneNo,
+                    u.MobileNo
+                })
+                .Take(1000)
+                .ToList();
+
+            return ToDataTable(users);
+        
         }
     }
 }

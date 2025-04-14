@@ -1,6 +1,7 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace DemoMVC.Service
@@ -64,6 +65,10 @@ namespace DemoMVC.Service
         public List<string> GetAllEmails()
         {
             return _userProfileProvider.GetAllEmails();
+        }
+        public DataTable GetUserProfileDataFromEF()
+        {
+            return _userProfileProvider.GetUserProfileDataFromEF();
         }
     }
 }
