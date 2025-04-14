@@ -122,9 +122,17 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             var data = _rolesService.GetAllRolesGrid();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                data = data.Where(q =>
+                    (q.Name != null && q.Name.ToLower().Contains(searchTerm)) ||
+                    (q.RoleCode != null && q.RoleCode.ToLower().Contains(searchTerm))
+                );
+            }
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
         public JsonResult CheckDuplicateRoleCode(string RoleCode, int Id)

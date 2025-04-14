@@ -16,7 +16,58 @@
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
 }
-<h2 class="text m-4">Participants</h2>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .form-select {
+        padding: 10px 14px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    }
+
+    .input-group .form-control {
+        min-height: 40px;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        font-size: 15px;
+    }
+
+    .input-group-text {
+        background-color: #fff;
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+    }
+
+    #gridSearchBox {
+        margin-right: 10px
+    }
+</style>
+<div class="d-flex justify-content-between align-items-center m-3 flex-wrap gap-3">
+    <h2 class="fw-bold m-0">Participants</h2>
+
+    <div class="d-flex align-items-center gap-2">
+        <div class="input-group" style="min-width: 250px;">
+            <span class="input-group-text bg-white border-end-0">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            @Html.TextBox("gridSearchBox", null, new
+            {
+                @class = "form-control border-start-0",
+                placeholder = "Search..."
+            })
+        </div>
+    </div>
+</div>
 <div class="common_white_box listingpage mx-4">
     <div class="page-loader k-loading-image"></div>
     @(Html.Kendo().Grid<DemoMVC.Models.UserExamGrid>()
@@ -64,12 +115,22 @@
              .DataSource(dataSource => dataSource
                  .Ajax()
                  //.Sort(sortable=>sortable.Add("Name").Ascending())
-                 .Read(read => read.Action("GetGridData", "UserExam")).PageSize(10)
+                 .Read(read => read.Action("GetGridData", "UserExam").Data("getFilterData"))
+                 .PageSize(10)
              )
         )
 </div>
 <script>
-
+    function getFilterData() {
+        return {
+            searchTerm: $("#gridSearchBox").val()
+        };
+    }
+    $(document).ready(function () {
+        $('#gridSearchBox').on('input', function () {
+            $('#gridUserExam').data('kendoGrid').dataSource.read();
+        });
+    })
     function copyLink(UserExamId) {
         var grid = $("#gridUserExam").data("kendoGrid");
         var dataSource = grid.dataSource.data();

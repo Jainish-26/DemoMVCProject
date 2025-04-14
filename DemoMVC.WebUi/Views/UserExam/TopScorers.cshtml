@@ -16,40 +16,60 @@
     }
 
     .form-select {
-        padding: 12px;
-        border: 1px solid #e0e6ed;
+        padding: 10px 14px;
+        border: 1px solid #dee2e6;
         border-radius: 8px;
         font-size: 15px;
         transition: all 0.3s;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    }
+
+    .input-group .form-control {
+        min-height: 40px;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        font-size: 15px;
+    }
+
+    .input-group-text {
+        background-color: #fff;
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+    }
+
+    #gridSearchBox{
+        margin-right :10px
     }
 
     #ddlExamList {
-        min-width: 100px;
-        padding-right: 50px;
+        min-width: 200px;
     }
-
-    #gridSearchBox {
-        min-width: 250px;
-        margin-left: 15px;
-        min-height: 45px;
-    }
-
-        #gridSearchBox::placeholder {
-            color: #6c757d; /* Bootstrap default gray */
-            opacity: 1; /* Make sure it's visible */
-        }
 </style>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
 
-<div class="d-flex justify-content-between align-items-center m-4 mx-4">
-    <h2 class="mb-0">Leaderboard</h2>
+<div class="d-flex justify-content-between align-items-center m-4 flex-wrap">
+    <h2 class="mb-0 fw-bold me-3">Leaderboard</h2>
+    <div class="d-flex align-items-center gap-3 flex-grow-1 justify-content-end">
+        <div class="input-group" style="min-width: 260px;">
+            <span class="input-group-text">
+                <i class="bi bi-search text-muted"></i>
+            </span>
+            @Html.TextBox("gridSearchBox", null, new
+            {
+                @class = "form-control",
+                placeholder = "Search..."
+            })
+        </div>
 
-    <div class="d-flex align-items-center gap-3">
-        @Html.DropDownListFor(model => model.ExamId, Model._ExamList, new { @class = "form-select", @id = "ddlExamList" })
-        <input type="search" id="gridSearchBox" class="form-control" placeholder="Search..." style="width: 250px;" />
+        @Html.DropDownListFor(model => model.ExamId, Model._ExamList, new
+        {
+            @class = "form-select ",
+            @id = "ddlExamList"
+        })
     </div>
 </div>
+
 
 <div class="mx-4">
     @Html.ValidationMessageFor(model => model.ExamId, "", new { @class = "text-danger d-block mt-1" })

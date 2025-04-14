@@ -255,9 +255,20 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             var data = _examService.GetExamsGridModels();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                data = data.Where(q =>
+                    (q.ExamName != null && q.ExamName.ToLower().Contains(searchTerm)) ||
+                    (q.ExamCode != null && q.ExamCode.ToLower().Contains(searchTerm)) ||
+                    (q.ExamStatus != null && q.ExamStatus.ToLower().Contains(searchTerm))  ||
+                    (q.TotalMarks.ToString().Contains(searchTerm)) ||
+                    (q.DurationMin.ToString().Contains(searchTerm))
+                );
+            }
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
@@ -319,15 +330,14 @@ namespace DemoMVC.WebUi.Controllers
             var questions = _questionService.GetQuestionsByExamId(id)
             .Select(q =>
             {
-                List<string> mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId)
-                                .Select(m => m.MediaName+m.MediaType).ToList();
+                var mediaList = _questionMediaService.GetMediaByQuestionId(q.QuestionId);
 
                 return new QuestionAndAnswerModel
                 {
                     QuestionId = q.QuestionId,
                     QuestionText = q.QuestionText,
                     IsActive = q.IsActive,
-                    //QuestionImage = mediaList.Any() && mediaList!=null ? mediaList : null,
+                    QuestionImages = mediaList.Any() && mediaList!=null ? mediaList : null,
                     Difficulty = q.Difficulty,
                     QuestionType = q.QuestionType.QuestionTypeName,
                     Subject = q.Subject.SubjectName,

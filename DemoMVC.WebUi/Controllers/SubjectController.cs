@@ -119,9 +119,17 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             var data = _subjectService.GetSubjectGridModels();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                data = data.Where(q =>
+                    (q.Name != null && q.Name.ToLower().Contains(searchTerm)) ||
+                    (q.SubjectCode != null && q.SubjectCode.ToLower().Contains(searchTerm))
+                );
+            }
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 

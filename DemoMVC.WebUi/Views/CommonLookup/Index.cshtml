@@ -13,7 +13,41 @@
     bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
 }
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+/*        margin-top: 8px;*/
+/*        margin-bottom: 8px;*/
+        font-size: 15px;
+    }
 
+    .form-select {
+        padding: 10px 14px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    }
+
+    .input-group .form-control {
+        min-height: 40px;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        font-size: 15px;
+    }
+
+    .input-group-text {
+        background-color: #fff;
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+    }
+
+    #gridSearchBox {
+        margin-right: 10px
+    }
+</style>
 @Html.Hidden("hdnFormAccessCode", formCode)
 
 @Html.Hidden("hdnKendoGridId", "gridcommonlookup")
@@ -34,7 +68,17 @@
             @if (AllowedAdd)
             {
                 <div class="d-flex justify-content-end">
-                    @Html.ActionLink("Create New", "Create", "CommonLookup" ,null, new { @class = "btn btn-warning btn rounded-pill  shadow-sm fw-bold" })
+                    <div class="input-group" style="min-width: 250px;">
+                        <span class="input-group-text">
+                            <i class="fa fa-search text-muted"></i>
+                        </span>
+                        @Html.TextBox("gridSearchBox", null, new
+                        {
+                            @class = "form-control",
+                            placeholder = "Search..."
+                        })
+                    </div>
+                    @Html.ActionLink("Create New", "Create", "CommonLookup", null, new { @class = "btn btn-warning btn rounded-pill  shadow-sm fw-bold" })
                 </div>
             }
         </div>
@@ -80,15 +124,23 @@
           .DataSource(dataSource => dataSource
               .Ajax()
               .Sort(sortable=>sortable.Add("Type").Ascending())
-              .Read(read => read.Action("GetGridData", "CommonLookup")).PageSize(10)
+              .Read(read => read.Action("GetGridData", "CommonLookup").Data("getFilterData"))
+        .PageSize(10)
           ))
     </div>
 </div>
 <script>
+    function getFilterData() {
+        return {
+            searchTerm: $("#gridSearchBox").val()
+        };
+    }
     $(document).ready(function () {
         $('#gridcommonlookup').data('kendoGrid').dataSource.read();
         $('#gridcommonlookup').data('kendoGrid').refresh();
-
+        $('#gridSearchBox').on('input', function () {
+            $('#gridcommonlookup').data('kendoGrid').dataSource.read();
+        });
         $('#btnAdd').click(function () {
 
             grid = $("#gridcommonlookup").data("kendoGrid");

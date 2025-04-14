@@ -167,10 +167,20 @@ namespace DemoMVC.WebUi.Controllers
             return model;
         }
 
-        public ActionResult User_Read([DataSourceRequest] DataSourceRequest request)
+        public ActionResult User_Read([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
-            var getallusers = _userProfileService.GetAllUserProfileGrid();
-            return Json(getallusers.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            var data = _userProfileService.GetAllUserProfileGrid();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                data = data.Where(q =>
+                        (q.Name != null && q.Name.ToLower().Contains(searchTerm)) ||
+                        (q.UserName != null && q.UserName.ToLower().Contains(searchTerm)) ||
+                        (q.Role != null && q.Role.ToLower().Contains(searchTerm)) ||
+                        (q.Email != null && q.Email.ToLower().Contains(searchTerm))
+                    );
+            }
+            return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult CheckDuplicateUserEmail(string Email, int UserId)
@@ -246,7 +256,7 @@ namespace DemoMVC.WebUi.Controllers
                     .Fill.SetBackgroundColor(XLColor.LightBlue);
 
                 // Header Formatting
-                ws.Row(2).Style
+                ws.Range("A1:L1").Row(2).Style
                     .Font.SetBold()
                     .Fill.SetBackgroundColor(XLColor.LightGray);
 

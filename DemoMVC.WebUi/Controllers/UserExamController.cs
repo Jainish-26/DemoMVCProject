@@ -353,9 +353,21 @@ namespace DemoMVC.WebUi.Controllers
 
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             var data = _userExamService.GetUserExamGrids();
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+
+                data = data.Where(q =>
+                        (q.Email != null && q.Email.ToLower().Contains(searchTerm)) ||
+                        (q.ExamName != null && q.ExamName.ToLower().Contains(searchTerm)) ||
+                        (q.Result != null && q.Result.ToString().ToLower().Contains(searchTerm)) ||
+                        (q.ExamStatus != null && q.ExamStatus.ToLower().Contains(searchTerm)) ||
+                        (q.ResultStatus != null && q.ResultStatus.ToLower().Contains(searchTerm))
+                    );
+            }
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 

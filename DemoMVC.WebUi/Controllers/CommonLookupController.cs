@@ -2,6 +2,7 @@
 using DemoMVC.Models;
 using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
@@ -125,12 +126,22 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
             if (!CheckPermission(formCode, AccessPermission.IsView))
                 return AccessDenied();
-            var commonLookUpData = _commonLookupService.GetAllLookup();
-            return Json(commonLookUpData.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
+            var data = _commonLookupService.GetAllLookup();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                data = data.Where(q =>
+                    (q.Name != null && q.Name.ToLower().Contains(searchTerm)) ||
+                    (q.Code != null && q.Code.ToLower().Contains(searchTerm)) ||
+                    (q.Type != null && q.Type.ToLower().Contains(searchTerm)) ||
+                    (q.Comment != null && q.Comment.ToLower().Contains(searchTerm))
+                );
+            }
+            return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
 

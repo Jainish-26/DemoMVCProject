@@ -144,10 +144,18 @@ namespace DemoMVC.WebUi.Controllers
             return model;
         }
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
         {
 
             var data = _formsService.GetAllFormsGrid();
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower();
+                data = data.Where(q =>
+                    (q.Name != null && q.Name.ToLower().Contains(searchTerm)) ||
+                    (q.FormAccessCode != null && q.FormAccessCode.ToLower().Contains(searchTerm)) 
+                );
+            }
             return Json(data.ToDataSourceResult(request), JsonRequestBehavior.AllowGet);
         }
 
