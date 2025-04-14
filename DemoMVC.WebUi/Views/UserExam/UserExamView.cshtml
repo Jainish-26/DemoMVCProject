@@ -471,20 +471,20 @@
         updateQuestionPalette();
         checkAllQuestionsVisited();
     });
-        Fancybox.bind("[data-fancybox]", {
-            // Options
-            buttons: [
-                "zoom",
-                "slideShow",
-                "fullScreen",
-                "download",
-                "thumbs",
-                "close"
-            ],
-            thumbs: {
-                autoStart: true, // Show thumbnails on opening
-            }
-        });
+    Fancybox.bind("[data-fancybox]", {
+        // Options
+        buttons: [
+            "zoom",
+            "slideShow",
+            "fullScreen",
+            "download",
+            "thumbs",
+            "close"
+        ],
+        thumbs: {
+            autoStart: true, // Show thumbnails on opening
+        }
+    });
     function loadAnswersFromDatabase() {
         $.ajax({
             url: '/UserAnswer/GetAllAnswers',

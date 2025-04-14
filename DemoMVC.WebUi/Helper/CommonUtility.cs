@@ -1,4 +1,5 @@
-﻿using DemoMVC.Models;
+﻿using ClosedXML.Excel;
+using DemoMVC.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -546,5 +547,31 @@ namespace DemoMVC.WebUi.Helper
             string value = ConfigurationStaticValues.VideoExtension;
             return value;
         }
+
+        public static void DesignExcelExport(IXLWorksheet ws, int totalColumns)
+        { 
+            string lastColumnLetter = XLHelper.GetColumnLetterFromNumber(totalColumns); 
+
+             ws.Range($"A1:{lastColumnLetter}1").Merge().Style
+            .Font.SetBold()
+            .Font.SetFontSize(16)
+            .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+            .Fill.SetBackgroundColor(XLColor.LightBlue);
+
+            var headerRange = ws.Range($"A2:{lastColumnLetter}2");
+            headerRange.Style
+                .Font.SetBold()
+                .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
+                .Fill.SetBackgroundColor(XLColor.DarkGreen);
+
+            // Auto-adjust column width for all columns
+            for (int i = 1; i <= totalColumns; i++)
+            {
+                ws.Column(i).AdjustToContents();
+            }
+
+            ws.AutoFilter.Clear();
+        }
+
     }
 }

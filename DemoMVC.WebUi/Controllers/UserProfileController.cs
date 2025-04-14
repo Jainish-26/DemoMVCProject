@@ -2,6 +2,7 @@
 using DemoMVC.Helper;
 using DemoMVC.Models;
 using DemoMVC.Service;
+using DemoMVC.WebUi.Helper;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
@@ -249,22 +250,8 @@ namespace DemoMVC.WebUi.Controllers
 
                 // Title Row
                 ws.Cell("A1").Value = "User Profiles Report";
-                ws.Range("A1:L1").Merge().Style
-                    .Font.SetBold()
-                    .Font.SetFontSize(16)
-                    .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
-                    .Fill.SetBackgroundColor(XLColor.LightBlue);
 
-                // Header Formatting
-                ws.Range("A1:L1").Row(2).Style
-                    .Font.SetBold()
-                    .Fill.SetBackgroundColor(XLColor.LightGray);
-
-                // Adjust columns
-                ws.Columns().AdjustToContents();
-
-                // Freeze top two rows (title + headers)
-                ws.SheetView.FreezeRows(2);
+                CommonUtility.DesignExcelExport(ws, dt.Columns.Count);
 
                 // Export
                 using (MemoryStream stream = new MemoryStream())
