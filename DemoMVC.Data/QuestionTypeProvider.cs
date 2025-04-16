@@ -1,6 +1,7 @@
 ﻿using DemoMVC.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace DemoMVC.Data
@@ -62,6 +63,11 @@ namespace DemoMVC.Data
             return _db.QuestionType.Where(x => x.QuestionTypeName == QuestionTypeName).FirstOrDefault();
         }
 
+        public QuestionType GetQuestionTypetByCode(string QuestionTypeCode)
+        {
+            return _db.QuestionType.Where(x => x.QuestionTypeCode == QuestionTypeCode).FirstOrDefault();
+        }
+
         public List<QuestionType> CheckQuestionTypeCode(string QuestionTypeCode)
         {
             var getQuestionTypeDetails = (from qType in _db.QuestionType
@@ -69,6 +75,20 @@ namespace DemoMVC.Data
                                           select qType).ToList();
             return getQuestionTypeDetails;
         }
+        public DataTable GetQuestionType()
+        {
 
+            var questionType = _db.QuestionType
+                .Select(x => new
+                {
+                    x.QuestionTypeName,
+                    x.QuestionTypeCode,
+                })
+                .Take(1000)
+                .ToList();
+
+            return ToDataTable(questionType);
+
+        }
     }
 }

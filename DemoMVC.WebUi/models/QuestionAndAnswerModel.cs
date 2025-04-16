@@ -59,4 +59,10 @@ namespace DemoMVC.WebUi.Models
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedOn { get; set; }
     }
+    public class AnswerImportModel
+    {
+        public string AnswerText { get; set; }
+        public bool IsCorrect { get; set; }
+    }
+
 }

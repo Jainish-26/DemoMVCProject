@@ -1,10 +1,17 @@
-﻿using DemoMVC.Models;
+﻿using ClosedXML.Excel;
+using DemoMVC.Models;
 using DemoMVC.Service;
+using DemoMVC.WebUi.Helper;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -148,6 +155,83 @@ namespace DemoMVC.WebUi.Controllers
             {
                 return Json(true);
             }
+        }
+
+        public ActionResult ExportQuestionType()
+        {
+            DataTable dt = _questionTypeService.GetQuestionType();
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                var ws = wb.Worksheets.Add("Question Type");
+
+                // Add DataTable
+                ws.Cell(2, 1).InsertTable(dt);
+
+                // Title Row
+                ws.Cell("A1").Value = "Question Type Report";
+
+                CommonUtility.DesignExcelExport(ws, dt.Columns.Count);
+
+                // Export
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    stream.Position = 0;
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "QuestionType.xlsx");
+                }
+            }
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ImportExcel(HttpPostedFileBase ExcelFile)
+        {
+            if (ExcelFile != null && ExcelFile.ContentType.Contains("spreadsheet"))
+            {
+                try
+                {
+                    var allQuestionTypes = _questionTypeService.GetAllQuestionTypes().Select(x=>x.QuestionTypeCode);
+                    using (var stream = ExcelFile.InputStream) 
+                    using (var workbook = new XLWorkbook(stream))
+                    {
+                        var worksheet = workbook.Worksheet(1); 
+                        var rows = worksheet.RangeUsed().RowsUsed().Skip(2);
+
+                        var questionTypes = new List<QuestionType>();
+
+                        foreach (var row in rows)
+                        {
+                            if (!allQuestionTypes.Contains(row.Cell(2).GetValue<string>().ToUpper()))
+                            {
+                                var questionType = new QuestionType
+                                {
+                                    QuestionTypeName = row.Cell(1).GetValue<string>(), 
+                                    QuestionTypeCode = row.Cell(2).GetValue<string>().ToUpper(),
+                                    CreatedOn = DateTime.UtcNow,
+                                    CreatedBy = SessionHelper.UserId
+                                };
+                                _questionTypeService.CreateQuestionType(questionType);
+                            }
+                        }
+
+                        TempData["Success"] = "Excel Imported Successfully!";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error occurred while importing Excel: " + ex.Message;
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Please upload a valid Excel file.";
+            }
+
+            return RedirectToAction("Index");
         }
     }
 }

@@ -223,6 +223,7 @@
     <Compile Include="Models\CommonLookupModel.cs" />
     <Compile Include="Models\ExamModel.cs" />
     <Compile Include="Models\ExamQuestionModel.cs" />
+    <Compile Include="Models\ExcelUploadViewModel.cs" />
     <Compile Include="Models\FormModel.cs" />
     <Compile Include="Models\LeaderboardModel.cs" />
     <Compile Include="Models\QuestionAndAnswerModel.cs" />
@@ -2537,6 +2538,7 @@
     <Content Include="Views\Shared\ErrorPage.cshtml" />
     <Content Include="Views\UserExamCheck\CheckExam.cshtml" />
     <Content Include="Views\UserExam\TopScorers.cshtml" />
+    <Content Include="Views\Question\_InvalidQuestionsPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

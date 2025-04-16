@@ -1,0 +1,39 @@
+﻿@model List<string>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<div class="modal fade" id="invalidQuestionsModal" tabindex="-1" role="dialog" aria-labelledby="invalidQuestionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="invalidQuestionsModalLabel">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Invalid Questions Found
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="font-weight-semibold text-danger mb-3">
+                    <i class="fas fa-ban mr-2"></i> Total Invalid Questions: @Model.Count
+                </p>
+                <ul class="list-group list-group-flush border rounded bg-light">
+                    @foreach (var item in Model)
+                    {
+                        <li class="list-group-item">
+                            <i class="fas fa-exclamation-circle text-danger mr-2"></i> @item
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>

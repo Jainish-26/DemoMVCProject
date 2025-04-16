@@ -43,5 +43,13 @@ namespace DemoMVC.Models
         public bool IsActive { get; set; } = false;
         public string Difficulty { get; set; }
     }
-
+    public class QuestionAnswerExport
+    {
+        public string QuestionText { get; set; }
+        public decimal Marks { get; set; }
+        public string QuestionType { get; set; }
+        public string Subject { get; set; }
+        public string Difficulty { get; set; }
+        public string AnswerJson { get; set;  }
+    }
 }

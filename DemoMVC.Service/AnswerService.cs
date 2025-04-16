@@ -42,5 +42,9 @@ namespace DemoMVC.Service
         {
             return _answerProvider.DeleteAnswer(id);
         }
+        public void AddAnswers(List<Answers> model)
+        {
+            _answerProvider.AddAnswers(model);
+        }
     }
 }

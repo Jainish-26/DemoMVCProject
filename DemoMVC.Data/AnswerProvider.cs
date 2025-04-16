@@ -69,5 +69,18 @@ namespace DemoMVC.Data
             }
             return false;
         }
+
+        public void AddAnswers(List<Answers> model)
+        {
+            try
+            {
+                _db.Answers.AddRange(model);
+                _db.SaveChanges();
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
     }
 }

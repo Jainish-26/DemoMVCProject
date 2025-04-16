@@ -15,6 +15,12 @@
     bool AllowedEdit = _base.CheckPermission(formCode, AccessPermission.IsEdit);
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
+
+    var invalidList = TempData["InvalidQuestions"] as List<string>;
+    if (invalidList != null && invalidList.Any())
+    {
+        Html.RenderPartial("_InvalidQuestionsPartial", invalidList);
+    }
 }
 <style>
     .form-label {
@@ -70,6 +76,12 @@
         {
             @class = "btn btn-warning rounded-pill mx-2 px-4 shadow-sm fw-bold"
         })
+        @Html.ActionLink("Import Excel", "ImportExcel", null, new
+        {
+            @class = "btn btn-info rounded-pill mx-2 px-4 shadow-sm fw-bold",
+            @id = "importExcelButton"
+        })
+        @Html.ActionLink("Export Excel", "ExportQuestionAndAnswerData", null, new { @class = "btn btn-success btn rounded-pill px-4 shadow-sm fw-bold" })
     </div>
 </div>
 
@@ -137,7 +149,116 @@
 
 <div id="imageModalContainer"></div>
 <div id="questionModelContainer"></div>
+<div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="">
+    <div class="modal-dialog modal-lg">
+        <!-- Increased width -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importExcelModalLabel">Import Question Types</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Row for Two Columns -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <h6><strong>Select One Answer Type and Use Its Code:</strong></h6>
+                            <ul>
+                                <li><strong>SINGLEMCQ</strong></li>
+                                <li><strong>MULTIPLEMCQ</strong></li>
+                                <li><strong>TEXTANSWER</strong></li>
+                                <li><strong>SQL</strong></li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6><strong>Select One Subject and Use Its Code:</strong></h6>
+                            <ul>
+                                <li><strong>JAVA</strong></li>
+                                <li><strong>PYTHON</strong></li>
+                                <li><strong>DBMS</strong></li>
+                                <li><strong>SQL</strong></li>
+                                <li><strong>ASP.NETMVC</strong></li>
+                                <li><strong>ANGULAR</strong></li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6><strong>Select Difficulty Level:</strong></h6>
+                            <ul>
+                                <li><strong>EASY</strong></li>
+                                <li><strong>MEDIUM</strong></li>
+                                <li><strong>HARD</strong></li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6><strong>File Import Instructions:</strong></h6>
+                            <p>Please upload a valid Excel file containing the questions and answers in the correct format.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (JSON Format for Answers) -->
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <h6><strong>Validation Rules for Questions & Answers:</strong></h6>
+                            <ul>
+                                <li><strong>Each question must have at least one answer.</strong></li>
+                                <li><strong>At least one answer must be marked as correct.</strong> For Single Choice, only one correct answer is allowed.</li>
+                                <li><strong>Single and Multiple Choice questions must have at least two options.</strong></li>
+                                <li><strong>No question fields can be left empty.</strong> All fields are mandatory.</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6><strong>JSON Format for Answers:</strong></h6>
+                            <p><strong>Use the following format to add answers:</strong></p>
+                            <pre>
+[
+    {
+        "answerText": "Answer option 1",
+        "isCorrect": true
+    },
+    {
+        "answerText": "Answer option 2",
+        "isCorrect": false
+    }
+]
+                            </pre>
+
+                            <div class="mb-4">
+                                <a href="@Url.Action("DownloadTemplate","Question")" class="btn btn-info">
+                                    <i class="fas fa-download"></i> Download Excel Template
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Form to upload Excel file -->
+                @using (Html.BeginForm("ImportExcel", "Question", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label for="ExcelFile">Choose Excel File</label>
+                        <input type="file" name="ExcelFile" id="ExcelFile" class="form-control" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">Import</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <script>
+
     function getFilterData() {
         return {
             searchTerm: $("#gridSearchBox").val()
@@ -151,6 +272,10 @@
         $('#gridQuestion').data('kendoGrid').dataSource.read();
     });
 
+    $("#importExcelButton").on("click", function (e) {
+        e.preventDefault(); // Prevent the default ActionLink behavior
+        $("#importExcelModal").modal('show'); // Show the modal
+    });
     //Delete Questions
     function confirmDelete(roleId) {
     Swal.fire({
@@ -229,8 +354,16 @@
         });
     }
 </script>
-
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var modal = $('#invalidQuestionsModal');
+            if (modal.length) {
+                modal.modal('show');
+            }
+        });
+    </script>
+}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.min.js"></script>

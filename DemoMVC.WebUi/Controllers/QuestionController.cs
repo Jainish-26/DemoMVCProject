@@ -1,15 +1,20 @@
-﻿using DemoMVC.Helper;
+﻿using ClosedXML.Excel;
+using DemoMVC.Helper;
 using DemoMVC.Models;
 using DemoMVC.Service;
+using DemoMVC.WebUi.Helper;
 using DemoMVC.WebUi.Models;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
+using Microsoft.Ajax.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static DemoMVC.Helper.Constants;
 
 namespace DemoMVC.WebUi.Controllers
 {
@@ -215,14 +220,14 @@ namespace DemoMVC.WebUi.Controllers
                                 MediaName = DateTime.Now.ToString("yyMMddHHmmssfff"),
                                 MediaType = Path.GetExtension(i.FileName)
                             };
-                            var QueMedia = media.MediaName+ media.MediaType;
+                            var QueMedia = media.MediaName + media.MediaType;
                             i.SaveAs(Server.MapPath("~/content/QuestionImage/") + QueMedia);
                             imageList.Add(media);
                         }
                     }
                     _questionMediaService.AddMedia(imageList);
                 }
-            
+
                 if (model.Answers == null || !model.Answers.Any(a => !string.IsNullOrWhiteSpace(a.AnswerText)))
                 {
                     ModelState.AddModelError("AnswerText", "At least one answer must be provided.");
@@ -359,7 +364,7 @@ namespace DemoMVC.WebUi.Controllers
         }
 
         [HttpPost]
-        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request,string searchTerm)
+        public ActionResult GetGridData([DataSourceRequest] DataSourceRequest request, string searchTerm)
         {
             var data = _questionService.GetAllQuestionsGridModel();
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -472,7 +477,7 @@ namespace DemoMVC.WebUi.Controllers
                 QuestionText = question.QuestionText,
                 IsActive = question.IsActive,
                 Difficulty = question.Difficulty,
-                QuestionImages=media,
+                QuestionImages = media,
                 QuestionType = question.QuestionType.QuestionTypeName,
                 Subject = question.Subject.SubjectName,
                 Marks = question.Marks,
@@ -530,5 +535,241 @@ namespace DemoMVC.WebUi.Controllers
                 return Json(new { success = true, questionId = QuestionId }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public ActionResult ExportQuestionAndAnswerData()
+        {
+            var dt = _questionService.GetQuestionAndAnswerExportData();
+
+            using (var wb = new XLWorkbook())
+            {
+                var ws = wb.Worksheets.Add("Questions");
+                ws.Cell(2, 1).InsertTable(dt);
+
+                // Add Title
+                ws.Cell("A1").Value = "Question and Answers Report";
+
+                // Design
+                CommonUtility.DesignExcelExport(ws, dt.Columns.Count);
+                var wrapColIndex = ws.FirstRowUsed().RowBelow().Cells()
+                .FirstOrDefault(c => c.Value.ToString() == "AnswerJson")?.Address.ColumnNumber ?? 0;
+
+                if (wrapColIndex > 0)
+                {
+                    ws.Column(wrapColIndex).Style.Alignment.WrapText = true;
+                }
+
+                // Export
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    stream.Position = 0;
+                    return File(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "QuestionExport.xlsx");
+                }
+            }
+        }
+        [HttpPost]
+        public ActionResult ImportExcel(HttpPostedFileBase excelFile)
+        {
+            if (excelFile == null || excelFile.ContentLength == 0)
+            {
+                TempData["Error"] = "Please upload a valid Excel file.";
+                return RedirectToAction("Index");
+            }
+            List<string> invalidQuestions = new List<string>();
+            List<Questions> validQuestions = new List<Questions>();
+            List<Answers> validAnswers = new List<Answers>();
+            List<string> subjects = _subjectService.GetAllSubjects().Select(x => x.SubjectCode).ToList();
+            List<string> questionTypes = _questionTypeService.GetAllQuestionTypes().Select(x => x.QuestionTypeCode).ToList();
+            List<string> difficultyLevel = _commonLookupService.GetLookupByType("QuestionDifficultyLevel").Select(x => x.Code).ToList();
+            int typeId=0;
+            int subjectId=0;
+            try
+            {
+                
+                using (var workbook = new XLWorkbook(excelFile.InputStream))
+                {
+                    var worksheet = workbook.Worksheet(1);
+                    var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // Skip header row
+
+                    foreach (var row in rows)
+                    {
+                        var questionText = row.Cell(1).Value.ToString();
+                        int marks;
+                        int.TryParse(row.Cell(2).Value.ToString(), out marks);
+                        marks = marks > 0 ? marks : 0;
+                        var questionType = row.Cell(3).Value.ToString().Replace(" ","");
+                        var subject = row.Cell(4).Value.ToString().Replace(" ", "");
+                        var difficulty = row.Cell(5).Value.ToString().Replace(" ", "");
+                        var answerJson = row.Cell(6).Value.ToString();
+
+                        //DeserializeObject of answerJson
+                        var answers = JsonConvert.DeserializeObject<List<AnswerImportModel>>(answerJson);
+
+                        //Get Id Of Type And Subject
+                        if (questionTypes.Contains(questionType))
+                        {
+                             typeId = _questionTypeService.GetQuestionTypetByCode(questionType).QuestionTypeId;
+                        }
+
+                        if (subjects.Contains(subject))
+                        {
+                            subjectId = _subjectService.GetSubjectByCode(subject).SubjectId;
+                        }
+
+                        if (questionText != null && questionText != "")
+                        {
+                            if (marks <= 0)
+                            {
+                                invalidQuestions.Add($"{row.RowNumber()} has invalid Marks");
+                            }
+                            else if (!questionTypes.Contains(questionType.ToUpper()) || questionType == null || typeId ==0)
+                            {
+                                invalidQuestions.Add($"{row.RowNumber()} has invalid Question Type");
+                            }
+                            else if (!subjects.Contains(subject.ToUpper()) || questionType == null || subjectId ==0)
+                            {
+                                invalidQuestions.Add($"{row.RowNumber()} has invalid Subject");
+                            }
+                            else if (!difficultyLevel.Contains(difficulty.ToUpper()) || questionType == null)
+                            {
+                                invalidQuestions.Add($"{row.RowNumber()} has invalid Question Difficulty");
+                            }
+                            else if (answers != null)
+                            {
+                                int CorrectCnt = 0;
+                                int OptionCnt = 0;
+                                foreach (var ans in answers)
+                                {
+
+                                    if (ans.AnswerText != null && ans.IsCorrect == true)
+                                    {
+                                        CorrectCnt++;
+                                        OptionCnt++;
+                                    }
+                                    else if (ans.AnswerText != null)
+                                    {
+                                        OptionCnt++;
+                                    }
+                                }
+
+                                if (CorrectCnt < 1 || OptionCnt < 1)
+                                {
+                                    invalidQuestions.Add($"{row.RowNumber()} has invalid . 0 correct answer");
+                                }
+                                else if (OptionCnt < 2 && (typeId == 1 || typeId == 2))
+                                {
+                                    invalidQuestions.Add($"{row.RowNumber()} has invalid . MCQ Must Have minimun 2 options");
+                                }
+                                else if (CorrectCnt > 1 && typeId != 1)
+                                {
+                                    invalidQuestions.Add($"{row.RowNumber()} has invalid Answer . SINGLEMCQ has only 1 correct answer");
+                                }
+                                else
+                                {
+                                    var question = new Questions
+                                    {
+                                        QuestionText = questionText,
+                                        Marks = marks,
+                                        IsActive = true,
+                                        QuestionTypeId = typeId,
+                                        SubjectId = subjectId,
+                                        Difficulty = difficulty.ToUpper(),
+                                        CreatedBy = SessionHelper.UserId,
+                                        CreatedOn = DateTime.Now
+                                    };
+
+                                    int questionId = _questionService.CreateQuestion(question);
+                                    foreach (var ans in answers)
+                                    {
+                                        var answer = new Answers
+                                        {
+                                            QuestionId = questionId, // FK link
+                                            AnswerText = ans.AnswerText,
+                                            IsCorrect = ans.IsCorrect,
+                                            CreatedOn = DateTime.Now
+                                        };
+
+                                        validAnswers.Add(answer);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            invalidQuestions.Add($"{row.RowNumber()} has Null Questions");
+                        }
+                    }
+
+                    if (invalidQuestions.Any())
+                    {
+                        TempData["InvalidQuestions"] = invalidQuestions;
+                        return RedirectToAction("Index", "Question");
+                    }
+                    _answerService.AddAnswers(validAnswers);
+                    
+                    TempData["Success"] = "Excel data imported successfully!";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error importing data: " + ex.Message;
+            }
+
+            return RedirectToAction("Index");
+        }
+        public ActionResult DownloadTemplate()
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Template");
+
+                // Header titles
+                var headers = new[] { "QuestionText", "Marks", "QuestionType", "Subject", "Difficulty", "Answers (JSON Format)" };
+
+                // Set headers
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    var cell = worksheet.Cell(1, i + 1);
+                    cell.Value = headers[i];
+                    cell.Style.Font.Bold = true;
+                    cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+                    cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                    cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    cell.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                }
+
+                // Sample data
+                worksheet.Cell(2, 1).Value = "What is Java?";
+                worksheet.Cell(2, 2).Value = 5;
+                worksheet.Cell(2, 3).Value = "SINGLEMCQ";
+                worksheet.Cell(2, 4).Value = "JAVA";
+                worksheet.Cell(2, 5).Value = "EASY";
+                worksheet.Cell(2, 6).Value = "[{\"answerText\":\"Java is a programming language\",\"isCorrect\":true},{\"answerText\":\"Java is a database\",\"isCorrect\":false}]";
+
+                // Style sample row
+                for (int i = 1; i <= headers.Length; i++)
+                {
+                    var cell = worksheet.Cell(2, i);
+                    cell.Style.Alignment.WrapText = true;
+                    cell.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    cell.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                }
+
+                worksheet.Columns().AdjustToContents(); // Auto-size columns
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Position = 0;
+                    return File(stream.ToArray(),
+                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                "QuestionTemplate.xlsx");
+                }
+            }
+        }
+
+
     }
 }

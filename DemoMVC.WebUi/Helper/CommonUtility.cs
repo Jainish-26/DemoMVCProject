@@ -561,8 +561,9 @@ namespace DemoMVC.WebUi.Helper
             var headerRange = ws.Range($"A2:{lastColumnLetter}2");
             headerRange.Style
                 .Font.SetBold()
+                .Font.SetFontColor(XLColor.White)
                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
-                .Fill.SetBackgroundColor(XLColor.DarkGreen);
+                .Fill.SetBackgroundColor(XLColor.AirForceBlue);
 
             // Auto-adjust column width for all columns
             for (int i = 1; i <= totalColumns; i++)
@@ -570,8 +571,11 @@ namespace DemoMVC.WebUi.Helper
                 ws.Column(i).AdjustToContents();
             }
 
-            ws.AutoFilter.Clear();
+            var table = ws.Tables.FirstOrDefault();
+            if (table != null)
+            {
+                table.ShowAutoFilter = false;
+            }
         }
-
     }
 }

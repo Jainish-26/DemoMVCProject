@@ -45,5 +45,9 @@ namespace DemoMVC.Service
         {
             return _subjectProvider.CheckDuplicateSubjectCode(subjectCode);
         }
+        public Subject GetSubjectByCode(string subjectCode)
+        {
+            return _subjectProvider.GetSubjectByCode(subjectCode);
+        }
     }
 }

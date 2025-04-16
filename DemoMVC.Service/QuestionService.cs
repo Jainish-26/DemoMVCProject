@@ -1,6 +1,7 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace DemoMVC.Service
@@ -58,6 +59,14 @@ namespace DemoMVC.Service
         public bool CheckQuestionInExam(int QuestionId)
         {
             return _questionProvider.CheckQuestionInExam(QuestionId);
+        }
+        public DataTable GetQuestionAndAnswerExportData()
+        {
+            return _questionProvider.GetQuestionAndAnswerExportData();
+        }
+        public void CreateQuestions(List<Questions> model)
+        {
+            _questionProvider.CreateQuestions(model);
         }
     }
 }

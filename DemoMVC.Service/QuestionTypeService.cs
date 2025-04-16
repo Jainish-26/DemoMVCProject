@@ -1,6 +1,7 @@
 ﻿using DemoMVC.Data;
 using DemoMVC.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace DemoMVC.Service
@@ -44,6 +45,14 @@ namespace DemoMVC.Service
         public List<QuestionType> CheckDuplicateQuestionTypeCode(string qTypeCode)
         {
             return _questionTypeProvider.CheckQuestionTypeCode(qTypeCode);
+        }
+        public DataTable GetQuestionType()
+        {
+            return _questionTypeProvider.GetQuestionType();
+        }
+        public QuestionType GetQuestionTypetByCode(string QuestionTypeCode)
+        {
+            return _questionTypeProvider.GetQuestionTypetByCode(QuestionTypeCode);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using DemoMVC.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -169,6 +171,57 @@ namespace DemoMVC.Data
             else
             {
                 return false;
+            }
+        }
+
+        public DataTable GetQuestionAndAnswerExportData()
+        {
+            var allData = (from q in _db.Questions
+                           join a in _db.Answers on q.QuestionId equals a.QuestionId
+                           join qt in _db.QuestionType on q.QuestionTypeId equals qt.QuestionTypeId
+                           join s in _db.Subject on q.SubjectId equals s.SubjectId
+                           select new
+                           {
+                               q.QuestionText,
+                               q.Marks,
+                               QuestionType = qt.QuestionTypeCode,
+                               Subject = s.SubjectCode,
+                               q.Difficulty,
+                               a.AnswerText,
+                               a.IsCorrect
+                           }).ToList();
+
+            var grouped = allData
+                .GroupBy(q => new {q.QuestionText, q.Marks, q.QuestionType, q.Subject, q.Difficulty })
+                .Select(g => new QuestionAnswerExport
+                {
+                    QuestionText = g.Key.QuestionText,
+                    Marks = g.Key.Marks,
+                    QuestionType = g.Key.QuestionType,
+                    Subject = g.Key.Subject,
+                    Difficulty = g.Key.Difficulty,
+                    AnswerJson = JsonConvert.SerializeObject(
+                        g.Select(a => new
+                        {
+                            a.AnswerText,
+                            a.IsCorrect
+                        })
+                    )
+                }).ToList();
+
+            return ToDataTable(grouped);
+        }
+
+        public void CreateQuestions(List<Questions> model)
+        {
+            try
+            {
+                _db.Questions.AddRange(model);
+                _db.SaveChanges();
+            }
+            catch(Exception e)
+            {
+                throw e;
             }
         }
     }

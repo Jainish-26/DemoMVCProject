@@ -63,6 +63,11 @@ namespace DemoMVC.Data
             return _db.Subject.Where(x => x.SubjectName == subjectName).FirstOrDefault();
         }
 
+        public Subject GetSubjectByCode(string subjectCode)
+        {
+            return _db.Subject.Where(x => x.SubjectCode == subjectCode).FirstOrDefault();
+        }
+
         public List<Subject> CheckDuplicateSubjectCode(string subjectCode)
         {
             var getsubjectDetails = (from subject in _db.Subject
