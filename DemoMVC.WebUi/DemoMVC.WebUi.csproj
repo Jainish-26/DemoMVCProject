@@ -2539,6 +2539,8 @@
     <Content Include="Views\UserExamCheck\CheckExam.cshtml" />
     <Content Include="Views\UserExam\TopScorers.cshtml" />
     <Content Include="Views\Question\_InvalidQuestionsPartial.cshtml" />
+    <Content Include="Views\Exam\GeneratePracticeTest.cshtml" />
+    <Content Include="Views\Exam\_GeneratePracticeTestPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

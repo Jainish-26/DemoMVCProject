@@ -1,0 +1,78 @@
+﻿@model DemoMVC.WebUi.Models.PracticeTestModel
+@{
+    ViewBag.Title = "Generate Practice Test";
+}
+<style>
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 15px;
+    }
+
+    .form-control, .form-select {
+        padding: 12px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        min-width: 130px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    .card {
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow rounded-4 p-4">
+                <h3 class="text-center mb-4 text-primary">📝 Generate Your Practice Test</h3>
+
+                @using (Html.BeginForm("GeneratePracticeTest", "Exam", FormMethod.Post))
+                {
+                    <!-- Subject Dropdown -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Subject</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-book"></i></span>
+                            @Html.DropDownListFor(model => model.SubjectId,
+                                new SelectList(Model._subjectList, "Value", "Text"),
+                                new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.SubjectId, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <!-- Difficulty Dropdown -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Difficulty Level</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
+                            @Html.DropDownListFor(model => model.Difficulty,
+                                new SelectList(Model._difficultyList, "Value", "Text"),
+                                new { @class = "form-select" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Difficulty, "", new { @class = "text-danger small" })
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill">
+                            Generate Test
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

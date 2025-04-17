@@ -16,9 +16,13 @@
     bool AllowedAdd = _base.CheckPermission(formCode, AccessPermission.IsAdd);
     bool AllowedView = _base.CheckPermission(formCode, AccessPermission.IsView);
     bool AllowedDelete = _base.CheckPermission(formCode, AccessPermission.IsDelete);
+
+    var test = ViewBag.Test;
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <style>
     .form-label {
         font-weight: 600;
@@ -55,7 +59,7 @@
     }
 </style>
 <div class="d-flex justify-content-between align-items-center m-3 flex-wrap gap-3">
-    <h2 class="fw-bold m-0">Exams</h2>
+    <h2 class="fw-bold mx-2">Exams</h2>
 
     <div class="d-flex align-items-center gap-2">
         <div class="input-group" style="min-width: 250px;">
@@ -71,8 +75,11 @@
 
         @Html.ActionLink("Create New", "Create", null, new
         {
-            @class = "btn btn-warning rounded-pill mx-2 px-4 shadow-sm fw-bold"
+            @class = "btn btn-warning  mx-2 px-4 shadow-sm fw-bold"
         })
+        <button class="btn btn-info mx-2 px-4 shadow-sm fw-bold" onclick="openGenerateTestModal()">Generate Test</button>
+
+
     </div>
 </div>
 <div class="common_white_box listingpage mx-4">
@@ -177,6 +184,23 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="generateTestModal" tabindex="-1" aria-labelledby="generateTestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generateTestModalLabel">Generate Test</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="generateTestModalBody">
+                <!-- Partial view will be loaded dynamically here -->
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     function getFilterData() {
@@ -305,11 +329,69 @@
             }
         });
     }
+    function openGenerateTestModal() {
+        $.ajax({
+            url: '@Url.Action("GeneratePracticeTest", "Exam")',
+            type: 'GET',
+            success: function (response) {
+                // Load the partial view into the modal body
+                $('#generateTestModalBody').html(response);
+                $('#generateTestModal').modal('show');
+            },
+            error: function () {
+                alert("Error loading the form.");
+            }
+        });
+    }
+    $(document).on('submit', '#generateTestForm', function (e) {
+        e.preventDefault();
 
+        var form = $(this);
 
+        if (!form.valid()) {
+            return;
+        }
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            success: function (response) {
+                if (response.success) {
+                    $('#generateTestModal').modal('hide');
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Test Generated Successfully!',
+                        text: response.message || "Test generated successfully!"
+                    });
+                    $('#gridExam').data('kendoGrid').dataSource.read();
+
+                } else if (!response.success && response.message) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message || "Something went wrong, please try again."
+                    });
+                } else if (response.errors) {
+                    $('.field-validation-error').text('');
+                    $('.text-danger').text('');
+
+                    $.each(response.errors, function (key, messages) {
+                        var errorMsg = messages[0];
+                        var errorSpan = $('[data-valmsg-for="' + key + '"]');
+                        errorSpan.text(errorMsg);
+                        errorSpan.addClass('text-danger');
+                    });
+                }
+            },
+            error: function () {
+                alert("Something went wrong.");
+            }
+        });
+    });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>

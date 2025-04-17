@@ -2,11 +2,16 @@
 using DemoMVC.Models;
 using DemoMVC.Service;
 using DemoMVC.WebUi.Models;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Vml.Spreadsheet;
 using Kendo.Mvc.Extensions;
 using Kendo.Mvc.UI;
+using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Web.Management;
 using System.Web.Mvc;
 
 namespace DemoMVC.WebUi.Controllers
@@ -22,6 +27,7 @@ namespace DemoMVC.WebUi.Controllers
         private readonly UserExamService _userExamService;
         private readonly UserAnswerService _userAnswerService;
         private readonly QuestionMediaService _questionMediaService;
+        private readonly SubjectService _subjectService;
 
         public ExamController()
         {
@@ -34,6 +40,7 @@ namespace DemoMVC.WebUi.Controllers
             _userExamService = new UserExamService();
             _userAnswerService = new UserAnswerService();
             _questionMediaService = new QuestionMediaService();
+            _subjectService = new SubjectService();
         }
         public ActionResult Index()
         {
@@ -474,6 +481,139 @@ namespace DemoMVC.WebUi.Controllers
             {
                 throw e;
             }
+        }
+
+        [HttpGet]
+        public ActionResult GeneratePracticeTest()
+        {
+            PracticeTestModel model = new PracticeTestModel();
+
+            BindLevel(ref model);
+            BindSubject(ref model);
+            return PartialView("_GeneratePracticeTestPartial", model);
+        }
+
+        public PracticeTestModel BindSubject(ref PracticeTestModel model)
+        {
+            var getSubject = _subjectService.GetAllSubjects();
+            model._subjectList.Add(new SelectListItem() { Text = "Select Subject", Value = "" });
+            foreach (var type in getSubject)
+            {
+                model._subjectList.Add(new SelectListItem() { Text = type.SubjectName.Trim(), Value = type.SubjectId.ToString() });
+            }
+
+            return model;
+        }
+
+        private PracticeTestModel BindLevel(ref PracticeTestModel model)
+        {
+            var data = _commonLookupService.GetLookupByType(LookupType.QuestionDifficultyLevel);
+            model._difficultyList.Add(new SelectListItem() { Text = "Select Level     ", Value = "" });
+            foreach (var item in data)
+            {
+                model._difficultyList.Add(new SelectListItem() { Text = item.Name, Value = item.Code });
+            }
+            return model;
+        }
+
+        [HttpPost]
+        public ActionResult GeneratePracticeTest(PracticeTestModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Json(new { success = false, errors });
+            }
+
+            int marks = 0;
+            List<ExamQuestions> examQuestions = new List<ExamQuestions>();
+            string subject = _subjectService.GetSubjectById(model.SubjectId).SubjectName;
+            Random rnd = new Random();
+            
+            var allQuestions = _questionService.GetAllQuestions()
+            .Where(x => x.SubjectId == model.SubjectId)
+            .Select(x => new
+            {
+                x.QuestionId,
+                x.Difficulty,
+                x.Marks
+            })
+            .ToList();
+
+                    // Return if no questions
+            if (allQuestions == null || allQuestions.Count == 0)
+            {
+                return Json(new { success = false, message = "Subject has no questions" });
+            }
+
+            var hardQuestions = allQuestions.Where(q => q.Difficulty == Constants.QuestionDifficultyLevel.HARD).OrderBy(x => rnd.Next()).ToList();
+            var mediumQuestions = allQuestions.Where(q => q.Difficulty == Constants.QuestionDifficultyLevel.MEDIUM).OrderBy(x => rnd.Next()).ToList();
+            var easyQuestions = allQuestions.Where(q => q.Difficulty == Constants.QuestionDifficultyLevel.EASY).OrderBy(x => rnd.Next()).ToList();
+
+            List<dynamic> sourceList = new List<dynamic>();
+
+            if (model.Difficulty == Constants.QuestionDifficultyLevel.HARD)
+            {
+                sourceList.AddRange(hardQuestions);
+                sourceList.AddRange(mediumQuestions); 
+                sourceList.AddRange(easyQuestions); 
+            }
+            else if (model.Difficulty == Constants.QuestionDifficultyLevel.MEDIUM)
+            {
+                sourceList.AddRange(mediumQuestions);
+                sourceList.AddRange(easyQuestions);  
+            }
+            else
+            {
+                sourceList.AddRange(easyQuestions);
+            }
+
+            foreach(var q in sourceList)
+            {
+                if (marks + q.Marks <= model.Marks)
+                {
+                    examQuestions.Add(new ExamQuestions
+                    {
+                        QuestionId = q.QuestionId,
+                        Marks = q.Marks
+                    });
+                    marks += q.Marks;
+
+                    if (marks >= model.Marks)
+                        break;
+                }
+            }
+
+            if (examQuestions.Any())
+            {
+                var exam = new Exams
+                {
+                    ExamName = subject+model.Difficulty+DateTime.UtcNow.ToString().Replace(" ",""),
+                    ExamCode = subject + model.Difficulty + DateTime.UtcNow.ToString().Replace(" ", "").ToUpper(),
+                    ExamStatus = marks == model.Marks ? Constants.ExamStatus.PUBLISHED : Constants.ExamStatus.DRAFT,
+                    TotalMarks = model.Marks,
+                    DurationMin = model.DurationMin,
+                    PassingMarks = (int)(33 * model.Marks / 100),
+                    IsActive = true,
+                    CreatedBy = SessionHelper.UserId,
+                    CreatedOn = DateTime.UtcNow,
+                };
+                int examId = _examService.CreateExam(exam);
+
+                examQuestions.ForEach(x => x.ExamId = examId);
+
+                _examQuestionsService.AddAllQuestions(examQuestions);
+
+                return Json(new { success = true, message = "Exam Created Successully" });
+            }
+
+            return View("Index");
         }
     }
 }

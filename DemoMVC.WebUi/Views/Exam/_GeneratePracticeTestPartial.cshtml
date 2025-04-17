@@ -1,0 +1,64 @@
+﻿@model DemoMVC.WebUi.Models.PracticeTestModel
+<style>
+    /* Custom CSS for styling form elements */
+    .form-label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        min-height: 50px;
+        min-width border-radius: 0.375rem; /* For rounded corners */
+    }
+
+    .custom-dropdown {
+        width: 100%; /* Set the dropdown width to 100% */
+        max-width: 300px; /* Set a maximum width for better control */
+        padding: 0.5rem; /* Add padding to make the dropdown larger */
+    }
+
+    /* Style for validation error messages */
+    label.error, .error {
+        color: red;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Adjust the margin for the modal footer button */
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1rem;
+    }
+</style>
+<form id="generateTestForm" action="@Url.Action("GeneratePracticeTest", "Exam")" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.SubjectId)
+        @Html.DropDownListFor(m => m.SubjectId, Model._subjectList, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.SubjectId, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Difficulty)
+        @Html.DropDownListFor(m => m.Difficulty, Model._difficultyList, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Difficulty, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Marks)
+        @Html.TextBoxFor(m => m.Marks, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Marks, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.DurationMin)
+        @Html.TextBoxFor(m => m.DurationMin, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.DurationMin, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Generate</button>
+    </div>
+</form>

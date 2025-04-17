@@ -39,7 +39,7 @@ namespace DemoMVC.Data
                         Marks = q.Marks,
                         Difficulty = q.Difficulty,
                         IsActive = q.IsActive,
-                    }).AsQueryable();
+                    }).AsQueryable().OrderByDescending(x => x.QuestionId);
         }
 
 
