@@ -519,6 +519,48 @@ namespace DemoMVC.WebUi.Controllers
         [HttpPost]
         public ActionResult GeneratePracticeTest(PracticeTestModel model)
         {
+            int requiredMarks = 0;
+
+            switch (model.Difficulty)
+            {
+                case Constants.QuestionDifficultyLevel.EASY:
+                    requiredMarks = 30;
+                    break;
+                case Constants.QuestionDifficultyLevel.MEDIUM:
+                    requiredMarks = 45;
+                    break;
+                case Constants.QuestionDifficultyLevel.HARD:
+                    requiredMarks = 60;
+                    break;
+            }
+
+            if (model.Marks < requiredMarks)
+            {
+                // Add a custom error to ModelState
+                ModelState.AddModelError("Marks", $"Minimum marks for {model.Difficulty} level exam is {requiredMarks}.");
+            }
+
+            int requiredMinutes = 0;
+
+            switch (model.Difficulty)
+            {
+                case Constants.QuestionDifficultyLevel.EASY:
+                    requiredMinutes = 30;
+                    break;
+                case Constants.QuestionDifficultyLevel.MEDIUM:
+                    requiredMinutes = 45;
+                    break;
+                case Constants.QuestionDifficultyLevel.HARD:
+                    requiredMinutes = 60;
+                    break;
+            }
+
+            if (model.DurationMin < requiredMinutes)
+            {
+                // Add a custom error to ModelState
+                ModelState.AddModelError("DurationMin", $"Minimum minutes for {model.Difficulty} level exam is {requiredMinutes}.");
+            }
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
@@ -535,7 +577,21 @@ namespace DemoMVC.WebUi.Controllers
             List<ExamQuestions> examQuestions = new List<ExamQuestions>();
             string subject = _subjectService.GetSubjectById(model.SubjectId).SubjectName;
             Random rnd = new Random();
-            
+
+            var markRatios = new Dictionary<string, (double easyRatio, double mediumRatio, double hardRatio)>
+            {
+                { "EASY", (0.7, 0.3, 0.0) },
+                { "MEDIUM", (0.4, 0.4, 0.2) },
+                { "HARD", (0.2, 0.3, 0.5) },
+            };
+
+            var total = model.Marks;
+            var ratios = markRatios[model.Difficulty];
+
+            int easyMarks = (int)(ratios.easyRatio * total);
+            int mediumMarks = (int)(ratios.mediumRatio * total);
+            int hardMarks = total - easyMarks - mediumMarks;
+
             var allQuestions = _questionService.GetAllQuestions()
             .Where(x => x.SubjectId == model.SubjectId)
             .Select(x => new
@@ -560,33 +616,55 @@ namespace DemoMVC.WebUi.Controllers
 
             if (model.Difficulty == Constants.QuestionDifficultyLevel.HARD)
             {
-                sourceList.AddRange(hardQuestions);
-                sourceList.AddRange(mediumQuestions); 
-                sourceList.AddRange(easyQuestions); 
+                sourceList.AddRange(hardQuestions.OrderByDescending(x=>x.Marks));
+                sourceList.AddRange(mediumQuestions.OrderByDescending(x => x.Marks)); 
+                sourceList.AddRange(easyQuestions.OrderByDescending(x => x.Marks)); 
             }
             else if (model.Difficulty == Constants.QuestionDifficultyLevel.MEDIUM)
             {
-                sourceList.AddRange(mediumQuestions);
-                sourceList.AddRange(easyQuestions);  
+                sourceList.AddRange(hardQuestions.OrderByDescending(x => x.Marks));
+                sourceList.AddRange(mediumQuestions.OrderByDescending(x => x.Marks));
+                sourceList.AddRange(easyQuestions.OrderByDescending(x => x.Marks));  
             }
             else
             {
-                sourceList.AddRange(easyQuestions);
+                sourceList.AddRange(mediumQuestions.OrderByDescending(x => x.Marks));
+                sourceList.AddRange(easyQuestions.OrderByDescending(x => x.Marks));
             }
 
+
+            int easy = 0, medium = 0, hard = 0;
             foreach(var q in sourceList)
             {
-                if (marks + q.Marks <= model.Marks)
+                if(total >= easy + medium + hard)
                 {
-                    examQuestions.Add(new ExamQuestions
+                    if(easy + q.Marks <= easyMarks && q.Difficulty == Constants.QuestionDifficultyLevel.EASY)
                     {
-                        QuestionId = q.QuestionId,
-                        Marks = q.Marks
-                    });
-                    marks += q.Marks;
-
-                    if (marks >= model.Marks)
-                        break;
+                        examQuestions.Add(new ExamQuestions
+                        {
+                            QuestionId = q.QuestionId,
+                            Marks = q.Marks
+                        });
+                        easy += q.Marks;
+                    }
+                    else if (medium + q.Marks <= mediumMarks && q.Difficulty == Constants.QuestionDifficultyLevel.MEDIUM)
+                    {
+                        examQuestions.Add(new ExamQuestions
+                        {
+                            QuestionId = q.QuestionId,
+                            Marks = q.Marks
+                        });
+                        medium += q.Marks;
+                    }
+                    else if (hard + q.Marks <= hardMarks && q.Difficulty == Constants.QuestionDifficultyLevel.HARD)
+                    {
+                        examQuestions.Add(new ExamQuestions
+                        {
+                            QuestionId = q.QuestionId,
+                            Marks = q.Marks
+                        });
+                        hard += q.Marks;
+                    }
                 }
             }
 

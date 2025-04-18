@@ -552,12 +552,6 @@ namespace DemoMVC.WebUi.Helper
         { 
             string lastColumnLetter = XLHelper.GetColumnLetterFromNumber(totalColumns); 
 
-             ws.Range($"A1:{lastColumnLetter}1").Merge().Style
-            .Font.SetBold()
-            .Font.SetFontSize(16)
-            .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center)
-            .Fill.SetBackgroundColor(XLColor.LightBlue);
-
             var headerRange = ws.Range($"A2:{lastColumnLetter}2");
             headerRange.Style
                 .Font.SetBold()

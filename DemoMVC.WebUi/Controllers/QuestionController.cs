@@ -545,9 +545,6 @@ namespace DemoMVC.WebUi.Controllers
                 var ws = wb.Worksheets.Add("Questions");
                 ws.Cell(2, 1).InsertTable(dt);
 
-                // Add Title
-                ws.Cell("A1").Value = "Question and Answers Report";
-
                 // Design
                 CommonUtility.DesignExcelExport(ws, dt.Columns.Count);
                 var wrapColIndex = ws.FirstRowUsed().RowBelow().Cells()
@@ -662,7 +659,7 @@ namespace DemoMVC.WebUi.Controllers
                                 {
                                     invalidQuestions.Add($"{row.RowNumber()} has invalid . MCQ Must Have minimun 2 options");
                                 }
-                                else if (CorrectCnt > 1 && typeId != 1)
+                                else if (CorrectCnt > 1 && typeId == 1)
                                 {
                                     invalidQuestions.Add($"{row.RowNumber()} has invalid Answer . SINGLEMCQ has only 1 correct answer");
                                 }

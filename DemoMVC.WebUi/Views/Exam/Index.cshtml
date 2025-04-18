@@ -351,6 +351,7 @@
         if (!form.valid()) {
             return;
         }
+
         $.ajax({
             url: form.attr('action'),
             method: 'POST',
@@ -364,18 +365,22 @@
                         title: 'Test Generated Successfully!',
                         text: response.message || "Test generated successfully!"
                     });
-                    $('#gridExam').data('kendoGrid').dataSource.read();
 
-                } else if (!response.success && response.message) {
+                    $('#gridExam').data('kendoGrid').dataSource.read();
+                }
+                else if (!response.success && response.message) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
                         text: response.message || "Something went wrong, please try again."
                     });
-                } else if (response.errors) {
+                }
+                else if (response.errors) {
+                    // Clear previous errors
                     $('.field-validation-error').text('');
                     $('.text-danger').text('');
 
+                    // Show new errors
                     $.each(response.errors, function (key, messages) {
                         var errorMsg = messages[0];
                         var errorSpan = $('[data-valmsg-for="' + key + '"]');
@@ -389,6 +394,19 @@
             }
         });
     });
+
+    // ✅ Live clearing of field-specific error messages
+    $(document).on('input change', '#generateTestForm input, #generateTestForm select, #generateTestForm textarea', function () {
+        var fieldName = $(this).attr('name');
+        var errorSpan = $('[data-valmsg-for="' + fieldName + '"]');
+
+        // Optional: Only remove error if value is not empty (adjust this based on need)
+        if ($(this).val()) {
+            errorSpan.text('');
+            errorSpan.removeClass('text-danger');
+        }
+    });
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>

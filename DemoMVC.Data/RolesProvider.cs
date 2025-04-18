@@ -98,7 +98,7 @@ namespace DemoMVC.Data
 
         public List<RoleUserCountModel> GetRolesWithUserCount()
         {
-            var data = _db.webpages_Roles
+            var data = _db.webpages_Roles.Where(x=>x.RoleCode != "SADMIN")
             .GroupJoin(
                 _db.webpages_UsersInRoles,
                 role => role.RoleId,
